@@ -1,0 +1,22 @@
+<div class="demo-container">
+  <div class="current-value">
+    <h3>Messaggio Corrente:</h3>
+    <div class="value-display">{{ currentMessage }}</div>
+  </div>
+
+  <div class="controls">
+    <input
+      type="text"
+      #messageInput
+      placeholder="Scrivi un nuovo messaggio..."
+      class="message-input"
+      (keyup.enter)="updateMessage(messageInput.value); messageInput.value = ''"
+    />
+    <button (click)="updateMessage(messageInput.value); messageInput.value = ''" class="btn btn-primary">
+      📝 Aggiorna
+    </button>
+    <button (click)="resetMessage()" class="btn btn-secondary">
+      🔄 Reset
+    </button>
+  </div>
+</div>

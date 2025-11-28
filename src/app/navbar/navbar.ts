@@ -52,8 +52,8 @@ export class Navbar {
       label: 'State',
       icon: 'store',
       items: [
-        { label: 'NgRx', route: '/state/ngrx', icon: 'store' },
         { label: 'BehaviorSubject', route: '/state/behavior-subject', icon: 'signals' },
+        { label: 'NgRx', route: '/state/ngrx', icon: 'store' },
       ],
     },
     {

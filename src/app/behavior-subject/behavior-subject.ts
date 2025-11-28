@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { PageHeader } from '../page-header/page-header';
 import { CodeBlock } from '../components/code-block/code-block';
+import { MessageDemo } from './message-demo/message-demo';
 
 interface Message {
   text: string;
@@ -12,7 +13,7 @@ interface Message {
 @Component({
   selector: 'app-behavior-subject',
   standalone: true,
-  imports: [CommonModule, PageHeader, CodeBlock],
+  imports: [CommonModule, PageHeader, CodeBlock, MessageDemo],
   templateUrl: './behavior-subject.html',
   styleUrl: './behavior-subject.scss'
 })

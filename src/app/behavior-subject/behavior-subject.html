@@ -89,26 +89,7 @@
     <h2>Demo 1: Gestione Messaggio</h2>
     <p>Questo esempio mostra come un BehaviorSubject mantiene e aggiorna un valore.</p>
 
-    <div class="demo-container">
-      <div class="current-value">
-        <h3>Messaggio Corrente:</h3>
-        <div class="value-display">{{ currentMessage }}</div>
-      </div>
-
-      <div class="controls">
-        <input
-          type="text"
-          placeholder="Nuovo messaggio..."
-          #messageInput
-          class="message-input">
-        <button (click)="updateMessage(messageInput.value); messageInput.value = ''" class="btn btn-primary">
-          Aggiorna Messaggio
-        </button>
-        <button (click)="resetMessage()" class="btn btn-secondary">
-          Reset
-        </button>
-      </div>
-    </div>
+    <app-message-demo />
   </section>
 
   <!-- Demo Interattiva: Contatore -->
