@@ -17,39 +17,59 @@ export const routes: Routes = [
     component: Home,
   },
   {
-    path: 'forms',
-    component: Forms,
+    path: 'basics',
+    children: [
+      {
+        path: 'data-binding',
+        component: DataBinding,
+      },
+      {
+        path: 'directives',
+        component: Directives,
+      },
+      {
+        path: 'forms',
+        component: Forms,
+      },
+    ],
   },
   {
-    path: 'data-binding',
-    component: DataBinding,
+    path: 'advanced',
+    children: [
+      {
+        path: 'signals',
+        component: Signals,
+      },
+      {
+        path: 'http',
+        component: HttpExample,
+      },
+    ],
   },
   {
-    path: 'directives',
-    component: Directives,
+    path: 'state',
+    children: [
+      {
+        path: 'ngrx',
+        component: NgrxExample,
+      },
+      {
+        path: 'behavior-subject',
+        component: BehaviorSubjectComponent,
+      },
+    ],
   },
   {
-    path: 'signals',
-    component: Signals,
-  },
-  {
-    path: 'http',
-    component: HttpExample,
-  },
-  {
-    path: 'users',
-    component: UserPage,
-  },
-  {
-    path: 'ngrx',
-    component: NgrxExample,
+    path: 'examples',
+    children: [
+      {
+        path: 'users',
+        component: UserPage,
+      },
+    ],
   },
   {
     path: 'code-block-demo',
     component: CodeBlockDemo,
-  },
-  {
-    path: 'behavior-subject',
-    component: BehaviorSubjectComponent,
   },
 ];

@@ -1,43 +1,47 @@
 <nav class="nav">
-  <a
-    routerLink=""
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{ exact: true }"
-    class="nav-link"
-  >
-    <app-icon name="home" />
-    Home
-  </a>
-  <a routerLink="data-binding" routerLinkActive="active" class="nav-link">
-    <app-icon name="data-binding" />
-    Data Binding
-  </a>
-  <a routerLink="directives" routerLinkActive="active" class="nav-link">
-    <app-icon name="directives" />
-    Directives
-  </a>
-  <a routerLink="forms" routerLinkActive="active" class="nav-link">
-    <app-icon name="form" />
-    Forms
-  </a>
-  <a routerLink="signals" routerLinkActive="active" class="nav-link">
-    <app-icon name="signals" />
-    Signals
-  </a>
-  <a routerLink="http" routerLinkActive="active" class="nav-link">
-    <app-icon name="http" />
-    HTTP
-  </a>
-  <a routerLink="users" routerLinkActive="active" class="nav-link">
-    <app-icon name="users" />
-    Users
-  </a>
-  <a routerLink="ngrx" routerLinkActive="active" class="nav-link">
-    <app-icon name="store" />
-    NgRx
-  </a>
-  <a routerLink="behavior-subject" routerLinkActive="active" class="nav-link">
-    <app-icon name="signals" />
-    BehaviorSubject
-  </a>
+  <!-- Main Items -->
+  @for (item of mainItems; track item.route) {
+    <a
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: !!item.exact }"
+      class="nav-link"
+      (click)="closeDropdown()"
+    >
+      <app-icon [name]="item.icon" class="nav-icon" />
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  }
+
+  <!-- Dropdown Groups -->
+  @for (group of groups; track group.label) {
+    <div class="nav-dropdown" [class.open]="openDropdown() === group.label">
+      <button
+        class="nav-link dropdown-trigger"
+        [class.active]="isGroupActive(group)"
+        (click)="toggleDropdown(group.label)"
+        type="button"
+      >
+        <app-icon [name]="group.icon" class="nav-icon" />
+        <span class="nav-label">{{ group.label }}</span>
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+          <path d="M6 8L2 4h8z"/>
+        </svg>
+      </button>
+
+      <div class="dropdown-menu">
+        @for (item of group.items; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="dropdown-item"
+            (click)="closeDropdown()"
+          >
+            <app-icon [name]="item.icon" class="dropdown-icon" />
+            <span class="dropdown-label">{{ item.label }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
 </nav>
