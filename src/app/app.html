@@ -1,9 +1,14 @@
-<app-navbar></app-navbar>
+<div appLinkInterceptor>
+  <app-navbar></app-navbar>
 
-<main class="main">
-  <!--/* ROUTER OUTLET */-->
-  <router-outlet></router-outlet>
-</main>
+  <main class="main">
+    <!--/* ROUTER OUTLET */-->
+    <router-outlet></router-outlet>
+  </main>
 
-<!-- Componente loghi rimbalzanti -->
-<app-bouncing-logo></app-bouncing-logo>
+  <!-- Componente loghi rimbalzanti -->
+  <app-bouncing-logo></app-bouncing-logo>
+</div>
+
+<!-- Modale per link esterni/interni -->
+<app-link-modal></app-link-modal>

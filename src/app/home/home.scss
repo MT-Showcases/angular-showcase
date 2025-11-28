@@ -97,6 +97,10 @@
       transform: translateY(-4px);
       box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
     }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   }
 }
 

@@ -1,0 +1,82 @@
+@use 'sass:math';
+
+$base: 16;
+$base-vh: 900;
+
+@function rem($size) {
+  @return calc($size / $base) * 1rem;
+}
+
+@function vw($size, $base-vw: 375) {
+  @return calc($size / $base-vw) * 100vw;
+}
+
+@function vh($size) {
+  @return calc($size / $base-vh) * 100vh;
+}
+
+@function vh($size) {
+  @return calc($size / $base-vh) * 100vh;
+}
+
+@mixin flex(
+  $justify-content: initial,
+  $align-items: initial,
+  $flex-direction: row,
+  $flex-wrap: initial,
+  $display: flex
+) {
+  display: $display;
+
+  @if $justify-content != initial {
+    justify-content: $justify-content;
+  }
+
+  @if $align-items != initial {
+    align-items: $align-items;
+  }
+
+  @if $flex-direction != row {
+    flex-direction: $flex-direction;
+  }
+
+  @if $flex-wrap != initial {
+    flex-wrap: $flex-wrap;
+  }
+}
+
+@mixin animated-underline {
+  position: relative;
+
+  &:after {
+    content: '';
+    display: block;
+
+    width: 0;
+    height: rem(1);
+
+    background: currentcolor;
+
+    position: absolute;
+    top: 100%;
+    left: 0;
+
+    transition: $transition;
+  }
+}
+
+@mixin media-min-breakpoint($breakpoint) {
+  @if map-has-key($grid-breakpoints, $breakpoint) {
+    @media (min-width: calc(map-get($grid-breakpoints, $breakpoint) - 0.1px)) {
+      @content;
+    }
+  }
+}
+
+@mixin media-max-breakpoint($breakpoint) {
+  @if map-has-key($grid-breakpoints, $breakpoint) {
+    @media (max-width: calc(map-get($grid-breakpoints, $breakpoint) - 0.1px)) {
+      @content;
+    }
+  }
+}

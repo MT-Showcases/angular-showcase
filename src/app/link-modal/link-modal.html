@@ -1,0 +1,20 @@
+<div class="modal-backdrop" *ngIf="isOpen()" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ content()?.title || 'Contenuto' }}</h2>
+      <button class="close-button" (click)="close()" aria-label="Chiudi modale">
+        <app-icon name="close"></app-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      @if (content()?.type === 'external') {
+      <iframe [src]="safeUrl()" class="modal-iframe" frameborder="0" allowfullscreen></iframe>
+      } @else if (content()?.type === 'component') {
+      <div class="modal-component-wrapper">
+        <ng-container #dynamicComponentContainer></ng-container>
+      </div>
+      }
+    </div>
+  </div>
+</div>

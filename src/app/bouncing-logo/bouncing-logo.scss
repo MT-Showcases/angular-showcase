@@ -1,7 +1,7 @@
 // Logo Angular che rimbalza per la pagina stile DVD screensaver
 .floating-logo {
   position: fixed;
-  z-index: 9999;
+  z-index: 9998; // Sotto i controlli
   cursor: pointer; // Indica che è cliccabile
   user-select: none;
   will-change: top, left; // Ottimizzazione per animazioni smooth
@@ -120,20 +120,29 @@
   left: 0;
   right: 0;
   height: 150px;
-  z-index: 9999;
+  z-index: 9998;
   pointer-events: none; // Non blocca interazioni con i loghi
   background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
 }
 
 // Controlli per i loghi (fissi in basso a destra)
 .logo-controls {
+  width: 100%;
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 10000;
+  bottom: 0;
+  left: 0;
+  z-index: 9998;
 
   display: flex;
   gap: 12px;
+
+  padding: 12px;
+
+  @media screen and (min-width: 768px) {
+    justify-content: flex-end;
+
+    padding: 16px;
+  }
 
   &__button {
     display: flex;
