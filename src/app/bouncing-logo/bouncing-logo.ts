@@ -50,7 +50,7 @@ export class BouncingLogo implements OnInit, OnDestroy {
   private readonly TOPICS = [
     { icon: 'data-binding', title: 'Data Binding' },
     { icon: 'directives', title: 'Directives' },
-    { icon: 'forms', title: 'Forms' },
+    { icon: 'form', title: 'Forms' },
     { icon: 'users', title: 'Users' },
     { icon: 'signals', title: 'Signals' },
   ];
