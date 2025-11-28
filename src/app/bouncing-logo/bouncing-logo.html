@@ -9,12 +9,12 @@
   (click)="onLogoClick(logo, $event)"
 >
   @if (logo.contentType === 'logo') {
-    <img src="/logo.png" alt="Angular Logo" [style.width.px]="logo.size" />
+  <img src="/logo.png" alt="Angular Logo" [style.width.px]="logo.size" />
   } @else {
-    <div class="floating-logo__topic-content">
-      <app-icon [name]="logo.topicIcon!" />
-      <span class="floating-logo__topic-title">{{ logo.topicTitle }}</span>
-    </div>
+  <div class="floating-logo__topic-content">
+    <app-icon [name]="logo.topicIcon!" />
+    <span class="floating-logo__topic-title">{{ logo.topicTitle }}</span>
+  </div>
   }
 </div>
 }
@@ -27,7 +27,7 @@
   <!-- Bottone per spawnare manualmente un logo -->
   <button class="logo-controls__button logo-controls__button--spawn" (click)="spawnLogo()">
     <app-icon name="plus" />
-    <span class="logo-controls__text">Spawna Logo / Topic</span>
+    <span class="logo-controls__text">Random Topic</span>
   </button>
 
   <!-- Toggle per controllare lo spawn automatico -->
@@ -38,7 +38,7 @@
   >
     <app-icon [name]="isSpawnEnabled() ? 'pause' : 'play'" />
     <span class="logo-controls__text">
-      {{ isSpawnEnabled() ? 'Disattiva' : 'Attiva' }} Auto Spawn
+      {{ isSpawnEnabled() ? 'Disattiva' : 'Attiva' }} Auto Random Topic
     </span>
   </button>
 </div>

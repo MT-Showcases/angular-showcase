@@ -40,7 +40,7 @@ export class BouncingLogo implements OnInit, OnDestroy {
 
   private readonly SIZE_MULTIPLIERS = [
     { multiplier: 1, probability: 0.6 }, // 60% - dimensione normale (0.8-1.2x)
-    { multiplier: 4, probability: 0.1 }, // 10%  - dimensione quadrupla
+    { multiplier: 3, probability: 0.1 }, // 10%  - dimensione tripla
   ];
 
   private readonly SHINY_PROBABILITY = 0.05; // 5% - probabilità logo "shiny" con gradiente animato
@@ -169,17 +169,19 @@ export class BouncingLogo implements OnInit, OnDestroy {
     const velocityX = (Math.random() > 0.5 ? 1 : -1) * this.BASE_VELOCITY * velocityMultiplier;
     const velocityY = (Math.random() > 0.5 ? 1 : -1) * this.BASE_VELOCITY * velocityMultiplier;
 
-    // Determina se il logo è "shiny" (raro!)
+    // Determina se il logo è "shiny" (raro 5%!)
     const isShiny = Math.random() < this.SHINY_PROBABILITY;
 
-    // Se è shiny, mostra sempre il logo Angular, altrimenti scegli casualmente tra logo e topic
-    let contentType: 'logo' | 'topic' = 'logo';
+    // Se è shiny, mostra il logo Angular shiny, altrimenti mostra sempre un topic
+    let contentType: 'logo' | 'topic' = 'topic';
     let topicIcon: string | undefined;
     let topicTitle: string | undefined;
 
-    if (!isShiny && Math.random() > 0.5) {
-      // 50% probabilità di mostrare un topic invece del logo
-      contentType = 'topic';
+    if (isShiny) {
+      // 5% - Logo Angular shiny
+      contentType = 'logo';
+    } else {
+      // 95% - Mostra un topic casuale
       const randomTopic = this.TOPICS[Math.floor(Math.random() * this.TOPICS.length)];
       topicIcon = randomTopic.icon;
       topicTitle = randomTopic.title;
