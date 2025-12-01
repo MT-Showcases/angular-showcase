@@ -3,8 +3,22 @@
 > **📚 Detailed Documentation**: This file provides a high-level overview. For detailed guidelines, see:
 > - [Project Structure](./copilot-instructions/project-structure.md) - Directory organization and file naming
 > - [Styling Conventions](./copilot-instructions/styling-conventions.md) - SCSS best practices (mobile-first, rem(), BEM)
+> - [Commenting Standards](./copilot-instructions/commenting-standards.md) - File headers, pattern comments, AI-assisted conventions
 > - [Reusable Components](./copilot-instructions/reusable-components.md) - Component documentation standards
 > - [TypeScript Conventions](./copilot-instructions/typescript.md) - TypeScript best practices (TODO)
+
+## 🤖 AI-Assisted Development Approach
+
+This project is **AI-assistant friendly** while remaining fully human-readable. Code is structured so that tools like GitHub Copilot can recognize patterns, generate consistent code, and maintain documentation standards—but the architecture is idiomatic Angular that any developer can understand and modify.
+
+**Key principles:**
+- 📝 File-level headers describe component type, role, patterns, and contributor notes
+- 🏗️ Pattern comments label recurring architectural constructs
+- 🎯 Micro-comments only for non-obvious decisions
+- ✅ Consistent naming and structure across similar files
+- 👥 Human-first code + AI-assisted efficiency
+
+See [Commenting Standards](./copilot-instructions/commenting-standards.md) for complete guidelines.
 
 ## 🌍 Language Policy
 

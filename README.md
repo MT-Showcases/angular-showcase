@@ -156,12 +156,15 @@ Our vision unfolds in phases:
 
 ### Phase 2: Progressive Depth (In Progress - Q1 2026)
 - [x] Comprehensive documentation structure (Styling, Components, Project Structure)
+- [x] AI-assisted development approach and commenting standards
+- [x] File-level headers and pattern comments applied to core components
 - [ ] Expandable concept cards with multiple depth levels
 - [ ] Side panel system for related topics
 - [ ] Internal hyperlink network (zero external redirects)
 - [ ] Breadcrumb navigation for context retention
 - [ ] Search with instant preview modals
 - [ ] TypeScript conventions documentation
+- [ ] Apply commenting standards to all remaining components
 
 ### Phase 3: Interactive Sandboxes (Q2 2026)
 - [ ] Live code editor integration
@@ -219,6 +222,64 @@ Success for us means:
 
 ---
 
+## 🤖 AI-Assisted Development
+
+This project is intentionally **AI-assistant friendly** while remaining fully human-readable and maintainable.
+
+### Why AI-Assisted?
+
+The codebase is structured and commented so that tools like **GitHub Copilot** or **ChatGPT** can:
+- ✅ Recognize recurring patterns (container/presentational, facades, store patterns, etc.)
+- ✅ Generate new examples and sections consistent with existing architecture
+- ✅ Maintain highly consistent comments and documentation across similar files
+- ✅ Speed up repetitive tasks while preserving code quality
+
+### AI-Friendly ≠ AI-Only
+
+**This is still idiomatic, clean Angular code:**
+- 👥 Fully readable and editable by humans
+- 📖 Comments focus on *role* and *responsibilities*, not trivial details
+- 🏗️ Patterns are clearly labeled (e.g., "PATTERN: Facade service")
+- ✨ Follows modern Angular best practices (standalone components, Signals, etc.)
+
+### Comment Standards
+
+**File-level headers** describe component type, section, role, patterns, and contributor notes:
+```typescript
+// COMPONENT TYPE: Container | Presentational | Shared UI
+// SECTION: High-level area (e.g., "Angular Signals", "HTTP")
+//
+// ROLE:
+// - What this file is responsible for
+//
+// PATTERNS USED:
+// - Container/Presentational split
+// - Signals for local UI state
+//
+// NOTES FOR CONTRIBUTORS:
+// - Guidelines for future modifications
+```
+
+**Pattern comments** label recurring architectural patterns:
+```typescript
+// PATTERN: Facade service
+// PURPOSE:
+// - Expose simplified API to components
+// - Hide implementation details
+```
+
+**Micro-comments** only where truly needed (non-obvious decisions, trade-offs, educational simplifications).
+
+For complete commenting standards, see [Copilot Instructions](./.github/copilot-instructions.md).
+
+### Working With or Without AI
+
+- ✅ **With AI tools**: Speed up repetitive tasks, maintain consistency
+- ✅ **Without AI tools**: Code is fully understandable and maintainable
+- 🎯 **Best of both worlds**: Human-first architecture + AI-assisted efficiency
+
+---
+
 ## 📚 Technical Documentation
 
 Complete technical documentation for developers is available in the `.github/copilot-instructions/` folder:
@@ -227,6 +288,7 @@ Complete technical documentation for developers is available in the `.github/cop
 - [📘 **Copilot Instructions**](./.github/copilot-instructions.md) - Complete project overview, architecture, and conventions
 - [📐 **Project Structure**](./.github/copilot-instructions/project-structure.md) - Directory organization, file naming, and path aliases
 - [🎨 **Styling Conventions**](./.github/copilot-instructions/styling-conventions.md) - SCSS best practices, mobile-first approach, BEM methodology
+- [💬 **Commenting Standards**](./.github/copilot-instructions/commenting-standards.md) - File headers, pattern comments, AI-assisted conventions
 - [🧩 **Reusable Components**](./.github/copilot-instructions/reusable-components.md) - Component documentation standards and guidelines
 
 ### Quick Reference
