@@ -1,22 +1,27 @@
 <!-- Loghi Angular animati che rimbalzano come il logo DVD -->
 @for (logo of bouncingLogos(); track logo.id) {
-<div
-  class="floating-logo"
-  [class.floating-logo--shiny]="logo.isShiny"
-  [class.floating-logo--topic]="logo.contentType === 'topic'"
-  [style.top.px]="logo.top"
-  [style.left.px]="logo.left"
-  (click)="onLogoClick(logo, $event)"
->
-  @if (logo.contentType === 'logo') {
-  <img src="/logo.png" alt="Angular Logo" [style.width.px]="logo.size" />
-  } @else {
-  <div class="floating-logo__topic-content">
-    <app-icon [name]="logo.topicIcon!" />
-    <span class="floating-logo__topic-title">{{ logo.topicTitle }}</span>
+  <div
+    class="floating-logo"
+    [class.floating-logo--shiny]="logo.isShiny"
+    [class.floating-logo--topic]="logo.contentType === 'topic'"
+    [style.top.px]="logo.top"
+    [style.left.px]="logo.left"
+    (click)="onLogoClick(logo, $event)"
+  >
+    @if (logo.contentType === 'logo') {
+      <img
+        class="floating-logo__image"
+        src="/logo.png"
+        alt="Angular Logo"
+        [style.width.px]="logo.size"
+      />
+    } @else {
+      <div class="floating-logo__topic-content">
+        <app-icon class="floating-logo__icon" [name]="logo.topicIcon!" />
+        <span class="floating-logo__topic-title">{{ logo.topicTitle }}</span>
+      </div>
+    }
   </div>
-  }
-</div>
 }
 
 <!-- Dark fade at bottom to improve readability -->
@@ -26,19 +31,20 @@
 <div class="logo-controls">
   <!-- Bottone per spawnare manualmente un logo -->
   <button class="logo-controls__button logo-controls__button--spawn" (click)="spawnLogo()">
-    <app-icon name="plus" />
-    <span class="logo-controls__text">Random Topic</span>
+    <app-icon class="logo-controls__icon" name="plus" />
+    <span class="logo-controls__text">Argomento casuale</span>
   </button>
 
   <!-- Toggle per controllare lo spawn automatico -->
   <button
     class="logo-controls__button logo-controls__button--toggle"
     (click)="toggleSpawn()"
+    [attr.aria-pressed]="isSpawnEnabled()"
     [class.logo-controls__button--active]="isSpawnEnabled()"
   >
-    <app-icon [name]="isSpawnEnabled() ? 'pause' : 'play'" />
+    <app-icon class="logo-controls__icon" [name]="isSpawnEnabled() ? 'pause' : 'play'" />
     <span class="logo-controls__text">
-      {{ isSpawnEnabled() ? 'Disattiva' : 'Attiva' }} Auto Random Topic
+      {{ isSpawnEnabled() ? 'Disattiva' : 'Attiva' }} argomenti automatici
     </span>
   </button>
 </div>

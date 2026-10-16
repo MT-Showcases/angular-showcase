@@ -3,6 +3,7 @@
     <span class="code-block-language">{{ language }}</span>
     <button
       class="code-block-copy-btn"
+      [attr.aria-label]="copied() ? 'Codice copiato' : 'Copia codice'"
       (click)="copyCode()"
       [class.copied]="copied()"
     >

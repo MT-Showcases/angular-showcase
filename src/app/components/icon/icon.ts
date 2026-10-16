@@ -17,12 +17,13 @@
 // - Keep icon names lowercase and kebab-case
 // - All icons should be 24x24 viewBox for consistency
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-icon',
   imports: [],
   templateUrl: './icon.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './icon.scss',
 })
 export class Icon {

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CodeBlock } from './code-block';
+import { vi } from 'vitest';
 
 describe('CodeBlock', () => {
   let component: CodeBlock;
@@ -20,22 +21,27 @@ describe('CodeBlock', () => {
   });
 
   it('should highlight TypeScript code', () => {
-    component.code = 'const message = "Hello";';
-    component.language = 'typescript';
+    fixture.componentRef.setInput('code', 'const message = "Hello";');
+    fixture.componentRef.setInput('language', 'typescript');
     fixture.detectChanges();
 
     const highlighted = component.highlightedCode;
-    expect(highlighted).toContain('code-keyword');
-    expect(highlighted).toContain('code-string');
+    const code = fixture.nativeElement.querySelector('code');
+    expect(highlighted).toBeTruthy();
+    expect(code.querySelector('.code-keyword')?.textContent).toBe('const');
+    expect(code.querySelector('.code-string')?.textContent).toBe('"Hello"');
   });
 
   it('should copy code to clipboard', async () => {
-    const clipboardSpy = spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
-    component.code = 'test code';
+    const clipboardSpy = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText: clipboardSpy } });
+    fixture.componentRef.setInput('code', 'test code');
 
     await component.copyCode();
 
     expect(clipboardSpy).toHaveBeenCalledWith('test code');
     expect(component.copied()).toBe(true);
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 });

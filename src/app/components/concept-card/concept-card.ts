@@ -17,8 +17,8 @@
 // - Used primarily in ngrx-concepts for educational cards
 // - Icon can be emoji or icon name from Icon component
 
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+
 import { CodeBlock } from '@components/code-block/code-block';
 import { CodeLanguage } from '@models/code';
 
@@ -59,8 +59,9 @@ export interface ConceptCardData {
 @Component({
   selector: 'app-concept-card',
   standalone: true,
-  imports: [CommonModule, CodeBlock],
+  imports: [CodeBlock],
   templateUrl: './concept-card.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './concept-card.scss',
 })
 export class ConceptCard {

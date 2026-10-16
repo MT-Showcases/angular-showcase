@@ -20,8 +20,19 @@
 // - Always clear component refs on close to prevent memory leaks
 // - Use DomSanitizer for all external URLs
 
-import { Component, signal, ViewChild, ViewContainerRef, ComponentRef, Type, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  signal,
+  ViewChild,
+  ViewContainerRef,
+  ComponentRef,
+  Type,
+  inject,
+  HostListener,
+  ChangeDetectionStrategy
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { ModalService, ModalContent, ModalState } from '../services/modal.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Icon } from '../components/icon/icon';
@@ -29,8 +40,9 @@ import { Icon } from '../components/icon/icon';
 @Component({
   selector: 'app-link-modal',
   standalone: true,
-  imports: [CommonModule, Icon],
+  imports: [Icon],
   templateUrl: './link-modal.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './link-modal.scss',
 })
 export class LinkModal {
@@ -46,7 +58,7 @@ export class LinkModal {
   private sanitizer = inject(DomSanitizer);
 
   constructor() {
-    this.modalService.modalState$.subscribe((state: ModalState) => {
+    this.modalService.modalState$.pipe(takeUntilDestroyed()).subscribe((state: ModalState) => {
       this.isOpen.set(state.isOpen);
       this.content.set(state.content);
 
@@ -77,6 +89,7 @@ export class LinkModal {
     }
   }
 
+  @HostListener('document:keydown.escape')
   close() {
     this.modalService.close();
   }

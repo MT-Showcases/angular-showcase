@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { PageHeader } from '../page-header/page-header';
@@ -15,6 +15,7 @@ interface Message {
   standalone: true,
   imports: [CommonModule, PageHeader, CodeBlock, MessageDemo],
   templateUrl: './behavior-subject.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './behavior-subject.scss'
 })
 export class BehaviorSubjectComponent {

@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-message-demo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './message-demo.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './message-demo.scss'
 })
 export class MessageDemo {

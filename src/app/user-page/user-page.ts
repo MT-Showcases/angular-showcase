@@ -15,13 +15,14 @@
 // - All user list logic lives in UserList component
 // - Add page-level concerns here (breadcrumbs, page title, etc.)
 
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { UserList } from '../user-list/user-list';
 
 @Component({
   selector: 'app-user-page',
   imports: [UserList],
   templateUrl: './user-page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-page.scss',
 })
 export class UserPage {}

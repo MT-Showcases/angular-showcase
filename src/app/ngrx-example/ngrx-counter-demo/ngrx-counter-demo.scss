@@ -1,12 +1,24 @@
+/** Responsive counter panels and wrapping controls. */
+@use 'globals' as *;
+
 .demo-container {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 1fr);
+
+  @include media-min-breakpoint(lg) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
   gap: 2rem;
 }
 .demo-main {
   background: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
+  min-width: 0;
+  padding: rem(20);
+  border-radius: rem(16);
+
+  @include media-min-breakpoint(md) {
+    padding: rem(32);
+  }
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   h2 {
     color: #1f2937;
@@ -31,6 +43,7 @@
 .counter-controls {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 1rem;
   margin: 2rem 0;
   .btn {
@@ -140,6 +153,8 @@
         min-width: 30px;
       }
       .log-action {
+        overflow-wrap: anywhere;
+        min-width: 0;
         color: #1f2937;
       }
     }
@@ -165,10 +180,5 @@
       font-family: Monaco, 'Courier New', monospace;
       font-size: 0.875rem;
     }
-  }
-}
-@media (max-width: 1024px) {
-  .demo-container {
-    grid-template-columns: 1fr;
   }
 }

@@ -1,15 +1,5 @@
 import { Routes } from '@angular/router';
-import { UserList } from './user-list/user-list';
-import { DataBinding } from './data-binding/data-binding';
-import { Directives } from './directives/directives';
 import { Home } from './home/home';
-import { Forms } from './forms/forms';
-import { UserPage } from './user-page/user-page';
-import { Signals } from './signals/signals';
-import { HttpExample } from './http-example/http-example';
-import { NgrxExample } from './ngrx-example/ngrx-example';
-import { CodeBlockDemo } from './code-block-demo/code-block-demo';
-import { BehaviorSubjectComponent } from './behavior-subject/behavior-subject';
 
 export const routes: Routes = [
   {
@@ -21,15 +11,16 @@ export const routes: Routes = [
     children: [
       {
         path: 'data-binding',
-        component: DataBinding,
+        loadComponent: () =>
+          import('./data-binding/data-binding').then((module) => module.DataBinding),
       },
       {
         path: 'directives',
-        component: Directives,
+        loadComponent: () => import('./directives/directives').then((module) => module.Directives),
       },
       {
         path: 'forms',
-        component: Forms,
+        loadComponent: () => import('./forms/forms').then((module) => module.Forms),
       },
     ],
   },
@@ -38,11 +29,12 @@ export const routes: Routes = [
     children: [
       {
         path: 'signals',
-        component: Signals,
+        loadComponent: () => import('./signals/signals').then((module) => module.Signals),
       },
       {
         path: 'http',
-        component: HttpExample,
+        loadComponent: () =>
+          import('./http-example/http-example').then((module) => module.HttpExample),
       },
     ],
   },
@@ -51,11 +43,15 @@ export const routes: Routes = [
     children: [
       {
         path: 'ngrx',
-        component: NgrxExample,
+        loadComponent: () =>
+          import('./ngrx-example/ngrx-example').then((module) => module.NgrxExample),
       },
       {
         path: 'behavior-subject',
-        component: BehaviorSubjectComponent,
+        loadComponent: () =>
+          import('./behavior-subject/behavior-subject').then(
+            (module) => module.BehaviorSubjectComponent,
+          ),
       },
     ],
   },
@@ -64,12 +60,17 @@ export const routes: Routes = [
     children: [
       {
         path: 'users',
-        component: UserPage,
+        loadComponent: () => import('./user-page/user-page').then((module) => module.UserPage),
       },
     ],
   },
   {
+    path: 'design-system',
+    loadComponent: () => import('./design-system/design-system').then((module) => module.DesignSystem),
+  },
+  {
     path: 'code-block-demo',
-    component: CodeBlockDemo,
+    loadComponent: () =>
+      import('./code-block-demo/code-block-demo').then((module) => module.CodeBlockDemo),
   },
 ];

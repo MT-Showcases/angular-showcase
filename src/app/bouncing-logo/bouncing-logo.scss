@@ -1,3 +1,9 @@
+/** Floating topic controls with wrapping and safe-area spacing on mobile. */
+@use 'globals' as *;
+
+// Opaque dark green keeps white action labels readable over every page surface.
+$showcase-controls-success: #006b3c;
+
 // Angular logo that bounces around the page like DVD screensaver
 .floating-logo {
   position: fixed;
@@ -8,19 +14,21 @@
 
   // Glassmorphism effect
   background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  border-radius: 20px;
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(rem(8));
+  border-radius: rem(20);
+  padding: rem(16);
+  border: rem(1) solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 rem(8) rem(32) rgba(102, 126, 234, 0.2);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   // Appearance/disappearance animation with scale
   animation: floatingLogoAppear 10s ease-in-out forwards;
 
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 rem(12) rem(40) rgba(102, 126, 234, 0.4);
   }
 
   &:active {
@@ -37,12 +45,13 @@
       rgba(255, 215, 0, 0.3)
     );
     background-size: 200% 200%;
-    animation: floatingLogoAppear 10s ease-in-out forwards,
+    animation:
+      floatingLogoAppear 10s ease-in-out forwards,
       shinyGradientShift 3s ease-in-out infinite;
-    box-shadow: 0 8px 32px 0 rgba(255, 215, 0, 0.3);
+    box-shadow: 0 rem(8) rem(32) 0 rgba(255, 215, 0, 0.3);
   }
 
-  img {
+  &__image {
     width: 100%; // Fixed width from size
     height: auto; // Auto height to maintain aspect ratio
     object-fit: contain;
@@ -54,13 +63,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: rem(12);
     height: 100%;
     width: 100%;
 
-    app-icon {
-      width: 24px;
-      height: 24px;
+    .floating-logo__icon {
+      width: rem(24);
+      height: rem(24);
       color: white;
     }
   }
@@ -68,16 +77,17 @@
   &__topic-title {
     color: white;
     font-weight: 700;
-    font-size: 14px;
+    font-size: rem(14);
     text-align: center;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: rem(1);
     white-space: nowrap;
   }
 
   // Topic-specific style (less padding to fit content better)
   &--topic {
-    padding: 20px;
+    background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    padding: rem(20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,7 +129,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 150px;
+  height: rem(150);
   z-index: 9998;
   pointer-events: none; // Doesn't block interactions with logos
   background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
@@ -134,41 +144,50 @@
   z-index: 9998;
 
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: rem(8);
 
-  padding: 12px;
+  padding: rem(12);
+  padding-bottom: calc(rem(12) + env(safe-area-inset-bottom));
+  pointer-events: none;
 
-  @media screen and (min-width: 768px) {
+  @include media-min-breakpoint(md) {
     justify-content: flex-end;
 
-    padding: 16px;
+    padding: rem(16);
+    padding-bottom: calc(rem(16) + env(safe-area-inset-bottom));
   }
 
   &__button {
+    pointer-events: auto;
+    min-height: rem(44);
+    max-width: 100%;
+    justify-content: center;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: rem(8);
 
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    padding: 12px 20px;
+    background: var(--mat-sys-primary);
+    backdrop-filter: blur(rem(12));
+    border: rem(1) solid rgba(255, 255, 255, 0.3);
+    border-radius: rem(12);
+    padding: rem(10) rem(12);
 
     color: white;
     font-weight: 600;
-    font-size: 14px;
+    font-size: rem(14);
 
     cursor: pointer;
     user-select: none;
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 rem(8) rem(24) rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
-      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(rem(-2));
+      box-shadow: 0 rem(12) rem(32) rgba(102, 126, 234, 0.3);
+      background: color-mix(in srgb, var(--mat-sys-primary) 92%, $white);
     }
 
     &:active {
@@ -177,30 +196,34 @@
 
     // Spawn button with green gradient
     &--spawn {
-      background: linear-gradient(135deg, rgba(46, 204, 113, 0.5), rgba(39, 174, 96, 0.5));
+      background: $showcase-controls-success;
       border-color: rgba(46, 204, 113, 0.5);
 
       &:hover {
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.6), rgba(39, 174, 96, 0.6));
-        box-shadow: 0 12px 32px rgba(46, 204, 113, 0.6);
+        background: color-mix(in srgb, $showcase-controls-success 92%, $white);
+        box-shadow: 0 rem(12) rem(32) rgba(46, 204, 113, 0.6);
       }
     }
 
     // Active state for toggle (auto spawn enabled)
     &--active {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.5), rgba(118, 75, 162, 0.5));
-      border-color: rgba(102, 126, 234, 0.5);
+      background: var(--mat-sys-tertiary);
+      border-color: var(--mat-sys-tertiary);
+
+      &:hover {
+        background: color-mix(in srgb, var(--mat-sys-tertiary) 92%, $white);
+      }
     }
   }
 
-  app-icon {
-    width: 18px;
-    height: 18px;
+  &__icon {
+    width: rem(18);
+    height: rem(18);
   }
 
   &__text {
-    font-size: 13px;
+    font-size: rem(13);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: rem(0.5);
   }
 }

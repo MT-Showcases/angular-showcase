@@ -17,7 +17,7 @@
 // - Console logs demonstrate lifecycle for learning purposes
 // - Do not add HTTP logic here (parent handles data)
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { User } from '../../../types/users';
 import { Icon } from '../../components/icon/icon';
 
@@ -25,6 +25,7 @@ import { Icon } from '../../components/icon/icon';
   selector: 'app-user-card',
   imports: [Icon],
   templateUrl: './user-card.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-card.scss',
 })
 export class UserCard implements OnInit, OnDestroy {

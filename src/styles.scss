@@ -1,25 +1,55 @@
 @use 'typography';
+@use 'theme';
+@use 'globals' as *;
 
-/* Global styles */
-* {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+// Zero-specificity reset lets Material retain its component typography and spacing.
+:where(*, *::before, *::after) {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
-  // Remove default blue highlight on mobile for all buttons and links
   -webkit-tap-highlight-color: transparent;
-  outline: none;
 }
 
-body {
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+:where(button, input, select, textarea) {
+  font: inherit;
+}
+
+.site-html {
+  scroll-padding-top: rem(100);
+}
+
+.site-body {
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface);
+  background: $gradient-primary;
+  background-image: linear-gradient(135deg, $primary, $primary-dark, $primary-light);
   background-size: 400% 400%;
-  animation: gradientShift 5s ease-in-out infinite alternate;
+  animation: showcase-gradient-shift 5s ease-in-out infinite alternate;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
-@keyframes gradientShift {
+// Material uses its supported strong-focus API; native controls retain a visible ring.
+:where(a, button, input, select, textarea, summary, [tabindex]):where(
+  :not([matButton], [matIconButton], [matInput])
+):focus-visible {
+  outline: rem(3) solid var(--mat-sys-primary);
+  outline-offset: rem(3);
+  box-shadow: 0 0 0 rem(6) $white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes showcase-gradient-shift {
   from {
     background-position: 0% 50%;
   }

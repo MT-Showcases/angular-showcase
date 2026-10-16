@@ -1,181 +1,141 @@
-/**
- * Home Component Styles
- *
- * Homepage layout with hero section, feature cards grid, and tech stack display.
- * Features animations, responsive grid, and gradient backgrounds.
- * Uses BEM methodology.
- */
-
+/** Home layout coordinated with the Showcase Material theme. */
 @use 'globals' as *;
 
-// ═══ MAIN CONTAINER ═══
 .home {
   max-width: rem(1200);
   margin: 0 auto;
-  padding: rem(16);\n\n  // More padding on tablets and up\n  @include media-min-breakpoint(md) {\n    padding: rem(20);\n  }
+  min-width: 0;
 
-  // ─── HERO SECTION ───
-  // Centered title and subtitle
   &__hero {
     text-align: center;
-    margin-bottom: rem(48);
-    animation: fadeIn 0.6s ease-out;
-
-    // More margin on desktop
-    @include media-min-breakpoint(md) {
-      margin-bottom: rem(60);
-    }
+    margin-bottom: space(12);
+    padding: space(6);
+    border-radius: radius(lg);
+    // White text remains readable even over the bright end of the brand gradient.
+    background: rgb(26 22 46 / 65%);
+    color: $white;
+    animation: showcase-home-fade-in 0.6s ease-out;
   }
 
-  // Main homepage title
   &__title {
     font-size: rem(32);
+    line-height: 1.2;
     font-weight: 800;
-    color: $white;
-    margin-bottom: rem(16);
-    text-shadow: 0 rem(4) rem(12) rgba(0, 0, 0, 0.2);
-
-    // Larger title on tablets and up
-    @include media-min-breakpoint(md) {
-      font-size: rem(48);
-    }
+    margin-bottom: space(4);
   }
 
-  // Hero subtitle
   &__subtitle {
-    font-size: rem(16);
-    color: rgba(255, 255, 255, 0.95);
-    font-weight: 500;
-
-    // Larger subtitle on tablets and up
-    @include media-min-breakpoint(md) {
-      font-size: rem(20);
-    }
+    font: var(--mat-sys-body-large);
   }
 
-  // ─── FEATURES GRID ───
-  // Responsive grid of feature cards
   &__features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(rem(260), 1fr));
-    gap: rem(20);
-    margin-bottom: rem(48);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(260)), 1fr));
+    gap: space(6);
+    margin-bottom: space(12);
+  }
 
-    // Larger gap on desktop
-    @include media-min-breakpoint(md) {
-      grid-template-columns: repeat(auto-fit, minmax(rem(280), 1fr));
-      gap: rem(24);
-      margin-bottom: rem(60);
-    }
-
-    // Staggered animation for cards
-    app-feature-card {
-      @for $i from 1 through 4 {
-        &:nth-child(#{$i}) {
-          animation-delay: #{$i * 0.1}s;
-        }
+  &__feature {
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
       }
     }
   }
 
-  // ─── TECH STACK SECTION ───
-  // Showcases technologies used in the project
   &__tech {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(rem(10));
-    border-radius: rem(16);
-    padding: rem(32);
-    box-shadow: 0 rem(8) rem(32) rgba(0, 0, 0, 0.1);
-    border: rem(1) solid rgba(255, 255, 255, 0.3);
-    animation: fadeIn 0.6s ease-out 0.4s backwards;
-
-    // More padding on desktop
-    @include media-min-breakpoint(md) {
-      padding: rem(40);
-    }
+    @include surface-panel();
+    animation: showcase-home-fade-in 0.6s ease-out 0.4s backwards;
   }
 
-  // Tech section title
   &__tech-title {
-    font-size: rem(24);
+    font: var(--mat-sys-headline-small);
     font-weight: 700;
-    color: $primary;
+    color: var(--mat-sys-primary);
     text-align: center;
-    margin-bottom: rem(24);
-
-    // Larger title on desktop
-    @include media-min-breakpoint(md) {
-      font-size: rem(28);
-      margin-bottom: rem(32);
-    }
+    margin-bottom: space(6);
   }
 
-  // Tech items grid
   &__tech-grid {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: rem(12);
-
-    // Larger gap on desktop
-    @include media-min-breakpoint(md) {
-      gap: rem(16);
-    }
+    gap: space(3);
   }
 
-  // Individual tech badge
   &__tech-item {
-    background: $gradient-primary;
-    color: white;
-    padding: rem(12) rem(20);
-    border-radius: rem(12);
-
-    // Larger padding on desktop
-    @include media-min-breakpoint(md) {
-      padding: rem(16) rem(24);
-    }
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: anywhere;
     text-align: center;
-    font-weight: 600;
-    font-size: rem(14);
-    box-shadow: 0 rem(4) rem(12) rgba(102, 126, 234, 0.3);
-    transition: $transition;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: rem(8);
-    cursor: pointer;
+    justify-content: center;
+    gap: space(2);
+    padding: space(4) space(6);
+    border-radius: radius(md);
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+    font: var(--mat-sys-label-large);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-    // Larger font on desktop
-    @include media-min-breakpoint(md) {
-      font-size: rem(16);
+    @media (hover: hover) {
+      &:hover {
+        transform: translateY(rem(-4));
+        box-shadow: shadow(card);
+      }
+    }
+  }
+
+  &__tech-icon {
+    width: space(6);
+    height: space(6);
+    flex-shrink: 0;
+  }
+
+  @include media-min-breakpoint(sm) {
+    &__tech-item {
+      width: auto;
+    }
+  }
+
+  @include media-min-breakpoint(md) {
+    &__hero {
+      padding: space(8);
     }
 
-    app-icon {
-      width: rem(20);
-      height: rem(20);
-      flex-shrink: 0;
+    &__title {
+      font-size: rem(48);
     }
 
-    // Hover effect: lift and enhance shadow
-    &:hover {
-      transform: translateY(rem(-4));
-      box-shadow: 0 rem(8) rem(24) rgba(102, 126, 234, 0.4);
+    &__subtitle {
+      font: var(--mat-sys-title-large);
     }
 
-    // Full width on mobile
-    @include media-max-breakpoint(sm) {
-      width: 100%;
+    &__features {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(280)), 1fr));
+    }
+
+    &__tech {
+      padding: space(10);
+    }
+
+    &__tech-title {
+      margin-bottom: space(8);
+    }
+
+    &__tech-grid {
+      gap: space(4);
     }
   }
 }
 
-// ═══ ANIMATIONS ═══
-
-// Fade in animation
-@keyframes fadeIn {
+@keyframes showcase-home-fade-in {
   from {
     opacity: 0;
-    transform: translateY(rem(20));
+    transform: translateY(space(6));
   }
   to {
     opacity: 1;

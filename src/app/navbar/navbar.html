@@ -1,43 +1,55 @@
-<nav class="nav">
+<nav class="nav" aria-label="Navigazione principale">
   <!-- Main Items -->
   @for (item of mainItems; track item.route) {
     <a
       [routerLink]="item.route"
       routerLinkActive="active"
+      ariaCurrentWhenActive="page"
       [routerLinkActiveOptions]="{ exact: !!item.exact }"
       class="nav-link"
+      [attr.aria-label]="item.label"
       (click)="closeDropdown()"
     >
-      <app-icon [name]="item.icon" class="nav-icon" />
+      <app-icon [name]="item.icon" class="nav-icon" aria-hidden="true" />
       <span class="nav-label">{{ item.label }}</span>
     </a>
   }
 
   <!-- Dropdown Groups -->
-  @for (group of groups; track group.label) {
+  @for (group of groups; track group.label; let index = $index) {
     <div class="nav-dropdown" [class.open]="openDropdown() === group.label">
       <button
         class="nav-link dropdown-trigger"
+        [attr.aria-expanded]="openDropdown() === group.label"
+        [attr.aria-controls]="'nav-group-' + index"
         [class.active]="isGroupActive(group)"
         (click)="toggleDropdown(group.label)"
         type="button"
       >
-        <app-icon [name]="group.icon" class="nav-icon" />
+        <app-icon [name]="group.icon" class="nav-icon" aria-hidden="true" />
         <span class="nav-label">{{ group.label }}</span>
-        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-          <path d="M6 8L2 4h8z"/>
+        <svg
+          aria-hidden="true"
+          class="dropdown-arrow"
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="currentColor"
+        >
+          <path d="M6 8L2 4h8z" />
         </svg>
       </button>
 
-      <div class="dropdown-menu">
+      <div class="dropdown-menu" [id]="'nav-group-' + index">
         @for (item of group.items; track item.route) {
           <a
             [routerLink]="item.route"
             routerLinkActive="active"
+            ariaCurrentWhenActive="page"
             class="dropdown-item"
             (click)="closeDropdown()"
           >
-            <app-icon [name]="item.icon" class="dropdown-icon" />
+            <app-icon [name]="item.icon" class="dropdown-icon" aria-hidden="true" />
             <span class="dropdown-label">{{ item.label }}</span>
           </a>
         }

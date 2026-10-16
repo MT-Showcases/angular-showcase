@@ -1,0 +1,117 @@
+<div class="design-system">
+  <app-page-header
+    title="Design system"
+    subtitle="Angular Material e componenti Showcase: una base comune, esempi da provare." />
+
+  <section class="design-system__panel" aria-labelledby="palette-title">
+    <h2 class="design-system__section-title" id="palette-title">Colori e superfici</h2>
+    <p class="design-system__description">Il viola del brand <code class="design-system__code">#667eea</code> genera la palette Material. Il colore primario dei controlli usa un tono più scuro, abbinato al suo colore di testo.</p>
+    <p class="design-system__description">Ogni campione mostra una coppia semantica: usa sempre il colore <code class="design-system__code">on-*</code> sulla superficie corrispondente.</p>
+    <div class="design-system__palette">
+      @for (color of palette; track color.background) {
+        <article class="design-system__swatch"
+          [style.background]="'var(--mat-sys-' + color.background + ')'"
+          [style.color]="'var(--mat-sys-' + color.foreground + ')'">
+          <h3 class="design-system__subheading">{{ color.label }}</h3>
+          <code class="design-system__code">--mat-sys-{{ color.background }}</code>
+          <code class="design-system__code">--mat-sys-{{ color.foreground }}</code>
+          <span class="design-system__swatch-description">Testo sulla sua superficie</span>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="design-system__panel" aria-labelledby="typography-title">
+    <h2 class="design-system__section-title" id="typography-title">Tipografia</h2>
+    <p class="design-system__description">Il font attuale resta parte dell’identità Showcase. Questi esempi utilizzano direttamente la scala del tema Material.</p>
+    <div class="design-system__type-samples">
+      <div class="design-system__type-sample"><code class="design-system__code">headline-medium</code><h3 class="design-system__headline">Progetta con coerenza</h3></div>
+      <div class="design-system__type-sample"><code class="design-system__code">title-large</code><h3 class="design-system__title">Un titolo di sezione</h3></div>
+      <div class="design-system__type-sample"><code class="design-system__code">body-large</code><p class="design-system__body">Un testo chiaro accompagna ogni esempio e aiuta a capire cosa succede.</p></div>
+      <div class="design-system__type-sample"><code class="design-system__code">label-large</code><p class="design-system__label">Etichette e azioni</p></div>
+    </div>
+  </section>
+
+  <section class="design-system__panel" aria-labelledby="layout-title">
+    <h2 class="design-system__section-title" id="layout-title">Spaziature, raggi e ombre</h2>
+    <p class="design-system__description">La scala di layout è condivisa in SCSS. Le dimensioni sono espresse in rem; i valori sotto corrispondono a una base di 16 px.</p>
+    <ul class="design-system__spacing" aria-label="Scala delle spaziature">
+      @for (item of spacing; track item.step) {
+        <li class="design-system__spacing-item">
+          <code class="design-system__code">space({{ item.step }})</code>
+          <span class="design-system__space-bar" [style.width.rem]="item.pixels / 16" aria-hidden="true"></span>
+          <span>{{ item.pixels }} px</span>
+        </li>
+      }
+    </ul>
+    <div class="design-system__layout-samples">
+      <div class="design-system__radius design-system__radius--sm"><code class="design-system__code">radius(sm)</code><span>8 px</span></div>
+      <div class="design-system__radius design-system__radius--md"><code class="design-system__code">radius(md)</code><span>12 px</span></div>
+      <div class="design-system__radius design-system__radius--lg"><code class="design-system__code">radius(lg)</code><span>16 px</span></div>
+      <div class="design-system__shadow design-system__shadow--card"><code class="design-system__code">shadow(card)</code><span>Card</span></div>
+      <div class="design-system__shadow design-system__shadow--raised"><code class="design-system__code">shadow(raised)</code><span>In rilievo</span></div>
+    </div>
+    <app-code-block [code]="tokenCode" language="css" />
+  </section>
+
+  <section class="design-system__panel" aria-labelledby="controls-title">
+    <h2 class="design-system__section-title" id="controls-title">Controlli Material</h2>
+    <p class="design-system__description">Prova le varianti, modifica i campi e confronta gli stati attivo, disabilitato ed errore. Le azioni qui aggiornano solo l’anteprima.</p>
+    <div class="design-system__toolbar">
+      <button matButton="outlined" type="button" data-testid="toggle-controls"
+        [attr.aria-pressed]="controlsDisabled()" (click)="toggleControls()">
+        {{ controlsDisabled() ? 'Abilita controlli' : 'Disabilita controlli' }}
+      </button>
+      <button matIconButton type="button" aria-label="Ripristina gli esempi" (click)="resetExamples()">
+        <app-icon class="design-system__icon" name="reload" aria-hidden="true" />
+      </button>
+      <p aria-live="polite">{{ controlsDisabled() ? 'Controlli disabilitati.' : 'Controlli attivi.' }}</p>
+    </div>
+    <div class="design-system__buttons" role="group" aria-label="Varianti dei pulsanti">
+      <button matButton="filled" type="button" [disabled]="controlsDisabled()" (click)="recordAction('primaria')">Primaria</button>
+      <button matButton="tonal" type="button" [disabled]="controlsDisabled()" (click)="recordAction('secondaria')">Secondaria</button>
+      <button matButton="outlined" type="button" [disabled]="controlsDisabled()" (click)="recordAction('con bordo')">Con bordo</button>
+      <button matButton="text" type="button" [disabled]="controlsDisabled()" (click)="recordAction('testuale')">Testuale</button>
+      <button matButton="filled" class="showcase-danger" type="button" [disabled]="controlsDisabled()" (click)="recordAction('pericolosa')">Pericolosa</button>
+    </div>
+    <p class="design-system__status" aria-live="polite">{{ lastAction() }}</p>
+    <div class="design-system__fields">
+      <mat-form-field appearance="outline" class="showcase-field" subscriptSizing="dynamic">
+        <mat-label>Nome</mat-label>
+        <input matInput autocomplete="given-name" [formControl]="name" data-testid="name-input" />
+        <mat-hint>Campo senza errori, modificabile liberamente.</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="showcase-field" subscriptSizing="dynamic" data-testid="email-field">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" autocomplete="email" [formControl]="email" data-testid="email-input" />
+        <mat-hint>Inserisci un indirizzo valido per rimuovere l’errore.</mat-hint>
+        @if (email.hasError('required')) {
+          <mat-error>L’email è obbligatoria.</mat-error>
+        } @else if (email.hasError('email')) {
+          <mat-error>Inserisci un indirizzo email valido.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <h3 class="design-system__subheading">Utilizzo nei template</h3>
+    <app-code-block [code]="buttonCode" language="html" />
+    <app-code-block [code]="inputCode" language="html" />
+    <app-code-block [code]="controlCode" language="typescript" />
+  </section>
+
+  <section class="design-system__panel" aria-labelledby="components-title">
+    <h2 class="design-system__section-title" id="components-title">Componenti Showcase</h2>
+    <p class="design-system__description">I controlli standard provengono da Angular Material. Le card e le guide didattiche sono componenti del progetto, composti con lo stesso tema.</p>
+    <div class="design-system__components">
+      <app-feature-card class="design-system__component" routerLink="/basics/forms" iconName="form" title="Forms"
+        description="Una FeatureCard collega alla demo dei form."
+        [features]="['Navigazione', 'Icona condivisa', 'Stati interattivi']" />
+      <app-concept-card class="design-system__component" icon="◈" title="Design token"
+        description="Una ConceptCard presenta un concetto e i suoi punti chiave."
+        keyPointsTitle="Principi"
+        [keyPoints]="['Colori semantici abbinati', 'API pubbliche del tema', 'Layout riutilizzabile']" />
+    </div>
+    <app-guide-step [stepNumber]="1" title="Componi la pagina"
+      explanation="Riutilizza i componenti condivisi per presentare esempi con una gerarchia coerente." />
+    <app-code-block [code]="componentCode" language="html" />
+  </section>
+</div>

@@ -20,7 +20,7 @@
 // - All todos state lives in store/todo/
 // - Template uses single subscription: @if (vm$ | async; as vm)
 
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -37,6 +37,7 @@ import * as ActionsLogSelectors from '../../store/actions-log/actions-log.select
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './ngrx-todo-demo.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ngrx-todo-demo.scss'],
 })
 export class NgrxTodoDemo {

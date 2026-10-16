@@ -1,6 +1,6 @@
 <app-page-header
   title="HTTP & Service Facade"
-  description="Esempi pratici di richieste HTTP con Service Pattern"
+  subtitle="Esempi pratici di richieste HTTP con Service Pattern"
 />
 
 <div class="http-container">
@@ -40,15 +40,15 @@
 
   <!-- Messaggio di errore globale -->
   @if (error()) {
-  <div class="error-message">⚠️ {{ error() }}</div>
+    <div class="error-message">⚠️ {{ error() }}</div>
   }
 
   <!-- Indicatore di caricamento globale -->
   @if (loading()) {
-  <div class="loading-indicator">
-    <div class="loading-spinner"></div>
-    <span>Caricamento in corso...</span>
-  </div>
+    <div class="loading-indicator">
+      <div class="loading-spinner"></div>
+      <span>Caricamento in corso...</span>
+    </div>
   }
 
   <!-- Sezione CREATE - POST -->
@@ -104,39 +104,39 @@
 
     <!-- Lista dei post -->
     @if (posts().length > 0) {
-    <div class="posts-grid">
-      @for (post of posts(); track post.id) {
-      <div class="post-card">
-        <div class="post-card__header">
-          <span class="post-card__id">ID: {{ post.id }}</span>
-          <span class="post-card__user">User: {{ post.userId }}</span>
-        </div>
+      <div class="posts-grid">
+        @for (post of posts(); track post.id) {
+          <div class="post-card">
+            <div class="post-card__header">
+              <span class="post-card__id">ID: {{ post.id }}</span>
+              <span class="post-card__user">User: {{ post.userId }}</span>
+            </div>
 
-        <h3 class="post-card__title">{{ post.title }}</h3>
-        <p class="post-card__body">{{ post.body }}</p>
+            <h3 class="post-card__title">{{ post.title }}</h3>
+            <p class="post-card__body">{{ post.body }}</p>
 
-        <div class="post-card__actions">
-          <button
-            class="button button--small button--warning"
-            (click)="updatePost(post)"
-            [disabled]="loading()"
-          >
-            ✏️ Modifica
-          </button>
+            <div class="post-card__actions">
+              <button
+                class="button button--small button--warning"
+                (click)="updatePost(post)"
+                [disabled]="loading()"
+              >
+                ✏️ Modifica
+              </button>
 
-          <button
-            class="button button--small button--danger"
-            (click)="deletePost(post.id)"
-            [disabled]="loading()"
-          >
-            🗑️ Elimina
-          </button>
-        </div>
+              <button
+                class="button button--small button--danger"
+                (click)="deletePost(post.id)"
+                [disabled]="loading()"
+              >
+                🗑️ Elimina
+              </button>
+            </div>
+          </div>
+        }
       </div>
-      }
-    </div>
     } @else {
-    <div class="empty-state">Nessun post caricato. Clicca "Carica Post" per iniziare.</div>
+      <div class="empty-state">Nessun post caricato. Clicca "Carica Post" per iniziare.</div>
     }
   </section>
 

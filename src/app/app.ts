@@ -18,7 +18,7 @@
 // - Feature-specific logic belongs in feature components
 // - Router outlet renders feature components based on route
 
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 import { BouncingLogo } from './bouncing-logo/bouncing-logo';
@@ -29,8 +29,9 @@ import { LinkInterceptor } from '../directives/link-interceptor.directive';
   selector: 'app-root',
   imports: [RouterModule, Navbar, BouncingLogo, LinkModal, LinkInterceptor],
   templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('angular-showroom');
+  protected readonly title = signal('angular-showcase');
 }

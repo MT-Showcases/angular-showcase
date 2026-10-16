@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "angular-showroom": {
+    "angular-showcase": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -62,12 +62,15 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4200
+          },
           "configurations": {
             "production": {
-              "buildTarget": "angular-showroom:build:production"
+              "buildTarget": "angular-showcase:build:production"
             },
             "development": {
-              "buildTarget": "angular-showroom:build:development"
+              "buildTarget": "angular-showcase:build:development"
             }
           },
           "defaultConfiguration": "development"

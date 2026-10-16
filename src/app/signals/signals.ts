@@ -18,16 +18,31 @@
 // - Add new signal patterns as separate, well-labeled sections
 // - Avoid introducing complex state management (keep it educational)
 
-import { Component, signal, computed, effect } from '@angular/core';
+import { Component, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { PageHeader } from '../page-header/page-header';
+import { CodeBlock } from '../components/code-block/code-block';
 
 @Component({
   selector: 'app-signals',
-  imports: [PageHeader],
+  imports: [PageHeader, MatButtonModule, CodeBlock],
   templateUrl: './signals.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './signals.scss',
 })
 export class Signals {
+  readonly writableExample = `count = signal(0);
+increment() { this.count.update(value => value + 1); }`;
+  readonly computedExample = `doubleCount = computed(() => this.count() * 2);
+tripleCount = computed(() => this.count() * 3);`;
+  readonly cartExample = `items = signal([{ name: 'Magic Mouse', price: 99, quantity: 1 }]);
+total = computed(() => this.items().reduce(
+  (sum, item) => sum + item.price * item.quantity, 0
+));`;
+  readonly effectExample = `effect(() => {
+  console.log('Count:', this.count());
+});`;
+
   // ═══════════════════════════════════════════════════════════════════
   // 1. WRITABLE SIGNAL - Signal that can be modified
   // ═══════════════════════════════════════════════════════════════════
@@ -104,7 +119,7 @@ export class Signals {
     // Useful for logging, analytics, API calls, localStorage, etc.
     effect(() => {
       const currentCount = this.count();
-      const log = `Count changed: ${currentCount}`;
+      const log = `Conteggio aggiornato: ${currentCount}`;
       // Keep only last 5 logs to avoid overflow
       this.effectLogs.update((logs) => [...logs.slice(-4), log]);
     });

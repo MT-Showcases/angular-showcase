@@ -53,7 +53,7 @@ Every link, every reference, every related concept opens **within the platform**
 
 Built with modern web technologies:
 
-- **[Angular 18+](https://angular.dev/)** - Standalone components, Signals API, Control Flow
+- **[Angular 22](https://angular.dev/)** - Standalone components, Signals API, Control Flow
 - **TypeScript** - Type-safe, maintainable code
 - **SCSS** - Modular styling with global design system
 - **RxJS** - Reactive state management
@@ -65,7 +65,9 @@ Built with modern web technologies:
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js **24.22.0 LTS**, selected per project through `.nvmrc` (Node 22.22.3+ and 26.x are also compatible).
+- npm **12.2.0**, declared in `packageManager`. Bootstrap with `npx --yes npm@12.2.0 ci` if the selected Node installation bundles an older npm.
+- Runtime changes are scoped to this project; no global Node/npm replacement is required.
 - Git
 
 ### Installation
@@ -77,8 +79,8 @@ git clone https://github.com/Flame0510/angular-showcase.git
 # Navigate to project directory
 cd angular-showcase
 
-# Install dependencies
-npm install
+# Install locked dependencies with the declared package manager
+npx --yes npm@12.2.0 ci
 
 # Start development server
 npm start
@@ -93,6 +95,41 @@ npm run build
 ```
 
 Build artifacts will be stored in the `dist/` directory.
+
+---
+
+## Design System
+
+The `/design-system` route is the internal catalog, also linked under **Esempi** in the navigation.
+It demonstrates the actual theme, spacing, typography, reusable cards, Material controls, and their
+error/disabled states, with copyable examples.
+
+- `src/styles/`: the generated brand palette, Material theme, public component overrides, and layout tokens.
+- `src/app/components/`: reusable educational components such as FeatureCard, ConceptCard, GuideStep, and CodeBlock.
+- `src/app/design-system/`: the lazy-loaded catalog.
+- Home, Forms, and Signals use the shared theme. Other demos retain their existing styles for a later migration.
+
+Standard controls use Angular Material **22.2.3** directly. Customization uses `mat.theme`,
+`mat.theme-overrides`, component `*-overrides` mixins, and public `--mat-sys-*` tokens.
+Do not style Material private DOM classes or use `::ng-deep` to customize Material.
+See [the official theming guide](https://material.angular.dev/guide/theming) and
+[local styling conventions](.github/copilot-instructions/styling-conventions.md).
+
+### Runtime and verification
+
+The Angular 22 upgrade uses official Angular and NgRx migrations. Existing components explicitly retain
+`ChangeDetectionStrategy.Eager` to preserve demo behavior. Templates use built-in `@if`/`@for` control
+flow; legacy directive syntax is labelled as historical context. Reactive Forms, Signals,
+BehaviorSubject, and NgRx remain separate teaching examples.
+
+TypeScript stays on **6.0.x**, the line supported by Angular 22; newer incompatible majors are excluded.
+Vitest 5 and jsdom 30 run the component and routed interaction tests. Run `npm test -- --watch=false`,
+`npm run build`, and `npm audit`. The build budgets remain 500 kB for the initial bundle and 10 kB per
+component stylesheet (warning thresholds); existing NgRx/BehaviorSubject style warnings are tracked
+separately from functional failures.
+
+npm 12 uses version-pinned `allowScripts` entries for the native build dependencies. Review this
+allowlist when upgrading those packages instead of disabling the install-script policy globally.
 
 ---
 
@@ -378,6 +415,6 @@ Special thanks to:
 
 ## 📚 Additional Resources
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
+This project uses [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
 
 For more information on using the Angular CLI, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

@@ -19,7 +19,7 @@
 // - Actions log demonstrates Redux DevTools alternative
 // - Follow this pattern for new store features
 
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -35,6 +35,7 @@ import * as ActionsLogSelectors from '../../store/actions-log/actions-log.select
   standalone: true,
   imports: [CommonModule],
   templateUrl: './ngrx-counter-demo.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ngrx-counter-demo.scss'],
 })
 export class NgrxCounterDemo {

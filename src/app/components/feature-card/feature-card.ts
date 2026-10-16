@@ -10,7 +10,7 @@
 // - Pure presentational component (no business logic)
 // - @Input() for all data, no @Output() needed (navigation via RouterLink)
 // - Signal-based reactive transform for smooth 3D effect
-// - HostListener for global mouse tracking
+// - Pointer tracking limited to the hovered card
 //
 // NOTES FOR CONTRIBUTORS:
 // - Keep this component stateless and reusable
@@ -18,7 +18,7 @@
 // - Do not add data fetching or navigation logic here
 // - All visual behavior should be CSS-based where possible
 
-import { Component, Input, HostListener, signal, ElementRef } from '@angular/core';
+import { Component, Input, HostListener, signal, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Icon } from '../icon/icon';
 
@@ -26,6 +26,7 @@ import { Icon } from '../icon/icon';
   selector: 'app-feature-card',
   imports: [RouterLink, Icon],
   templateUrl: './feature-card.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './feature-card.scss',
 })
 export class FeatureCard {
@@ -43,86 +44,38 @@ export class FeatureCard {
   @Input() description!: string;
   @Input() features!: string[];
 
-  /**
-   * 3D PARALLAX EFFECT
-   *
-   * This signal contains the CSS transform value applied to the card.
-   * Combines three transformations:
-   *
-   * 1. perspective(1000px): Creates 3D depth, lower = more pronounced effect
-   * 2. rotateX/rotateY: Card rotates following mouse position
-   * 3. scale: Enlarges card (1.05) on hover, normal (1) otherwise
-   *
-   * Value is recalculated on every mouse movement across the page
-   */
-  transform = signal('perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)');
+  // Keep the transform neutral until the pointer enters this card.
+  transform = signal('none');
 
-  /**
-   * Tracks whether the mouse is over the card
-   * Used to apply scale(1.05) and change colors/background
-   */
-  private isHovering = signal(false);
+  constructor(private elementRef: ElementRef<HTMLElement>) {}
 
-  constructor(private elementRef: ElementRef) {}
-
-  /**
-   * Activate hover state when mouse enters the card
-   * Trigger for scale and color changes (handled via CSS :hover)
-   */
-  @HostListener('mouseenter')
-  onMouseEnter() {
-    this.isHovering.set(true);
-  }
-
-  /**
-   * Deactivate hover state when mouse leaves the card
-   * Card returns to normal size (scale 1)
-   */
   @HostListener('mouseleave')
   onMouseLeave() {
-    this.isHovering.set(false);
+    this.transform.set('none');
   }
 
-  /**
-   * HEART OF THE PARALLAX EFFECT
-   *
-   * Listens to mouse movement on the ENTIRE page (document:mousemove)
-   * On each movement:
-   *
-   * 1. Gets card position in viewport (getBoundingClientRect)
-   * 2. Calculates mouse position RELATIVE to card center
-   *    - If mouse is centered: x=0, y=0 → no rotation
-   *    - If mouse is at edges: x=±1, y=±1 → maximum rotation
-   * 3. Multiplies by MAX_ROTATION_DEGREES to get rotation degrees
-   * 4. rotateX is inverted (-y) for a more natural effect:
-   *    mouse up → card tilts upward
-   * 5. Applies scale(1.05) if isHovering is true, otherwise scale(1)
-   * 6. Updates transform signal which is bound to the template
-   *
-   * Result: each card "looks at" the mouse regardless of its position
-   */
-  @HostListener('document:mousemove', ['$event'])
+  @HostListener('mousemove', ['$event'])
   onMouseMove(event: MouseEvent) {
-    const card = this.elementRef.nativeElement;
-    const rect = card.getBoundingClientRect();
+    if (
+      !window.matchMedia('(hover: hover) and (pointer: fine)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
 
-    // Normalize mouse position relative to card center
-    // Result: values from -1 (left/top) to +1 (right/bottom)
-    const x = (event.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-    const y = (event.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
 
-    // Calculate rotation degrees
-    // rotateY: positive = rotate right, negative = rotate left
-    // rotateX: negative = rotate up, positive = rotate down (inverted with -y)
-    const rotateY = x * this.MAX_ROTATION_DEGREES;
-    const rotateX = -y * this.MAX_ROTATION_DEGREES;
-
-    // Slightly scale the card on hover for a "lift" effect
-    const scale = this.isHovering() ? 1.05 : 1;
-
-    // Apply all transformations together
+    const x = Math.max(
+      -1,
+      Math.min(1, (event.clientX - rect.left - rect.width / 2) / (rect.width / 2)),
+    );
+    const y = Math.max(
+      -1,
+      Math.min(1, (event.clientY - rect.top - rect.height / 2) / (rect.height / 2)),
+    );
     this.transform.set(
-      `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`
+      `perspective(1000px) rotateX(${-y * this.MAX_ROTATION_DEGREES}deg) rotateY(${x * this.MAX_ROTATION_DEGREES}deg) scale(1.02)`,
     );
   }
 }

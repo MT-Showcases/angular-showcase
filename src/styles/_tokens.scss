@@ -1,0 +1,35 @@
+/** Shared layout tokens. Material owns semantic colors and typography. */
+@use 'sass:map';
+@use 'sass:math';
+
+@function _rem($value) {
+  @return math.div($value, 16) * 1rem;
+}
+
+$showcase-spacing: (0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 6: 24, 8: 32, 10: 40, 12: 48, 16: 64);
+$showcase-radii: (sm: 8, md: 12, lg: 16);
+$showcase-shadows: (
+  card: 0 _rem(8) _rem(32) rgb(0 0 0 / 10%),
+  raised: 0 _rem(16) _rem(48) rgb(0 0 0 / 20%),
+);
+
+@function space($step) {
+  @if not map.has-key($showcase-spacing, $step) {
+    @error 'Unknown spacing step: #{$step}';
+  }
+  @return _rem(map.get($showcase-spacing, $step));
+}
+
+@function radius($size) {
+  @if not map.has-key($showcase-radii, $size) {
+    @error 'Unknown radius: #{$size}';
+  }
+  @return _rem(map.get($showcase-radii, $size));
+}
+
+@function shadow($level) {
+  @if not map.has-key($showcase-shadows, $level) {
+    @error 'Unknown shadow: #{$level}';
+  }
+  @return map.get($showcase-shadows, $level);
+}

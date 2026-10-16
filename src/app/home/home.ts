@@ -17,7 +17,7 @@
 // - Maintain consistent feature card structure across all sections
 // - Icons must be registered in the Icon component
 
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FeatureCard } from '../components/feature-card/feature-card';
 import { Icon } from '../components/icon/icon';
@@ -39,6 +39,7 @@ interface Feature {
   selector: 'app-home',
   imports: [RouterLink, FeatureCard, Icon],
   templateUrl: './home.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.scss',
 })
 export class Home {

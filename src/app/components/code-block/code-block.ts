@@ -18,16 +18,17 @@
 // - Keep token patterns in order (most specific to least specific)
 // - Sanitize all HTML to prevent XSS attacks
 
-import { Component, Input, signal, inject, SecurityContext } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Icon } from '../icon/icon';
 
 @Component({
   selector: 'app-code-block',
   standalone: true,
-  imports: [CommonModule, Icon],
+  imports: [Icon],
   templateUrl: './code-block.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-block.scss'],
 })
 export class CodeBlock {
@@ -42,11 +43,10 @@ export class CodeBlock {
     return this.sanitizer.bypassSecurityTrustHtml(highlighted);
   }
 
-  copyCode() {
-    navigator.clipboard.writeText(this.code).then(() => {
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
-    });
+  async copyCode(): Promise<void> {
+    await navigator.clipboard.writeText(this.code);
+    this.copied.set(true);
+    setTimeout(() => this.copied.set(false), 2000);
   }
 
   private highlightCode(code: string, language: string): string {
@@ -67,7 +67,7 @@ export class CodeBlock {
           const overlaps = tokens.some(
             (token) =>
               (match.index! >= token.start && match.index! < token.end) ||
-              (match.index! + match[0].length > token.start && match.index! < token.end)
+              (match.index! + match[0].length > token.start && match.index! < token.end),
           );
 
           if (!overlaps) {

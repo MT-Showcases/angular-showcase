@@ -1,7 +1,14 @@
+/** Responsive concept grids that respect the available card width. */
+@use 'globals' as *;
+
 .intro-section {
   background: linear-gradient(135deg, #667eea 0, #764ba2 100%);
   color: #fff;
-  padding: 2.5rem;
+  padding: rem(20);
+
+  @include media-min-breakpoint(md) {
+    padding: rem(40);
+  }
   border-radius: 1rem;
   margin-bottom: 2rem;
   box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.3);
@@ -65,13 +72,17 @@
 }
 .concepts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(500)), 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
 }
 .setup-section {
   background: #f9fafb;
-  padding: 2.5rem;
+  padding: rem(20);
+
+  @include media-min-breakpoint(md) {
+    padding: rem(40);
+  }
   border-radius: 1rem;
   margin-bottom: 2rem;
   border: 1px solid #e5e7eb;
@@ -82,7 +93,7 @@
   }
   .setup-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(350)), 1fr));
     gap: 1.5rem;
   }
   .setup-step {
@@ -101,7 +112,11 @@
 .best-practices {
   background: linear-gradient(135deg, #f093fb 0, #f5576c 100%);
   color: #fff;
-  padding: 2.5rem;
+  padding: rem(20);
+
+  @include media-min-breakpoint(md) {
+    padding: rem(40);
+  }
   border-radius: 1rem;
   box-shadow: 0 10px 25px -5px rgba(240, 147, 251, 0.3);
   h2 {
@@ -111,7 +126,7 @@
   }
   .practices-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(250)), 1fr));
     gap: 1.5rem;
   }
   .practice {
@@ -188,7 +203,7 @@
 
   .patterns-comparison {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(300)), 1fr));
     gap: 1.5rem;
   }
 
@@ -298,7 +313,11 @@
 .centralized-store-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-  padding: 2.5rem;
+  padding: rem(20);
+
+  @include media-min-breakpoint(md) {
+    padding: rem(40);
+  }
   border-radius: 1rem;
   margin: 3rem 0;
   box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.3);
@@ -347,7 +366,7 @@
 
     .comparison-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(300)), 1fr));
       gap: 1.5rem;
     }
 
@@ -404,7 +423,11 @@
   .guide-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 2.5rem;
+    padding: rem(20);
+
+    @include media-min-breakpoint(md) {
+      padding: rem(40);
+    }
     border-radius: 1rem;
     margin-bottom: 2rem;
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
@@ -423,12 +446,14 @@
     }
   }
 
-
-
   .guide-summary {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
-    padding: 2.5rem;
+    padding: rem(20);
+
+    @include media-min-breakpoint(md) {
+      padding: rem(40);
+    }
     border-radius: 1rem;
     box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
     margin-top: 3rem;

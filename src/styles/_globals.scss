@@ -2,5 +2,6 @@
 // Usage: @use 'globals' as *;
 
 @forward 'variables';
+@forward 'tokens';
 @forward 'mixins';
 @forward 'colors';

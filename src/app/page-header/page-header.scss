@@ -12,6 +12,10 @@
 .page-header {
   text-align: center;
   margin: rem(32) 0;
+  padding: space(6);
+  border-radius: radius(lg);
+  // Keep small white text readable over every stop of the animated brand gradient.
+  background: rgb(26 22 46 / 65%);
 
   // Larger margin on desktop
   @include media-min-breakpoint(md) {

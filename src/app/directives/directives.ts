@@ -17,22 +17,23 @@
 // - Include React equivalents in comments for cross-framework learning
 // - Use Italian for user-facing descriptions
 
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { PageHeader } from '../page-header/page-header';
 
 @Component({
   selector: 'app-directives',
-  imports: [CommonModule, PageHeader],
+  imports: [PageHeader],
   templateUrl: './directives.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './directives.scss',
 })
 export class Directives {
-  // *ngIf
+  // Built-in @if control flow
   showMessage = true;
   isLoggedIn = false;
 
-  // *ngFor
+  // Built-in @for control flow
   items = ['Mela', 'Banana', 'Arancia'];
 
   // ngClass

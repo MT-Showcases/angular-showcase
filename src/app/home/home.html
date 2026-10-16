@@ -1,54 +1,55 @@
 <div class="home">
   <div class="home__hero">
-    <h1 class="home__title">Angular Showroom</h1>
-    <p class="home__subtitle">Progetto educativo con esempi pratici di Angular 18+</p>
+    <h1 class="home__title">Angular Showcase</h1>
+    <p class="home__subtitle">Progetto educativo con esempi pratici di Angular 22</p>
   </div>
 
   <div class="home__features">
     @for (card of featureCards; track card.routerLink) {
-    <app-feature-card
-      [routerLink]="card.routerLink"
-      [iconName]="card.iconName"
-      [title]="card.title"
-      [description]="card.description"
-      [features]="card.features"
-    />
+      <app-feature-card
+        class="home__feature"
+        [routerLink]="card.routerLink"
+        [iconName]="card.iconName"
+        [title]="card.title"
+        [description]="card.description"
+        [features]="card.features"
+      />
     }
   </div>
 
   <div class="home__tech">
     <h2 class="home__tech-title">Tecnologie Utilizzate</h2>
     <div class="home__tech-grid">
-      <a href="https://angular.dev" target="_blank" class="home__tech-item">
-        <app-icon name="angular" />
-        Angular 18+
+      <a href="https://angular.dev" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="angular" />
+        Angular 22
       </a>
-      <a href="https://angular.dev/guide/components" target="_blank" class="home__tech-item">
-        <app-icon name="component" />
+      <a href="https://angular.dev/guide/components" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="component" />
         Standalone Components
       </a>
-      <a href="https://angular.dev/guide/signals" target="_blank" class="home__tech-item">
-        <app-icon name="signals" />
+      <a href="https://angular.dev/guide/signals" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="signals" />
         Signals API
       </a>
       <a
         href="https://angular.dev/guide/forms/reactive-forms"
-        target="_blank"
+        target="_blank" rel="noopener noreferrer"
         class="home__tech-item"
       >
-        <app-icon name="form" />
+        <app-icon class="home__tech-icon" name="form" />
         Reactive Forms
       </a>
-      <a href="https://www.typescriptlang.org/docs/" target="_blank" class="home__tech-item">
-        <app-icon name="code" />
+      <a href="https://www.typescriptlang.org/docs/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="code" />
         TypeScript
       </a>
-      <a href="https://sass-lang.com/guide/" target="_blank" class="home__tech-item">
-        <app-icon name="palette" />
+      <a href="https://sass-lang.com/guide/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="palette" />
         SCSS
       </a>
-      <a href="http://getbem.com/introduction/" target="_blank" class="home__tech-item">
-        <app-icon name="blocks" />
+      <a href="https://getbem.com/introduction/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
+        <app-icon class="home__tech-icon" name="blocks" />
         BEM con SCSS ( &__ )
       </a>
     </div>

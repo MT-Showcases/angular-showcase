@@ -1,12 +1,12 @@
 <a [routerLink]="routerLink" class="feature-card" [style.transform]="transform()">
   <div class="feature-card__icon">
-    <app-icon [name]="iconName" />
+    <app-icon class="feature-card__svg" [name]="iconName" aria-hidden="true" />
   </div>
   <h3 class="feature-card__title">{{ title }}</h3>
   <p class="feature-card__text">{{ description }}</p>
   <ul class="feature-card__list">
     @for (feature of features; track feature) {
-    <li>{{ feature }}</li>
+      <li class="feature-card__list-item">{{ feature }}</li>
     }
   </ul>
 </a>

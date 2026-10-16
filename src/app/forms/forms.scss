@@ -1,219 +1,49 @@
-// Main form block
+/** Reactive Forms layout; controls inherit the shared Material theme. */
+@use 'globals' as *;
+
 .form {
-  // Container that centers the form on page
   &__container {
     display: flex;
     justify-content: center;
-    align-items: center;
   }
 
-  // White card with shadow containing the form
   &__card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    padding: 40px;
-    max-width: 500px;
+    @include surface-panel(6);
     width: 100%;
-    animation: slideIn 0.5s ease-out;
+    max-width: rem(560);
 
-    @media (max-width: 600px) {
-      padding: 24px;
+    @include media-min-breakpoint(md) {
+      padding: space(10);
     }
   }
 
-  // Main form title
   &__title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 8px;
+    margin: 0 0 space(2);
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-headline-small);
     text-align: center;
-
-    @media (max-width: 600px) {
-      font-size: 24px;
-    }
   }
 
-  // Descriptive subtitle
   &__subtitle {
-    font-size: 14px;
-    color: #666;
+    margin: 0 0 space(8);
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
     text-align: center;
-    margin-bottom: 30px;
   }
 
-  // Container for each form field
-  &__group {
-    margin-bottom: 24px;
+  &__fields {
+    display: grid;
+    gap: space(6);
+    min-width: 0;
   }
 
-  // Label with validation icon
-  &__label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-  }
-
-  // Input with visual validation
-  &__input {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    outline: none;
-    box-sizing: border-box;
-
-    // Blue border on focus
-    &:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    // Valid input: green
-    &.valid {
-      border-color: #4caf50;
-      background-color: #f1f8f4;
-    }
-
-    // Invalid input: red
-    &.invalid {
-      border-color: #f44336;
-      background-color: #fef5f5;
-    }
-
-    &::placeholder {
-      color: #aaa;
-    }
-  }
-
-  // Buttons container
   &__actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 32px;
+    display: grid;
+    gap: space(3);
+    margin-top: space(2);
 
-    @media (max-width: 600px) {
-      flex-direction: column;
+    @include media-min-breakpoint(sm) {
+      grid-template-columns: 1fr 1fr;
     }
-  }
-}
-
-// Validation icon (check/cross)
-.validation-icon {
-  display: flex;
-  align-items: center;
-
-  app-icon {
-    width: 16px;
-    height: 16px;
-    transition: all 0.3s ease;
-
-    // Red color for error icon
-    &[name='error'] svg {
-      stroke: #f44336;
-    }
-
-    // Green color for success icon
-    &[name='check'] svg {
-      stroke: #4caf50;
-    }
-  }
-}
-
-// Validation errors block
-.error {
-  // Error messages container
-  &__messages {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  // Single error message with icon
-  &__item {
-    color: #f44336;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    &::before {
-      content: '⚠️';
-      font-size: 10px;
-    }
-  }
-}
-
-// Base style for buttons
-.btn {
-  flex: 1;
-  padding: 14px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  outline: none;
-
-  // Effetto click
-  &:active {
-    transform: scale(0.98);
-  }
-
-  @media (max-width: 600px) {
-    width: 100%;
-  }
-
-  // Submit button with gradient
-  &__submit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-
-    &:hover:not(:disabled) {
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-      transform: translateY(-2px);
-    }
-
-    // Disabled state if form invalid
-    &:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-  }
-
-  // Reset button with outline
-  &__reset {
-    background: white;
-    color: #667eea;
-    border: 2px solid #667eea;
-
-    &:hover {
-      background: #667eea;
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-    }
-  }
-}
-
-// Card entrance animation
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }

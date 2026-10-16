@@ -19,11 +19,12 @@
 // - Keep navigation structure flat (avoid deep nesting)
 // - Update currentUrl signal when adding route tracking features
 
-import { Component, signal, inject, HostListener } from '@angular/core';
+import { Component, signal, inject, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { Icon } from '../components/icon/icon';
 import { filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // PATTERN: Navigation data structure
 // PURPOSE:
@@ -45,8 +46,9 @@ interface NavGroup {
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, Icon, CommonModule],
+  imports: [RouterLink, RouterLinkActive, Icon],
   templateUrl: './navbar.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './navbar.scss',
 })
 export class Navbar {
@@ -58,7 +60,7 @@ export class Navbar {
 
   groups: NavGroup[] = [
     {
-      label: 'Basics',
+      label: 'Basi',
       icon: 'data-binding',
       items: [
         { label: 'Data Binding', route: '/basics/data-binding', icon: 'data-binding' },
@@ -67,7 +69,7 @@ export class Navbar {
       ],
     },
     {
-      label: 'Advanced',
+      label: 'Avanzato',
       icon: 'signals',
       items: [
         { label: 'Signals', route: '/advanced/signals', icon: 'signals' },
@@ -75,7 +77,7 @@ export class Navbar {
       ],
     },
     {
-      label: 'State',
+      label: 'Stato',
       icon: 'store',
       items: [
         { label: 'BehaviorSubject', route: '/state/behavior-subject', icon: 'signals' },
@@ -83,9 +85,12 @@ export class Navbar {
       ],
     },
     {
-      label: 'Examples',
+      label: 'Esempi',
       icon: 'users',
-      items: [{ label: 'Users List', route: '/examples/users', icon: 'users' }],
+      items: [
+        { label: 'Lista utenti', route: '/examples/users', icon: 'users' },
+        { label: 'Design system', route: '/design-system', icon: 'palette' },
+      ],
     },
   ];
 
@@ -94,9 +99,13 @@ export class Navbar {
     this.currentUrl.set(this.router.url);
 
     this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
       .subscribe((event) => {
         this.currentUrl.set(event.urlAfterRedirects);
+        this.closeDropdown();
       });
   }
 
@@ -111,6 +120,11 @@ export class Navbar {
 
   closeDropdown() {
     this.openDropdown.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.closeDropdown();
   }
 
   @HostListener('document:click', ['$event'])

@@ -8,32 +8,27 @@
   <!-- 1. Writable Signal - Signal base modificabile                       -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">Writable Signal - Counter</h3>
+    <h2 class="section__title">Writable Signal - Contatore</h2>
     <p class="section__text">
       Un <strong>writable signal</strong> è un signal che può essere modificato usando
-      <code>.set()</code> o <code>.update()</code>.
+      <code class="section__code">.set()</code> o <code class="section__code">.update()</code>.
     </p>
 
     <div class="counter">
-      <button class="section__button" (click)="decrement()">−</button>
-      <div class="counter__display">{{ count() }}</div>
-      <button class="section__button" (click)="increment()">+</button>
+      <button matIconButton type="button" aria-label="Diminuisci contatore" (click)="decrement()">−</button>
+      <div class="counter__display" aria-live="polite">{{ count() }}</div>
+      <button matIconButton type="button" aria-label="Aumenta contatore" (click)="increment()">+</button>
     </div>
-    <button class="section__button section__button--secondary" (click)="reset()">
-      Reset
-    </button>
+    <button matButton="tonal" type="button" (click)="reset()">Reset</button>
 
-    <div class="code-block">
-      <code>count = signal(0);</code><br />
-      <code>increment() {{ '{' }} this.count.update(v => v + 1); {{ '}' }}</code>
-    </div>
+    <app-code-block [code]="writableExample" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- 2. Computed Signal - Valori derivati reattivi                       -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">Computed Signal - Valori Derivati</h3>
+    <h2 class="section__title">Computed Signal - Valori derivati</h2>
     <p class="section__text">
       Un <strong>computed signal</strong> calcola automaticamente il suo valore basandosi su altri
       signal. Si aggiorna automaticamente quando i signal da cui dipende cambiano.
@@ -41,30 +36,27 @@
 
     <div class="computed-grid">
       <div class="computed-card">
-        <div class="computed-card__label">Count</div>
+        <div class="computed-card__label">Conteggio</div>
         <div class="computed-card__value">{{ count() }}</div>
       </div>
       <div class="computed-card computed-card--highlight">
-        <div class="computed-card__label">Double</div>
+        <div class="computed-card__label">Doppio</div>
         <div class="computed-card__value">{{ doubleCount() }}</div>
       </div>
       <div class="computed-card computed-card--highlight">
-        <div class="computed-card__label">Triple</div>
+        <div class="computed-card__label">Triplo</div>
         <div class="computed-card__value">{{ tripleCount() }}</div>
       </div>
     </div>
 
-    <div class="code-block">
-      <code>doubleCount = computed(() => this.count() * 2);</code><br />
-      <code>tripleCount = computed(() => this.count() * 3);</code>
-    </div>
+    <app-code-block [code]="computedExample" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- 3. Esempio Pratico - Carrello della spesa                           -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">Esempio Pratico - Carrello</h3>
+    <h2 class="section__title">Esempio Pratico - Carrello</h2>
     <p class="section__text">
       Carrello con <strong>signal per gli items</strong> e <strong>computed per il totale</strong>.
       Il totale si aggiorna automaticamente quando modifichi le quantità.
@@ -72,47 +64,59 @@
 
     <div class="cart">
       @for (item of items(); track $index) {
-      <div class="cart-item">
-        <div class="cart-item__info">
-          <div class="cart-item__name">{{ item.name }}</div>
-          <div class="cart-item__price">€{{ item.price }}</div>
+        <div class="cart-item">
+          <div class="cart-item__info">
+            <div class="cart-item__name">{{ item.name }}</div>
+            <div class="cart-item__price">€{{ item.price }}</div>
+          </div>
+          <div class="cart-item__controls">
+            <button
+              matIconButton
+              type="button"
+              [attr.aria-label]="'Diminuisci quantità di ' + item.name"
+              (click)="updateQuantity($index, -1)"
+              [disabled]="item.quantity === 0"
+            >
+              −
+            </button>
+            <span class="cart-item__quantity">{{ item.quantity }}</span>
+            <button
+              matIconButton
+              type="button"
+              [attr.aria-label]="'Aumenta quantità di ' + item.name"
+              (click)="updateQuantity($index, 1)"
+            >+</button>
+            <button
+              matIconButton
+              type="button"
+              class="showcase-danger"
+              [attr.aria-label]="'Rimuovi ' + item.name"
+              (click)="removeItem($index)"
+            >
+              ✕
+            </button>
+          </div>
         </div>
-        <div class="cart-item__controls">
-          <button
-            class="cart-item__button"
-            (click)="updateQuantity($index, -1)"
-            [disabled]="item.quantity === 0"
-          >
-            −
-          </button>
-          <span class="cart-item__quantity">{{ item.quantity }}</span>
-          <button class="cart-item__button" (click)="updateQuantity($index, 1)">+</button>
-          <button class="cart-item__button cart-item__button--delete" (click)="removeItem($index)">
-            ✕
-          </button>
-        </div>
-      </div>
+      } @empty {
+        <p class="cart__empty" role="status">Il carrello è vuoto. Aggiungi un prodotto per iniziare.</p>
       }
 
       <div class="cart-total">
         <span class="cart-total__label">Totale:</span>
-        <span class="cart-total__value">€{{ total() }}</span>
+        <span class="cart-total__value" aria-live="polite">€{{ total() }}</span>
       </div>
 
-      <button class="section__button" (click)="addItem()">Aggiungi Magic Mouse</button>
+      <button matButton="filled" type="button" (click)="addItem()">Aggiungi Magic Mouse</button>
     </div>
 
-    <div class="code-block">
-      <code>items = signal([...]);</code><br />
-      <code>total = computed(() => items().reduce(...));</code>
-    </div>
+    <app-code-block [code]="cartExample" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- 4. Effect - Side effects reattivi                                   -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">Effect - Side Effects</h3>
+    <h2 class="section__title">Effect - Effetti reattivi</h2>
     <p class="section__text">
       Un <strong>effect</strong> viene eseguito automaticamente ogni volta che i signal da cui
       dipende cambiano. Perfetto per logging, analytics, o sincronizzazione.
@@ -121,59 +125,62 @@
     <div class="effect-logs">
       <div class="effect-logs__title">Log Effect:</div>
       @for (log of effectLogs(); track $index) {
-      <div class="effect-logs__item">{{ log }}</div>
+        <div class="effect-logs__item">{{ log }}</div>
       } @empty {
-      <div class="effect-logs__empty">Nessun log ancora...</div>
+        <div class="effect-logs__empty">Nessun log ancora...</div>
       }
     </div>
 
-    <div class="code-block">
-      <code>effect(() => {{ '{' }}</code><br />
-      <code>&nbsp;&nbsp;console.log('Count:', this.count());</code><br />
-      <code>{{ '}' }});</code>
-    </div>
+    <app-code-block [code]="effectExample" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <!-- Riepilogo                                                           -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section summary">
-    <h3 class="section__title">Riepilogo Signals API</h3>
-    <table class="summary__table">
-      <thead>
-        <tr>
-          <th class="summary__header-cell">Tipo</th>
-          <th class="summary__header-cell">Descrizione</th>
-          <th class="summary__header-cell">Esempio</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="summary__row">
-          <td class="summary__cell summary__cell--type">signal()</td>
-          <td class="summary__cell">Signal modificabile</td>
-          <td class="summary__cell summary__cell--code">count = signal(0)</td>
-        </tr>
-        <tr class="summary__row">
-          <td class="summary__cell summary__cell--type">computed()</td>
-          <td class="summary__cell">Valore derivato reattivo</td>
-          <td class="summary__cell summary__cell--code">computed(() => count() * 2)</td>
-        </tr>
-        <tr class="summary__row">
-          <td class="summary__cell summary__cell--type">effect()</td>
-          <td class="summary__cell">Esegue side effects</td>
-          <td class="summary__cell summary__cell--code">effect(() => console.log(count()))</td>
-        </tr>
-        <tr class="summary__row">
-          <td class="summary__cell summary__cell--type">.set()</td>
-          <td class="summary__cell">Imposta nuovo valore</td>
-          <td class="summary__cell summary__cell--code">count.set(10)</td>
-        </tr>
-        <tr class="summary__row">
-          <td class="summary__cell summary__cell--type">.update()</td>
-          <td class="summary__cell">Modifica basata sul valore corrente</td>
-          <td class="summary__cell summary__cell--code">count.update(v => v + 1)</td>
-        </tr>
-      </tbody>
-    </table>
+    <h2 class="section__title">Riepilogo Signals API</h2>
+    <div
+      class="summary__table-wrapper"
+      role="region"
+      aria-label="Riepilogo Signals API"
+      tabindex="0"
+    >
+      <table class="summary__table">
+        <thead>
+          <tr>
+            <th class="summary__header-cell">Tipo</th>
+            <th class="summary__header-cell">Descrizione</th>
+            <th class="summary__header-cell">Esempio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="summary__row">
+            <td class="summary__cell summary__cell--type">signal()</td>
+            <td class="summary__cell">Signal modificabile</td>
+            <td class="summary__cell summary__cell--code">count = signal(0)</td>
+          </tr>
+          <tr class="summary__row">
+            <td class="summary__cell summary__cell--type">computed()</td>
+            <td class="summary__cell">Valore derivato reattivo</td>
+            <td class="summary__cell summary__cell--code">computed(() => count() * 2)</td>
+          </tr>
+          <tr class="summary__row">
+            <td class="summary__cell summary__cell--type">effect()</td>
+            <td class="summary__cell">Esegue side effects</td>
+            <td class="summary__cell summary__cell--code">effect(() => console.log(count()))</td>
+          </tr>
+          <tr class="summary__row">
+            <td class="summary__cell summary__cell--type">.set()</td>
+            <td class="summary__cell">Imposta nuovo valore</td>
+            <td class="summary__cell summary__cell--code">count.set(10)</td>
+          </tr>
+          <tr class="summary__row">
+            <td class="summary__cell summary__cell--type">.update()</td>
+            <td class="summary__cell">Modifica basata sul valore corrente</td>
+            <td class="summary__cell summary__cell--code">count.update(v => v + 1)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 </div>

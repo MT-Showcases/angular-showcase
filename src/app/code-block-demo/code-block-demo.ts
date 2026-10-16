@@ -17,7 +17,7 @@
 // - Escape template literals properly with \`
 // - This is a demo page, not a route in main navigation
 
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { PageHeader } from '../page-header/page-header';
 import { CodeBlock } from '../components/code-block/code-block';
 
@@ -26,6 +26,7 @@ import { CodeBlock } from '../components/code-block/code-block';
   standalone: true,
   imports: [PageHeader, CodeBlock],
   templateUrl: './code-block-demo.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-block-demo.scss'],
 })
 export class CodeBlockDemo {

@@ -1,1 +1,66 @@
-.ngrx-container{max-width:1400px;margin:0 auto;padding:2rem;min-height:100vh;.tabs{display:flex;gap:1rem;margin-bottom:2rem;border-bottom:2px solid #e5e7eb;background:#fff;border-radius:.5rem .5rem 0 0;padding:.5rem .5rem 0;.tab{padding:1rem 2rem;background:0 0;border:none;border-bottom:3px solid transparent;font-size:1rem;font-weight:500;color:#6b7280;cursor:pointer;transition:all .2s;border-radius:.5rem .5rem 0 0;&:hover{color:#374151;background-color:#f3f4f6}&.active{color:#2563eb;border-bottom-color:#2563eb;background-color:#eff6ff}}}.content-section{animation:fadeIn .3s ease-in}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}}
+/** NgRx tabs wrap on small screens without adding nested page gutters. */
+@use 'globals' as *;
+
+.ngrx-container {
+  max-width: rem(1400);
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: rem(4);
+  margin-bottom: rem(32);
+  padding: rem(8);
+  background: $white;
+  border-bottom: rem(2) solid $neutral-lightest;
+  border-radius: rem(8);
+}
+
+.tab {
+  flex: 1 1 auto;
+  min-height: rem(44);
+  padding: rem(12) rem(16);
+  background: transparent;
+  border: 0;
+  border-bottom: rem(3) solid transparent;
+  border-radius: rem(8) rem(8) 0 0;
+  font-size: rem(16);
+  font-weight: 500;
+  color: $neutral-light;
+  cursor: pointer;
+  transition: $transition-fast;
+
+  &:hover {
+    color: $neutral-darker;
+    background: $neutral-lightest;
+  }
+
+  &.active {
+    color: $info;
+    border-bottom-color: $info;
+    background: $blue-bg-lighter;
+  }
+
+  @include media-min-breakpoint(md) {
+    flex: 0 1 auto;
+    padding: rem(16) rem(32);
+  }
+}
+
+.content-section {
+  min-width: 0;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(rem(10));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

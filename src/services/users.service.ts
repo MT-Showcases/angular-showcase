@@ -33,6 +33,8 @@ export class UsersService {
   // Reactive signal for filtered users
   users = signal<User[]>([]);
 
+  private searchTerm = '';
+
   /**
    * Constructor initializes service with HTTP client and loads users.
    * Automatically fetches users when service is instantiated.
@@ -48,24 +50,19 @@ export class UsersService {
   fetchUsers() {
     this.http.get<User[]>('https://jsonplaceholder.typicode.com/users').subscribe((users) => {
       this.baseUsers = users;
-      this.users.set(users);
+      this.filterUsers(this.searchTerm);
     });
   }
 
   // Filter users based on search string (name or email)
   filterUsers(search?: string) {
-    // If search is undefined, reset to all users
-    if (!search) {
-      this.users.set(this.baseUsers);
-    }
-
-    const searchLower = (search || '').toLowerCase().trim();
+    this.searchTerm = (search || '').toLowerCase().trim();
 
     this.users.set(
       this.baseUsers.filter(
         (user) =>
-          user.name.toLowerCase().includes(searchLower) ||
-          user.email.toLowerCase().includes(searchLower)
+          user.name.toLowerCase().includes(this.searchTerm) ||
+          user.email.toLowerCase().includes(this.searchTerm)
       )
     );
   }
@@ -78,6 +75,6 @@ export class UsersService {
   // Delete user by ID
   deleteUser(userId: number) {
     this.baseUsers = this.baseUsers.filter((user) => user.id !== userId);
-    this.users.set(this.baseUsers);
+    this.filterUsers(this.searchTerm);
   }
 }

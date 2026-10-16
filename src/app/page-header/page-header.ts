@@ -16,12 +16,13 @@
 // - All styling should be in page-header.scss
 // - Used at the top of every major page/section
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-page-header',
   imports: [],
   templateUrl: './page-header.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './page-header.scss',
 })
 export class PageHeader {

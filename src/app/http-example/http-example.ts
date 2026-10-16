@@ -18,7 +18,7 @@
 // - Show code examples with CodeBlock component
 // - Handle all async states (loading, success, error)
 
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { PostsService, Post } from '../../services/posts.service';
 import { PageHeader } from '../page-header/page-header';
 import { CodeBlock } from '../components/code-block/code-block';
@@ -27,6 +27,7 @@ import { CodeBlock } from '../components/code-block/code-block';
   selector: 'app-http-example',
   imports: [PageHeader, CodeBlock],
   templateUrl: './http-example.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './http-example.scss',
 })
 export class HttpExample {

@@ -19,8 +19,8 @@
 // - UserCard is presentational and receives data via @Input
 // - Follow this pattern when adding more user features
 
-import { CommonModule } from '@angular/common';
-import { Component, inject, signal, effect } from '@angular/core';
+
+import { Component, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { User } from '../../types/users';
 import { UserCard } from './user-card/user-card';
 import { FormsModule } from '@angular/forms';
@@ -30,8 +30,9 @@ import { Icon } from '../components/icon/icon';
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule, UserCard, FormsModule, PageHeader, Icon],
+  imports: [UserCard, FormsModule, PageHeader, Icon],
   templateUrl: './user-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-list.scss',
 })
 export class UserList {

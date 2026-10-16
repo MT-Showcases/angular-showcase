@@ -6,37 +6,42 @@
 <div class="directives-container">
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 1. *ngIf - Mostra/Nascondi elementi                                 -->
+  <!-- 1. @if - Show or hide elements                                 -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">*ngIf - Condizionale</h3>
+    <h3 class="section__title">&#64;if - Condizionale</h3>
 
     <!-- Esempio base -->
-    <!-- Angular: *ngIf="showMessage" -->
+    <!-- Angular: @if (showMessage) { ... } -->
     <!-- React: {showMessage && <p>Messaggio</p>} -->
     <button class="section__button" (click)="toggleMessage()">Toggle Messaggio</button>
-    <p *ngIf="showMessage" class="message">✓ Messaggio visibile!</p>
+    @if (showMessage) {
+      <p class="message">✓ Messaggio visibile!</p>
+    }
 
-    <!-- *ngIf con else -->
-    <!-- Angular: *ngIf="condition; else elseBlock" -->
+    <!-- Conditional with an alternative branch -->
+    <!-- Angular: @if (condition) { ... } @else { ... } -->
     <!-- React: {isLoggedIn ? <p>Benvenuto</p> : <p>Login</p>} -->
     <button class="section__button" (click)="toggleLogin()">Toggle Login</button>
-    <p *ngIf="isLoggedIn; else notLoggedIn" class="success">✓ Sei autenticato</p>
-    <ng-template #notLoggedIn>
+    @if (isLoggedIn) {
+      <p class="success">✓ Sei autenticato</p>
+    } @else {
       <p class="warning">⚠ Devi fare login</p>
-    </ng-template>
+    }
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 2. *ngFor - Ripeti elementi                                         -->
+  <!-- 2. @for - Repeat elements                                         -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section">
-    <h3 class="section__title">*ngFor - Lista</h3>
+    <h3 class="section__title">&#64;for - Lista</h3>
 
-    <!-- Angular: *ngFor="let item of items; index as i" -->
+    <!-- Angular: @for (item of items; track item) { ... } -->
     <!-- React: {items.map((item, i) => <div key={i}>{item}</div>)} -->
     <ul class="section__list">
-      <li class="section__list-item" *ngFor="let item of items; index as i">{{ i + 1 }}. {{ item }}</li>
+      @for (item of items; track item; let i = $index) {
+        <li class="section__list-item">{{ i + 1 }}. {{ item }}</li>
+      }
     </ul>
   </section>
 
@@ -73,6 +78,7 @@
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="section summary">
     <h3 class="section__title">Riepilogo Angular vs React</h3>
+    <p class="section__text">Le precedenti direttive <code>*ngIf</code> e <code>*ngFor</code> sono sintassi legacy. Questi esempi usano il control flow integrato di Angular.</p>
     <table class="summary__table">
       <thead>
         <tr>
@@ -82,15 +88,15 @@
       </thead>
       <tbody>
         <tr class="summary__row">
-          <td class="summary__cell summary__cell--angular">*ngIf="show"</td>
+          <td class="summary__cell summary__cell--angular">&#64;if (show) {{ '{' }} ... {{ '}' }}</td>
           <td class="summary__cell summary__cell--react">{{ '{' }}show && &lt;div /&gt;{{ '}' }}</td>
         </tr>
         <tr class="summary__row">
-          <td class="summary__cell summary__cell--angular">*ngIf="x; else y"</td>
+          <td class="summary__cell summary__cell--angular">&#64;if (x) {{ '{' }} ... {{ '}' }} &#64;else {{ '{' }} ... {{ '}' }}</td>
           <td class="summary__cell summary__cell--react">{{ '{' }}x ? &lt;A/&gt; : &lt;B/&gt;{{ '}' }}</td>
         </tr>
         <tr class="summary__row">
-          <td class="summary__cell summary__cell--angular">*ngFor="let i of items"</td>
+          <td class="summary__cell summary__cell--angular">&#64;for (item of items; track item) {{ '{' }} ... {{ '}' }}</td>
           <td class="summary__cell summary__cell--react">{{ '{' }}items.map(i => ...){{ '}' }}</td>
         </tr>
         <tr class="summary__row">

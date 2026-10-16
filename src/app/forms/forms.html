@@ -4,109 +4,72 @@
 ></app-page-header>
 
 <div class="form__container">
-  <div class="form__card">
-    <h2 class="form__title">Esempio Pratico</h2>
+  <section class="form__card" aria-labelledby="form-title">
+    <h2 class="form__title" id="form-title">Esempio pratico</h2>
     <p class="form__subtitle">Compila tutti i campi per inviare il form</p>
 
-    <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
-      <!--/* NAME FIELD */-->
-      <div class="form__group">
-        <label class="form__label">
-          Nome
-          @if (reactiveForm.get('name')?.touched) {
-            <span class="validation-icon">
-              @if (reactiveForm.get('name')?.invalid) {
-                <app-icon name="error" />
-              } @else {
-                <app-icon name="check" />
-              }
-            </span>
-          }
-        </label>
+    <form class="form__fields" [formGroup]="reactiveForm" (ngSubmit)="onSubmit()">
+      <!-- Material associates each label and error with its input. -->
+      <mat-form-field class="showcase-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Nome</mat-label>
         <input
+          matInput
           type="text"
-          class="form__input"
           formControlName="name"
+          autocomplete="given-name"
           placeholder="Inserisci il tuo nome"
-          [class.invalid]="reactiveForm.get('name')?.invalid && reactiveForm.get('name')?.touched"
-          [class.valid]="reactiveForm.get('name')?.valid && reactiveForm.get('name')?.touched"
         />
-        <div *ngIf="reactiveForm.get('name')?.errors && reactiveForm.get('name')?.touched" class="error__messages">
-          <small *ngFor="let error of reactiveForm.get('name')?.errors | keyvalue" class="error__item">
-            <span *ngIf="error.key === 'required'">Il nome è obbligatorio</span>
-            <span *ngIf="error.key === 'minlength'">Minimo 3 caratteri</span>
-            <span *ngIf="error.key === 'maxlength'">Massimo 20 caratteri</span>
-            <span *ngIf="error.key === 'pattern'">Solo lettere alfabetiche</span>
-          </small>
-        </div>
-      </div>
+        @if (reactiveForm.get('name')?.hasError('required')) {
+          <mat-error>Il nome è obbligatorio</mat-error>
+        } @else if (reactiveForm.get('name')?.hasError('minlength')) {
+          <mat-error>Minimo 3 caratteri</mat-error>
+        } @else if (reactiveForm.get('name')?.hasError('maxlength')) {
+          <mat-error>Massimo 20 caratteri</mat-error>
+        } @else if (reactiveForm.get('name')?.hasError('pattern')) {
+          <mat-error>Solo lettere alfabetiche</mat-error>
+        }
+      </mat-form-field>
 
-      <!--/* SURNAME FIELD */-->
-      <div class="form__group">
-        <label class="form__label">
-          Cognome
-          @if (reactiveForm.get('surname')?.touched) {
-            <span class="validation-icon">
-              @if (reactiveForm.get('surname')?.invalid) {
-                <app-icon name="error" />
-              } @else {
-                <app-icon name="check" />
-              }
-            </span>
-          }
-        </label>
+      <mat-form-field class="showcase-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Cognome</mat-label>
         <input
+          matInput
           type="text"
-          class="form__input"
           formControlName="surname"
+          autocomplete="family-name"
           placeholder="Inserisci il tuo cognome"
-          [class.invalid]="reactiveForm.get('surname')?.invalid && reactiveForm.get('surname')?.touched"
-          [class.valid]="reactiveForm.get('surname')?.valid && reactiveForm.get('surname')?.touched"
         />
-        <div *ngIf="reactiveForm.get('surname')?.errors && reactiveForm.get('surname')?.touched" class="error__messages">
-          <small class="error__item">Il cognome è obbligatorio</small>
-        </div>
-      </div>
+        @if (reactiveForm.get('surname')?.hasError('required')) {
+          <mat-error>Il cognome è obbligatorio</mat-error>
+        }
+      </mat-form-field>
 
-      <!--/* EMAIL FIELD */-->
-      <div class="form__group">
-        <label class="form__label">
-          Email
-          @if (reactiveForm.get('email')?.touched) {
-            <span class="validation-icon">
-              @if (reactiveForm.get('email')?.invalid) {
-                <app-icon name="error" />
-              } @else {
-                <app-icon name="check" />
-              }
-            </span>
-          }
-        </label>
+      <mat-form-field class="showcase-field" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Email</mat-label>
         <input
+          matInput
           type="email"
-          class="form__input"
           formControlName="email"
+          autocomplete="email"
           placeholder="inserisci@email.com"
-          [class.invalid]="reactiveForm.get('email')?.invalid && reactiveForm.get('email')?.touched"
-          [class.valid]="reactiveForm.get('email')?.valid && reactiveForm.get('email')?.touched"
         />
-        <div *ngIf="reactiveForm.get('email')?.errors && reactiveForm.get('email')?.touched" class="error__messages">
-          <small *ngFor="let error of reactiveForm.get('email')?.errors | keyvalue" class="error__item">
-            <span *ngIf="error.key === 'required'">L'email è obbligatoria</span>
-            <span *ngIf="error.key === 'email' || error.key === 'pattern'">Formato email non valido</span>
-          </small>
-        </div>
-      </div>
+        @if (reactiveForm.get('email')?.hasError('required')) {
+          <mat-error>L'email è obbligatoria</mat-error>
+        } @else if (
+          reactiveForm.get('email')?.hasError('email') ||
+          reactiveForm.get('email')?.hasError('pattern')
+        ) {
+          <mat-error>Formato email non valido</mat-error>
+        }
+      </mat-form-field>
 
-      <!--/* BUTTONS */-->
       <div class="form__actions">
-        <button type="submit" class="btn btn__submit" [disabled]="reactiveForm.invalid">
-          Invia Form
+        <button matButton="filled" type="submit" [disabled]="reactiveForm.invalid">
+          Invia form
         </button>
-        <button type="button" class="btn btn__reset" (click)="onReset()">
-          Reset
-        </button>
+        <!-- Native reset also clears FormGroupDirective's submitted state. -->
+        <button matButton="outlined" type="reset">Reset</button>
       </div>
     </form>
-  </div>
+  </section>
 </div>

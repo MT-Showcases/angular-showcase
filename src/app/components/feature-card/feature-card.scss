@@ -1,169 +1,115 @@
-/**
- * FeatureCard Component Styles
- *
- * Reusable card component for feature showcase on homepage.
- * Features gradient hover effects, animations, and icon display.
- * Uses BEM methodology.
- */
-
+/** Shared feature navigation card, using Material public system tokens. */
 @use 'globals' as *;
 
-// ═══ MAIN CARD CONTAINER ═══
-.feature-card {
-  // Base styling (mobile-first)
+:host {
+  display: block;
+  min-width: 0;
   height: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(rem(10));
-  border-radius: rem(16);
-  padding: rem(24);
-  box-shadow: 0 rem(8) rem(32) rgba(0, 0, 0, 0.1);
-  border: rem(1) solid rgba(255, 255, 255, 0.3);
-  transition: $transition;
+  animation: showcase-feature-slide-up 0.6s ease-out backwards;
+}
+
+.feature-card {
+  @include surface-panel();
+  height: 100%;
   text-decoration: none;
-  color: inherit;
+  overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.6s ease-out backwards;
-  will-change: transform;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
   transform-style: preserve-3d;
 
-  // More padding on desktop
-  @include media-min-breakpoint(md) {
-    padding: rem(32);
-  }
-
-  // Hover effect: gradient background and enhanced shadow
-  &:hover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    box-shadow: 0 rem(16) rem(48) rgba(102, 126, 234, 0.3);
-
-    // Icon inverts colors on hover
-    .feature-card__icon {
-      background: white;
-
-      ::ng-deep app-icon svg {
-        stroke: #667eea !important;
-      }
-    }
-
-    // Text becomes white on hover
-    .feature-card__title,
-    .feature-card__text {
-      color: white;
-    }
-
-    // List items become white on hover
-    .feature-card__list li {
-      color: rgba(255, 255, 255, 0.9);
-
-      &::before {
-        color: white;
-      }
-    }
-  }
-
-  // ─── ICON CONTAINER ───
-  // Gradient background with centered icon
   &__icon {
     width: rem(56);
     height: rem(56);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: rem(16);
+    border-radius: radius(lg);
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: rem(20);
-
-    // Larger icon on desktop
-    @include media-min-breakpoint(md) {
-      width: rem(64);
-      height: rem(64);
-    }
-
-    app-icon {
-      width: rem(36);
-      height: rem(36);
-
-      @include media-min-breakpoint(md) {
-        width: rem(40);
-        height: rem(40);
-      }
-
-      svg {
-        stroke: white;
-      }
-    }
+    margin-bottom: space(6);
   }
 
-  // ─── CARD TITLE ───
+  &__svg {
+    width: rem(36);
+    height: rem(36);
+  }
+
   &__title {
-    font-size: rem(20);
+    font: var(--mat-sys-title-large);
     font-weight: 700;
-    color: #667eea;
-    margin-bottom: rem(12);
-
-    // Larger title on desktop
-    @include media-min-breakpoint(md) {
-      font-size: rem(24);
-    }
+    color: var(--mat-sys-primary);
+    margin-bottom: space(3);
   }
 
-  // Card description text
   &__text {
-    font-size: rem(15);
-    color: #666;
-    margin-bottom: rem(16);
-    line-height: 1.5;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+    margin-bottom: space(4);
   }
 
-  // ─── FEATURE LIST ───
-  // List of features with checkmark icons
   &__list {
     list-style: none;
     padding: 0;
     margin: 0;
+  }
 
-    li {
-      font-size: rem(14);
-      color: #555;
-      padding: rem(6) 0;
-      padding-left: rem(20);
-      position: relative;
+  &__list-item {
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+    padding: space(2) 0 space(2) space(6);
+    position: relative;
 
-      // Checkmark icon before each item
-      &::before {
-        content: '✓';
-        position: absolute;
-        left: 0;
-        color: #667eea;
-        font-weight: bold;
-        transition: 0.5s;
+    &::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--mat-sys-primary);
+      font-weight: 700;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+      box-shadow: shadow(raised);
+
+      .feature-card__icon {
+        background: var(--mat-sys-on-primary);
+        color: var(--mat-sys-primary);
       }
+
+      .feature-card__title,
+      .feature-card__text,
+      .feature-card__list-item,
+      .feature-card__list-item::before {
+        color: var(--mat-sys-on-primary);
+      }
+    }
+  }
+
+  @include media-min-breakpoint(md) {
+    padding: space(8);
+
+    &__icon {
+      width: space(16);
+      height: space(16);
+    }
+
+    &__svg {
+      width: space(10);
+      height: space(10);
     }
   }
 }
 
-// ═══ ANIMATIONS ═══
-
-// Slide up animation on card mount
-@keyframes slideUp {
+@keyframes showcase-feature-slide-up {
   from {
     opacity: 0;
-    transform: translate3d(0, rem(30), 0);
+    transform: translateY(space(8));
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 30px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translateY(0);
   }
 }

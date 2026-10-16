@@ -1,0 +1,66 @@
+/** Material 3 theme. Customize only through Angular Material's public Sass APIs. */
+@use '@angular/material' as mat;
+@use 'theme-colors' as palette;
+@use 'globals' as *;
+
+.site-html {
+  color-scheme: light;
+  @include mat.theme((
+    color: (
+      primary: palette.$primary-palette,
+      tertiary: palette.$tertiary-palette,
+      theme-type: light,
+    ),
+    typography: $font-family,
+    density: 0,
+  ));
+  @include mat.theme-overrides((
+    corner-small: radius(sm),
+    corner-medium: radius(md),
+    corner-large: radius(lg),
+  ));
+  @include mat.button-overrides((
+    filled-container-shape: radius(md),
+    tonal-container-shape: radius(md),
+    outlined-container-shape: radius(md),
+    text-container-shape: radius(sm),
+  ));
+  @include mat.form-field-overrides((outlined-container-shape: radius(sm)));
+  @include mat.strong-focus-indicators((border-width: rem(3), border-radius: radius(sm)));
+}
+
+// Filled actions need a light focus indicator against their dark container.
+[matButton='filled'] {
+  @include mat.strong-focus-indicators((border-color: var(--mat-sys-on-primary)));
+}
+
+.showcase-danger {
+  @include mat.button-overrides((
+    filled-container-color: var(--mat-sys-error),
+    filled-label-text-color: var(--mat-sys-on-error),
+    filled-state-layer-color: var(--mat-sys-on-error),
+    filled-ripple-color: color-mix(in srgb, var(--mat-sys-on-error) 12%, transparent),
+    tonal-container-color: var(--mat-sys-error-container),
+    tonal-label-text-color: var(--mat-sys-on-error-container),
+    tonal-state-layer-color: var(--mat-sys-on-error-container),
+    tonal-ripple-color: color-mix(in srgb, var(--mat-sys-on-error-container) 12%, transparent),
+    outlined-label-text-color: var(--mat-sys-error),
+    outlined-outline-color: var(--mat-sys-error),
+    outlined-state-layer-color: var(--mat-sys-error),
+    outlined-ripple-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent),
+    text-label-text-color: var(--mat-sys-error),
+    text-state-layer-color: var(--mat-sys-error),
+    text-ripple-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent),
+  ));
+  @include mat.icon-button-overrides((
+    icon-color: var(--mat-sys-error),
+    state-layer-color: var(--mat-sys-error),
+    ripple-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent),
+  ));
+}
+
+// Layout is independent of the Material form-field internals.
+.showcase-field {
+  width: 100%;
+  min-width: 0;
+}

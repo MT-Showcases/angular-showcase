@@ -9,38 +9,38 @@
 // PATTERNS USED:
 // - Reactive Forms pattern (FormBuilder, FormGroup)
 // - Built-in and custom validators
-// - Real-time validation with visual feedback (icons, error messages)
+// - Angular Material fields with accessible validation feedback
 //
 // NOTES FOR CONTRIBUTORS:
 // - Use Reactive Forms (not Template-driven) for consistency
 // - Add validators inline when creating the form group
 // - Keep validation logic simple and educational
-// - Show validation states visually (check/error icons)
+// - Use Material public APIs for control presentation and error states
 
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { PageHeader } from '../page-header/page-header';
-import { Icon } from '../components/icon/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-forms',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, PageHeader, Icon],
+  imports: [ReactiveFormsModule, PageHeader, MatButtonModule, MatFormFieldModule, MatInputModule],
   templateUrl: './forms.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './forms.scss',
 })
 export class Forms {
   reactiveForm: FormGroup;
 
-  // Inject FormBuilder to create reactive form in constructor
   constructor(private fb: FormBuilder) {
-    // Configura il form reattivo con validazioni
+    // Keep the validators visible here so the demo remains easy to follow.
     this.reactiveForm = this.fb.group({
       name: [
         '',
@@ -64,19 +64,13 @@ export class Forms {
   }
 
   onSubmit() {
-    // Esempio di setValue per aggiornare il valore di un controllo
-    //this.reactiveForm.get('name')?.setValue('Mario');
-
     if (this.reactiveForm.valid) {
-      console.log('Form reattivo inviato:', this.reactiveForm.value);
+      console.log('Reactive form submitted:', this.reactiveForm.value);
       alert('Form reattivo inviato con successo!');
     } else {
-      console.log('Form reattivo non valido', this.reactiveForm.controls);
+      this.reactiveForm.markAllAsTouched();
+      console.log('Reactive form is invalid:', this.reactiveForm.controls);
       alert('Form reattivo non valido. Controlla i campi e riprova.');
     }
-  }
-
-  onReset() {
-    this.reactiveForm.reset();
   }
 }

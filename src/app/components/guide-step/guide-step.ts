@@ -18,8 +18,8 @@
 // - Used primarily in ngrx-concepts for step-by-step guides
 // - Both codeExample and explanationBox are optional
 
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+
 import { CodeBlock } from '@components/code-block/code-block';
 import { CodeLanguage } from '@models/code';
 
@@ -63,8 +63,9 @@ export interface GuideStepData {
 @Component({
   selector: 'app-guide-step',
   standalone: true,
-  imports: [CommonModule, CodeBlock],
+  imports: [CodeBlock],
   templateUrl: './guide-step.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './guide-step.scss',
 })
 export class GuideStep {

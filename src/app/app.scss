@@ -1,7 +1,13 @@
 @use 'globals' as *;
 
 .main {
-  padding: 24px 24px 128px 24px;
-
+  min-width: 0;
+  max-width: rem(1440);
+  margin-inline: auto;
+  padding: rem(24) rem(16) calc(rem(160) + env(safe-area-inset-bottom));
   color: $white;
+
+  @include media-min-breakpoint(md) {
+    padding: rem(32) rem(24) calc(rem(112) + env(safe-area-inset-bottom));
+  }
 }

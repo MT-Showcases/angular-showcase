@@ -19,8 +19,8 @@
 // - Keep explanations beginner-friendly
 // - Add new patterns to StorePattern type if needed
 
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
+
 import { CodeBlock } from '@components/code-block/code-block';
 import { ConceptCard, ConceptCardData } from '@components/concept-card/concept-card';
 import { GuideStep, GuideStepData } from '@components/guide-step/guide-step';
@@ -34,8 +34,9 @@ type StorePattern = 'centralized' | 'feature' | null;
 @Component({
   selector: 'app-ngrx-concepts',
   standalone: true,
-  imports: [CommonModule, CodeBlock, ConceptCard, GuideStep],
+  imports: [CodeBlock, ConceptCard, GuideStep],
   templateUrl: './ngrx-concepts.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./ngrx-concepts.scss'],
 })
 export class NgrxConcepts {

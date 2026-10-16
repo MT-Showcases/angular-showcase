@@ -20,7 +20,7 @@
 // - Memory cleanup is critical: always cancel animation frames in ngOnDestroy
 // - Velocity multipliers create varied speeds (1x, 2x, 4x, 8x, infinite)
 
-import { Component, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Icon } from '../components/icon/icon';
 
 // PATTERN: Bouncing logo data structure
@@ -47,6 +47,7 @@ interface BouncingLogoData {
   standalone: true,
   imports: [Icon],
   templateUrl: './bouncing-logo.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './bouncing-logo.scss',
 })
 export class BouncingLogo implements OnInit, OnDestroy {

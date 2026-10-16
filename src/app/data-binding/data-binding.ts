@@ -17,14 +17,15 @@
 // - Use clear section markers for different binding types
 // - Maintain Italian for user-facing content
 
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { PageHeader } from '../page-header/page-header';
 
 @Component({
   selector: 'app-data-binding',
-  imports: [CommonModule, PageHeader],
+  imports: [PageHeader],
   templateUrl: './data-binding.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './data-binding.scss',
 })
 export class DataBinding {
