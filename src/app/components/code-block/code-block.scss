@@ -66,11 +66,11 @@
 
   // Success state after copying
   &.copied {
-    background: #10b981;
+    background: #047857;
     color: white;
 
     &:hover {
-      background: #059669;
+      background: #065f46;
     }
   }
 
@@ -131,7 +131,7 @@
 // Using ::ng-deep to bypass view encapsulation for dynamically inserted HTML
 ::ng-deep {
   .code-comment {
-    color: #64748b;
+    color: #94a3b8;
     font-style: italic;
   }
 
