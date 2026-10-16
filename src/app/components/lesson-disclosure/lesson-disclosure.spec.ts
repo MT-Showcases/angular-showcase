@@ -22,6 +22,7 @@ describe('Lesson disclosure navigation', () => {
     const loader = TestbedHarnessEnvironment.loader(harness.fixture);
     const panel = await loader.getHarness(MatExpansionPanelHarness);
     expect(await panel.isExpanded()).toBe(true);
+    expect(document.activeElement).toBe(harness.routeNativeElement!.querySelector('mat-expansion-panel-header'));
     harness.routeNativeElement!.querySelector('button')!.click();
     await panel.collapse();
     await panel.expand();

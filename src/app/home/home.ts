@@ -1,22 +1,5 @@
 // COMPONENT TYPE: Container
-// SECTION: Home Page
-//
-// ROLE:
-// - Display the main landing page with overview of all Angular features
-// - Organize feature cards into logical sections (basics, advanced, state management)
-// - Provide navigation entry points to all major showcases
-//
-// PATTERNS USED:
-// - Standalone component architecture
-// - Configuration-driven UI (feature array)
-// - Responsive grid layout for feature cards
-//
-// NOTES FOR CONTRIBUTORS:
-// - Add new features to the featureCards array, UI will auto-update
-// - Keep descriptions concise and in Italian (user-facing content)
-// - Maintain consistent feature card structure across all sections
-// - Icons must be registered in the Icon component
-
+// ROLE: Present published learning paths from the shared topic registry.
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FeatureCard } from '../components/feature-card/feature-card';
@@ -44,7 +27,7 @@ interface Feature {
 })
 export class Home {
   readonly paths = [
-    { category: 'basics', title: 'Parti dalle Basi', description: 'Dal primo componente ai form, un concetto alla volta.', route: '/basics' },
+    { category: 'basics', title: 'Parti dalle Basi', description: 'Dal primo componente a servizi e routing, un concetto alla volta.', route: '/basics' },
     { category: 'advanced', title: 'Esplora Avanzato', description: 'Stato reattivo e richieste HTTP, con esperimenti e casi di errore.', route: '/advanced' },
   ];
   cards(category: string): Feature[] {
