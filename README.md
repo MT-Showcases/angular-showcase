@@ -2,6 +2,8 @@
 
 An Italian-language Angular 22 learning site for newcomers and experienced developers. Each lesson starts with an explanation and a working demo, then offers optional code and deeper discussion. The UI uses Angular Material and the project's purple theme.
 
+Project workflow rules live in [AGENTS.md](AGENTS.md). The current [product direction](docs/product-direction.md) puts a live preview first and editable, commented code directly below it. The First Component lesson implements the reference playground.
+
 ## Learning paths
 
 Start at `/basics` and follow the suggested order, or open a lesson directly:
@@ -19,7 +21,7 @@ Start at `/basics` and follow the suggested order, or open a lesson directly:
 
 The `/advanced` path covers Signals (`/advanced/signals`) and HTTP (`/advanced/http`). Separate examples for NgRx, BehaviorSubject and users retain their existing URLs.
 
-Lessons have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. These are interactive demonstrations, not a live code editor. External documentation links provide optional supporting material.
+The First Component lesson has a real Angular preview and an editable TypeScript/HTML/CSS playground. Other lessons currently have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. The component playground supports one component and bundled Angular modules; full project editing and package installation remain future work. External documentation links provide optional supporting material.
 
 ### HTTP demonstration
 
@@ -45,6 +47,8 @@ npm run build
 npm audit
 ```
 
+`npm start`, `npm run build` and `npm test` generate the isolated playground runtime first. `npm test -- --watch=false` also runs the generated runtime tests after the Angular suite. Use `npm run playground:test` to verify the runtime on its own. Direct `ng` commands bypass npm lifecycle hooks; run `npm run playground:build` first when using them. Generated preview assets are ignored by Git and included in production build assets.
+
 The app uses Angular/Material 22.2.3, NgRx 22, TypeScript 6.0.x and Vitest 5. Existing components retain Angular 22's explicit `ChangeDetectionStrategy.Eager`; this project does not perform a blanket change-detection migration. npm's version-pinned `allowScripts` entries allow the required native build dependencies.
 
 Production warning budgets remain 500 kB for the initial bundle and 10 kB for each component stylesheet. The existing NgRx concepts and BehaviorSubject styles exceed their warning threshold; these warnings are separate from functional failures. Do not raise budgets to hide regressions.
@@ -62,7 +66,7 @@ State Management and Examples receive regression coverage but are not part of th
 
 ## Contributing
 
-Code, comments, technical documentation and commit messages are English; product text is Italian. Use standalone components, explicit types and meaningful interaction tests. Keep snippets labelled as complete examples or fragments, with necessary imports/setup.
+Implementation identifiers, internal comments, technical documentation and commit messages are English. Product text and comments in user-visible examples are Italian. Use standalone components, explicit types and meaningful interaction tests. Keep snippets labelled as complete examples or fragments, with necessary imports/setup.
 
 Read the [project instructions](.github/copilot-instructions.md), [styling conventions](.github/copilot-instructions/styling-conventions.md), [component guide](.github/copilot-instructions/reusable-components.md) and [implementation plan](docs/plans/basics-advanced-update.md).
 
@@ -70,6 +74,6 @@ For parallel development, use a separate branch/worktree, dependency directory a
 
 ## Future work
 
-Search, related-topic drawers, a live code editor, progress persistence and AI tutoring remain future possibilities. They are not prerequisites for the current lessons and are not advertised as delivered functionality.
+Search, related-topic drawers, full project IDEs, progress persistence and AI tutoring remain future possibilities. A component editor is already available in the First Component lesson. They are not prerequisites for the current lessons and are not advertised as delivered functionality.
 
 Licensed under [MIT](LICENSE).

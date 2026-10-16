@@ -1,6 +1,9 @@
 @use 'globals' as *;
 .lesson-shell {
   max-width: rem(1100); margin-inline: auto; min-width: 0;
+  &__header { color: $white; margin-bottom: space(4); }
+  &__title { font: var(--mat-sys-headline-large); font-weight: 700; margin: 0 0 space(2); }
+  &__subtitle { font: var(--mat-sys-body-large); margin: 0; line-height: 1.6; }
   &__link { color: inherit; text-underline-offset: rem(4); }
   &__intro .lesson-shell__link { color: var(--mat-sys-primary); }
   &__breadcrumbs { display: flex; flex-wrap: wrap; gap: space(2); margin-bottom: space(4); color: $white; }

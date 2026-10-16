@@ -1,0 +1,34 @@
+<div class="playground">
+  <section class="playground__preview" [attr.aria-labelledby]="id + '-preview-title'">
+    <div class="playground__bar">
+      <h2 [id]="id + '-preview-title'" class="playground__title">Il tuo componente, dal vivo</h2>
+      <span class="playground__badge">Angular 22</span>
+    </div>
+    @for (frame of [channel()]; track frame) {
+      <iframe #previewFrame class="playground__frame" [src]="previewUrl()" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Anteprima interattiva del componente Angular"></iframe>
+    }
+    <div class="playground__feedback"><p role="status" class="playground__status">{{ statusText() }}</p>
+      <button matButton="text" type="button" (click)="restart()">Riavvia anteprima</button></div>
+    @if (error()) { <pre class="playground__error" role="alert">{{ error() }}</pre> }
+  </section>
+  <section id="code" class="playground__source" [attr.aria-labelledby]="id + '-code-title'">
+    <div class="playground__bar playground__bar--code">
+      <h2 [id]="id + '-code-title'" class="playground__title">Modifica il codice</h2>
+      <span class="playground__hint">Le modifiche aggiornano la preview</span>
+    </div>
+    <div class="playground__tabs" role="tablist" aria-label="File del componente">
+      @for (file of files; track file.id; let index = $index) {
+        <button class="playground__tab" type="button" role="tab" [id]="id + '-file-' + file.id" [attr.aria-selected]="activeFile() === file.id" [attr.aria-controls]="id + '-editor-' + file.id" [tabIndex]="activeFile() === file.id ? 0 : -1" (click)="selectFile(file.id)" (keydown)="fileKey($event, index)">{{ file.name }}</button>
+      }
+    </div>
+    @for (file of files; track file.id) {
+      <div [id]="id + '-editor-' + file.id" role="tabpanel" [attr.aria-labelledby]="id + '-file-' + file.id" [hidden]="activeFile() !== file.id"><div #editorHost class="playground__editor"></div></div>
+    }
+    <div class="playground__actions">
+      <button matButton="filled" type="button" (click)="run()" [disabled]="status() === 'loading'">Esegui</button>
+      <button matButton="tonal" type="button" (click)="toggleAutomatic()" [attr.aria-pressed]="automatic()">{{ automatic() ? 'Live attivo' : 'Live in pausa' }}</button>
+      <button matButton="outlined" type="button" (click)="reset()">Ripristina codice</button>
+    </div>
+    <p class="playground__keyboard" [id]="id + '-keyboard-help'">Tab indenta il codice. Premi Esc, poi Tab per uscire dall’editor. Ricompilare riparte dallo stato iniziale del componente.</p>
+  </section>
+</div>

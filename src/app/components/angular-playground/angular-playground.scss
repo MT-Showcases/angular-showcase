@@ -1,0 +1,22 @@
+/** The preview precedes the editor at every viewport width. */
+@use 'globals' as *;
+.playground {
+  display: grid; gap: space(4); min-width: 0;
+  &__preview, &__source { overflow: hidden; min-width: 0; border-radius: radius(lg); background: var(--mat-sys-surface); color: var(--mat-sys-on-surface); box-shadow: shadow(card); }
+  &__bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: space(2); padding: space(4) space(6); border-bottom: rem(1) solid var(--mat-sys-outline-variant); }
+  &__bar--code { color: #e2e8f0; background: #101a2e; border-color: #334155; }
+  &__title { margin: 0; font: var(--mat-sys-title-medium); }
+  &__badge { font: var(--mat-sys-label-medium); color: var(--mat-sys-primary); background: var(--mat-sys-primary-container); padding: space(1) space(3); border-radius: radius(sm); }
+  &__hint { font: var(--mat-sys-body-small); color: #b7c4db; }
+  &__frame { display: block; width: 100%; height: rem(290); border: 0; background: #fff; }
+  &__feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: space(2); padding: space(2) space(4); background: var(--mat-sys-surface-container-low); }
+  &__status { font: var(--mat-sys-body-small); }
+  &__error { padding: space(4); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--mat-sys-error-container); color: var(--mat-sys-on-error-container); }
+  &__tabs { display: flex; overflow-x: auto; background: #101a2e; border-bottom: rem(1) solid #334155; }
+  &__tab { flex-shrink: 0; min-height: rem(48); padding: space(3) space(4); border: 0; border-bottom: rem(3) solid transparent; color: #b7c4db; background: transparent; cursor: pointer; font-family: monospace; }
+  &__tab[aria-selected='true'] { color: #fff; background: #1e293b; border-bottom-color: #b9c3ff; }
+  &__tab:focus-visible { outline: rem(3) solid #b9c3ff; outline-offset: rem(-3); }
+  &__editor { min-height: rem(300); background: #101a2e; }
+  &__actions { display: flex; flex-wrap: wrap; align-items: center; gap: space(3); padding: space(4); }
+  &__keyboard { margin: 0; padding: 0 space(4) space(4); font: var(--mat-sys-body-small); color: var(--mat-sys-on-surface-variant); }
+}

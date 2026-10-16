@@ -41,3 +41,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Generated, isolated Angular playground runtime (npm lifecycle scripts rebuild it).
+/public/playground/generated/

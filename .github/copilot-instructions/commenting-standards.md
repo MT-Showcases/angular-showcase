@@ -1,5 +1,7 @@
 # Commenting Standards
 
+User-facing playground/example comments must be in Italian, following the project language policy in `AGENTS.md`. English-only guidance below applies to internal implementation comments.
+
 ## 📋 Overview
 This document defines commenting standards for the Angular Showcase project. These standards enable both human developers and AI assistants to maintain consistent, high-quality code.
 

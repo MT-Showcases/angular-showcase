@@ -1,5 +1,7 @@
 # Copilot Instructions - Angular Showcase
 
+Follow [project rules](../AGENTS.md) and the current [product direction](../docs/product-direction.md). The technical references below do not require retaining the existing verbose lesson layout.
+
 > **📚 Detailed Documentation**: This file provides a high-level overview. For detailed guidelines, see:
 > - [Project Structure](./copilot-instructions/project-structure.md) - Directory organization and file naming
 > - [Styling Conventions](./copilot-instructions/styling-conventions.md) - SCSS best practices (mobile-first, rem(), BEM)
@@ -23,12 +25,12 @@ See [Commenting Standards](./copilot-instructions/commenting-standards.md) for c
 ## 🌍 Language Policy
 
 ### Code & Technical Content (English Only)
-**ALL code, comments, and technical documentation MUST be in English:**
+**Implementation code and technical documentation use English, with Italian comments in user-visible teaching examples:**
 - Variable names, function names, class names: English only
-- Code comments: English only
+- Internal implementation comments: English. Comments inside user-visible examples and playground source: Italian.
 - Technical documentation (README, inline docs): English only
 - Commit messages: English only
-- Console logs and error messages: English only
+- Internal console logs: English. User-visible diagnostics and instructional messages: Italian.
 
 ### User-Facing Content (Italian)
 **ALL user-facing text in templates MUST be in Italian:**
@@ -310,7 +312,7 @@ npm test           # Run tests
 - Use comments for complex logic
 - Document configurations with inline comments
 - Logical sections with headers `// ═══ SECTION ═══`
-- **All comments must be in English**
+- Internal comments are English; user-visible example comments are Italian.
 
 ### Formatting
 - 2 spaces indentation
@@ -326,7 +328,7 @@ npm test           # Run tests
 - ❌ Don't put business logic in components (use services)
 - ❌ Don't use `@import` in SCSS (use `@use` or `@forward`)
 - ❌ Don't increase budgets without optimizing code first
-- ❌ Don't use Italian in code, comments, or documentation
+- ❌ Do not use Italian for implementation identifiers or technical documentation; use Italian for comments in user-visible examples.
 - ❌ **NEVER use direct HTML tag selectors in SCSS** (always use classes)
 - ❌ **NEVER use px or rem literals** (always use `rem()` function for all sizes)
 - ❌ **NEVER use desktop-first approach** (always use mobile-first with `@include media-min-breakpoint()`)
@@ -353,11 +355,12 @@ npm test           # Run tests
 
 ## Progressive lesson contract
 
+- The existing LessonShell layout can be simplified under the current product direction. Retain useful state/navigation behavior without preserving repeated introductory content.
 - Publish routes and navigation through `src/app/learning/topics.ts` only after integration.
 - Wrap feature demos with LessonShell. Keep the demo mounted; use LessonDisclosure for optional `code` and `deepen` sections.
 - Section links preserve the complete current route and query, including nested routing sandbox views.
 - Use fragment navigation and public Material header APIs for disclosure focus; verify initial direct links as well as later fragment changes.
-- Label snippets as complete examples or fragments and state their setup/import requirements.
-- Use real interactions and meaningful tests for claims made by Home cards. Do not advertise a live editor or persistence that the demo does not implement.
+- Keep playground source editable directly below its preview. Include concise teaching comments, blank lines between logical blocks and expanded attributes/style declarations. Label remaining static snippets as complete examples or fragments and state their setup/import requirements.
+- Use real interactions and meaningful tests for claims made by Home cards. Distinguish the First Component editor from static demos and from a future full project runtime. Keep generated preview assets out of Git; npm lifecycle hooks rebuild them.
 - JSONPlaceholder writes are simulated. Keep POST history separate from fetched GET resources and assign unique local operation IDs.
 - Feature-local DI providers are teaching scopes; do not describe them as application-wide root singletons.

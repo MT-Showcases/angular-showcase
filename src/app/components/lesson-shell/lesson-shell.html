@@ -4,6 +4,9 @@
     <a class="lesson-shell__link" [routerLink]="'/' + topic().category">{{ topic().category === 'basics' ? 'Basi' : 'Avanzato' }}</a>
     <span aria-hidden="true">/</span><span aria-current="page">{{ topic().title }}</span>
   </nav>
+  @if (compact()) {
+    <header class="lesson-shell__header"><h1 class="lesson-shell__title">{{ topic().title }}</h1><p class="lesson-shell__subtitle">{{ topic().outcome }}</p></header>
+  } @else {
   <app-page-header [title]="topic().title" [subtitle]="topic().outcome" />
   <section class="lesson-shell__intro" aria-label="Come usare questa lezione">
     <p class="lesson-shell__lead">Capisci il concetto, prova la demo e apri i dettagli quando ti servono.</p>
@@ -30,6 +33,7 @@
       </dl>
     </details>
   </section>
+  }
   <!-- Projection leaves interactive demos mounted when explanations are collapsed. -->
   <div class="lesson-shell__content"><ng-content /></div>
   <nav class="lesson-shell__footer" aria-label="Continua il percorso">

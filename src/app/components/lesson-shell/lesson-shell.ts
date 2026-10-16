@@ -30,6 +30,7 @@ export class LessonShell {
     };
     return { demo: link('demo'), code: link('code'), deepen: link('deepen') };
   });
+  readonly compact = input(false);
   readonly topicId = input.required<LessonId>();
   readonly topic = computed(() => TOPICS.find(topic => topic.id === this.topicId())!);
   readonly prerequisites = computed(() => TOPICS.filter(topic => this.topic().prerequisites.includes(topic.id)));
