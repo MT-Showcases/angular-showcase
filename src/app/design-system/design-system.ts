@@ -1,4 +1,5 @@
 import { Component, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,12 +9,14 @@ import { CodeBlock } from '../components/code-block/code-block';
 import { ConceptCard } from '../components/concept-card/concept-card';
 import { FeatureCard } from '../components/feature-card/feature-card';
 import { GuideStep } from '../components/guide-step/guide-step';
+import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { Icon } from '../components/icon/icon';
 
 @Component({
   selector: 'app-design-system',
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
@@ -23,6 +26,7 @@ import { Icon } from '../components/icon/icon';
     FeatureCard,
     GuideStep,
     Icon,
+    LessonDisclosure,
   ],
   templateUrl: './design-system.html',
   styleUrl: './design-system.scss',

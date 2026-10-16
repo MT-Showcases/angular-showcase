@@ -17,7 +17,7 @@
       }
     </button>
   </div>
-  @if (copyError()) { <p role="status">Copia non disponibile. Seleziona il codice e copialo con la tastiera.</p> }
+  @if (copyError()) { <p class="code-block-copy-error" role="status">Copia non disponibile. Seleziona il codice e copialo con la tastiera.</p> }
   <div class="code-block-content" tabindex="0" role="region" aria-label="Codice dell’esempio">
     <pre><code [innerHTML]="highlightedCode"></code></pre>
   </div>

@@ -7,7 +7,12 @@
   </main>
 
   <!-- Bouncing logos component -->
-  <app-bouncing-logo></app-bouncing-logo>
+  @if (isLesson()) {
+    <details class="exploration" (toggle)="toggleExploration($event)">
+      <summary class="exploration__summary">Esplorazione libera: mostra gli argomenti casuali</summary>
+      @if (explorationOpen()) { <app-bouncing-logo /> }
+    </details>
+  } @else { <app-bouncing-logo /> }
 </div>
 
 <!-- Modal for external/internal links -->

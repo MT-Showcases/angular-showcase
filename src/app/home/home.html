@@ -1,57 +1,28 @@
 <div class="home">
   <div class="home__hero">
     <h1 class="home__title">Angular Showcase</h1>
-    <p class="home__subtitle">Progetto educativo con esempi pratici di Angular 22</p>
+    <p class="home__subtitle">Impara Angular 22 osservando cosa cambia. Parti dalle basi oppure scegli un concetto da approfondire.</p>
+    <div class="home__entry"><a class="home__entry-link" routerLink="/basics">Inizia il percorso Basi →</a><a class="home__entry-link" routerLink="/advanced">Vai ad Avanzato →</a></div>
   </div>
-
-  <div class="home__features">
-    @for (card of featureCards; track card.routerLink) {
-      <app-feature-card
-        class="home__feature"
-        [routerLink]="card.routerLink"
-        [iconName]="card.iconName"
-        [title]="card.title"
-        [description]="card.description"
-        [features]="card.features"
-      />
-    }
-  </div>
-
-  <div class="home__tech">
-    <h2 class="home__tech-title">Tecnologie Utilizzate</h2>
+  @for (path of paths; track path.category) {
+    <section [attr.aria-labelledby]="'home-' + path.category">
+      <h2 class="home__section-title" [id]="'home-' + path.category">{{ path.title }}</h2>
+      <p class="home__section-text">{{ path.description }} Leggi la sintesi, prova la demo, poi apri codice e dettagli.</p>
+      <div class="home__features">
+        @for (card of cards(path.category); track card.routerLink) {
+          <app-feature-card [routerLink]="card.routerLink" [iconName]="card.iconName" [title]="card.title" [description]="card.description" [features]="card.features" />
+        }
+      </div>
+    </section>
+  }
+  <section class="home__tech" aria-labelledby="home-explore">
+    <h2 class="home__tech-title" id="home-explore">Continua a esplorare</h2>
+    <p class="lesson-text">Confronta modelli di stato, osserva un esempio completo o consulta i componenti del sito.</p>
     <div class="home__tech-grid">
-      <a href="https://angular.dev" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="angular" />
-        Angular 22
-      </a>
-      <a href="https://angular.dev/guide/components" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="component" />
-        Standalone Components
-      </a>
-      <a href="https://angular.dev/guide/signals" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="signals" />
-        Signals API
-      </a>
-      <a
-        href="https://angular.dev/guide/forms/reactive-forms"
-        target="_blank" rel="noopener noreferrer"
-        class="home__tech-item"
-      >
-        <app-icon class="home__tech-icon" name="form" />
-        Reactive Forms
-      </a>
-      <a href="https://www.typescriptlang.org/docs/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="code" />
-        TypeScript
-      </a>
-      <a href="https://sass-lang.com/guide/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="palette" />
-        SCSS
-      </a>
-      <a href="https://getbem.com/introduction/" target="_blank" rel="noopener noreferrer" class="home__tech-item">
-        <app-icon class="home__tech-icon" name="blocks" />
-        BEM con SCSS ( &__ )
-      </a>
+      <a routerLink="/state/behavior-subject" class="home__tech-item">BehaviorSubject</a>
+      <a routerLink="/state/ngrx" class="home__tech-item">NgRx</a>
+      <a routerLink="/examples/users" class="home__tech-item">Lista utenti</a>
+      <a routerLink="/design-system" class="home__tech-item">Design system</a>
     </div>
-  </div>
+  </section>
 </div>

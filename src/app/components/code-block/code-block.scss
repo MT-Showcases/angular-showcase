@@ -82,6 +82,12 @@
 }
 
 // ─── CONTENT SECTION ───
+.code-block-copy-error {
+  color: #e2e8f0;
+  padding: rem(12) rem(20);
+  margin: 0;
+}
+
 // Scrollable code content with syntax highlighting
 .code-block-content {
   padding: rem(24);

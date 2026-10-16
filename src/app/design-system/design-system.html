@@ -114,4 +114,10 @@
       explanation="Riutilizza i componenti condivisi per presentare esempi con una gerarchia coerente." />
     <app-code-block [code]="componentCode" language="html" />
   </section>
+  <section class="design-system__panel" aria-labelledby="lesson-pattern-title">
+    <h2 class="design-system__section-title" id="lesson-pattern-title">Lezioni a profondità progressiva</h2>
+    <p class="lesson-text">La demo resta visibile. Codice e approfondimenti si aprono su richiesta, anche da tastiera, senza azzerare i controlli della lezione.</p>
+    <app-lesson-disclosure anchor="lesson-pattern" title="Apri un approfondimento di esempio"><p class="lesson-text">Questo pannello usa Angular Material. I link alle sezioni delle lezioni aprono il pannello e spostano il focus sulla sua intestazione.</p></app-lesson-disclosure>
+    <a routerLink="/basics/data-binding">Prova il modello nella lezione Data Binding</a>
+  </section>
 </div>

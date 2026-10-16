@@ -11,3 +11,6 @@
     padding: rem(32) rem(24) calc(rem(112) + env(safe-area-inset-bottom));
   }
 }
+
+.exploration { max-width: rem(1100); margin: 0 auto space(8); padding-inline: space(4); color: $white; }
+.exploration__summary { cursor: pointer; padding: space(4); border: rem(1) solid currentColor; border-radius: radius(sm); }

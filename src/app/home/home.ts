@@ -20,7 +20,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FeatureCard } from '../components/feature-card/feature-card';
-import { Icon } from '../components/icon/icon';
+import { TOPICS } from '../learning/topics';
 
 // PATTERN: Feature definition
 // PURPOSE:
@@ -37,58 +37,23 @@ interface Feature {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FeatureCard, Icon],
+  imports: [RouterLink, FeatureCard],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.scss',
 })
 export class Home {
-  featureCards: Feature[] = [
-    {
-      routerLink: '/basics/data-binding',
-      iconName: 'data-binding',
-      title: 'Data Binding',
-      description: 'Esempi di binding bidirezionale',
-      features: ['Property Binding', 'Event Binding', 'Two-way Binding [(ngModel)]'],
-    },
-    {
-      routerLink: '/basics/directives',
-      iconName: 'directives',
-      title: 'Directives',
-      description: 'Direttive strutturali e di attributo',
-      features: ['@if, @for, @switch', 'ngClass, ngStyle', 'Custom Directives'],
-    },
-    {
-      routerLink: '/basics/forms',
-      iconName: 'form',
-      title: 'Forms',
-      description: 'Reactive Forms con validazione avanzata',
-      features: ['FormGroup e FormControl', 'Validatori custom', 'Feedback visivo real-time'],
-    },
-    {
-      routerLink: '/advanced/signals',
-      iconName: 'signals',
-      title: 'Signals',
-      description: 'Angular Signals API con esempi pratici',
-      features: ['Writable Signals', 'Computed Signals', 'Effects', 'Carrello reattivo'],
-    },
-    {
-      routerLink: '/advanced/http',
-      iconName: 'http',
-      title: 'HTTP & Services',
-      description: 'Richieste HTTP con Service Facade Pattern',
-      features: [
-        'GET, POST, PUT, DELETE',
-        'Observable e subscribe',
-        'Service Facade best practices',
-      ],
-    },
-    {
-      routerLink: '/examples/users',
-      iconName: 'users',
-      title: 'Users',
-      description: 'Gestione utenti con componenti standalone, Signals e Service',
-      features: ['Lista utenti dinamica', 'Ricerca in tempo reale', 'Cards con animazioni'],
-    },
+  readonly paths = [
+    { category: 'basics', title: 'Parti dalle Basi', description: 'Dal primo componente ai form, un concetto alla volta.', route: '/basics' },
+    { category: 'advanced', title: 'Esplora Avanzato', description: 'Stato reattivo e richieste HTTP, con esperimenti e casi di errore.', route: '/advanced' },
   ];
+  cards(category: string): Feature[] {
+    return TOPICS.filter(topic => topic.published && topic.category === category).map(topic => ({
+      routerLink: topic.route,
+      iconName: topic.id === 'forms' ? 'form' : topic.id === 'http' ? 'http' : topic.id === 'signals' ? 'signals' : 'component',
+      title: topic.title,
+      description: topic.outcome,
+      features: ['Demo guidata', 'Codice spiegato', 'Approfondimenti facoltativi'],
+    }));
+  }
 }

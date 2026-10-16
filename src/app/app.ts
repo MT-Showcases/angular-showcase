@@ -18,8 +18,10 @@
 // - Feature-specific logic belongs in feature components
 // - Router outlet renders feature components based on route
 
-import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
+import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 import { BouncingLogo } from './bouncing-logo/bouncing-logo';
 import { LinkModal } from './link-modal/link-modal';
@@ -33,5 +35,10 @@ import { LinkInterceptor } from '../directives/link-interceptor.directive';
   styleUrl: './app.scss',
 })
 export class App {
+  private readonly router = inject(Router);
+  private readonly url = toSignal(this.router.events.pipe(filter(event => event instanceof NavigationEnd), map(event => event.urlAfterRedirects)), { initialValue: this.router.url });
+  readonly isLesson = computed(() => /^\/(basics|advanced)\//.test(this.url()));
+  readonly explorationOpen = signal(false);
+  toggleExploration(event: Event): void { this.explorationOpen.set((event.target as HTMLDetailsElement).open); }
   protected readonly title = signal('angular-showcase');
 }

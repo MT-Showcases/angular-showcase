@@ -25,6 +25,7 @@ import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/ro
 import { Icon } from '../components/icon/icon';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TOPICS } from '../learning/topics';
 
 // PATTERN: Navigation data structure
 // PURPOSE:
@@ -63,17 +64,16 @@ export class Navbar {
       label: 'Basi',
       icon: 'data-binding',
       items: [
-        { label: 'Data Binding', route: '/basics/data-binding', icon: 'data-binding' },
-        { label: 'Directives', route: '/basics/directives', icon: 'directives' },
-        { label: 'Forms', route: '/basics/forms', icon: 'form' },
+        { label: 'Percorso Basi', route: '/basics', icon: 'home' },
+        ...TOPICS.filter(topic => topic.category === 'basics' && topic.published).map(topic => ({ label: topic.title, route: topic.route, icon: 'component' })),
       ],
     },
     {
       label: 'Avanzato',
       icon: 'signals',
       items: [
-        { label: 'Signals', route: '/advanced/signals', icon: 'signals' },
-        { label: 'HTTP', route: '/advanced/http', icon: 'http' },
+        { label: 'Percorso Avanzato', route: '/advanced', icon: 'signals' },
+        ...TOPICS.filter(topic => topic.category === 'advanced' && topic.published).map(topic => ({ label: topic.title, route: topic.route, icon: topic.id === 'http' ? 'http' : 'signals' })),
       ],
     },
     {
