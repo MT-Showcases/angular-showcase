@@ -1,0 +1,43 @@
+<app-lesson-shell topicId="routing">
+  <section id="demo" class="lesson-panel" aria-labelledby="routing-title">
+    <h2 id="routing-title" class="lesson-title">Naviga dentro una lezione</h2>
+    <p class="lesson-text">Il router collega un URL a una vista. Questa demo ha un componente padre stabile e un router-outlet per le viste figlie. I link qui sotto restano nel laboratorio: osserva indirizzo, parametro e contenuto.</p>
+    <ol class="lesson-list"><li>Incrementa il promemoria locale del padre.</li><li>Apri i dettagli 1 e 2: cambia l'ID nell'URL, il promemoria resta.</li><li>Attiva la query compatta, poi prova un percorso sconosciuto.</li></ol>
+    <div class="lesson-actions">
+      <button matButton="tonal" type="button" (click)="incrementReminder()">Incrementa promemoria</button>
+      <button matButton="outlined" type="button" [attr.aria-pressed]="compact()" (click)="toggleMode()">Query compatta</button>
+      <button matButton="text" type="button" (click)="reset()">Ripristina laboratorio</button>
+    </div>
+    <p class="lesson-status" role="status" data-testid="parent-state">Promemoria del padre: {{ reminders() }}. Modalità {{ compact() ? 'compatta' : 'completa' }}.</p>
+    <nav class="lesson-actions" aria-label="Navigazione interna della demo">
+      <a matButton="outlined" routerLink="overview" queryParamsHandling="preserve" routerLinkActive="routing-demo__active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Panoramica</a>
+      <a matButton="outlined" [routerLink]="['detail', 1]" queryParamsHandling="preserve" routerLinkActive="routing-demo__active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Dettaglio 1</a>
+      <a matButton="outlined" [routerLink]="['detail', 2]" queryParamsHandling="preserve" routerLinkActive="routing-demo__active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Dettaglio 2</a>
+      <a matButton="outlined" routerLink="missing-demo" queryParamsHandling="preserve">Percorso sconosciuto</a>
+    </nav>
+    <p class="lesson-output" data-testid="current-url">URL attuale: {{ currentUrl() }}</p>
+    <div class="routing-demo__outlet" aria-label="Vista figlia della demo" [class.routing-demo__outlet--compact]="compact()">
+      <router-outlet />
+    </div>
+    <p class="lesson-text">Il promemoria vive nel componente padre e resta durante la navigazione tra figli. Uscendo dalla lezione il padre viene distrutto: questo stato locale non è una memoria persistente.</p>
+  </section>
+  <app-lesson-disclosure anchor="code" title="Guarda il codice: rotte, outlet e parametri">
+    <p class="lesson-text">Preparazione dell'applicazione: registra le rotte con provideRouter e importa RouterOutlet nel componente dell'app. La rotta padre carica la lezione e le sue rotte figlie quando servono.</p>
+    <app-code-block [code]="rootCode" language="typescript" />
+    <p class="lesson-text">File delle rotte figlie: la rotta jolly deve restare per ultima. Le tre viste sono componenti standalone esportati da demo-views.ts.</p>
+    <app-code-block [code]="childCode" language="typescript" />
+    <p class="lesson-text">Template padre: RouterLink cambia indirizzo, RouterOutlet ospita il figlio.</p>
+    <app-code-block [code]="templateCode" language="html" />
+    <p class="lesson-text">Classe del dettaglio: inject e computed provengono da Angular core; toSignal dal pacchetto di interoperabilità; ActivatedRoute dal router. La lettura reattiva aggiorna anche un componente già montato.</p>
+    <app-code-block [code]="paramCode" language="typescript" />
+    <p class="lesson-text">Navigazione dalla classe padre: aggiorna la query senza tornare alla panoramica.</p>
+    <app-code-block [code]="queryCode" language="typescript" />
+  </app-lesson-disclosure>
+  <app-lesson-disclosure anchor="deepen" title="Approfondisci: URL, durata dello stato e fallback">
+    <div><h2 class="lesson-subtitle">Parametro e query hanno ruoli diversi</h2><p class="lesson-text">In detail/2, :id identifica quale scheda leggere. In ?mode=compact, il parametro di query configura la vista. Sono stringhe provenienti dall'URL: valida i valori prima di usarli per operazioni reali. La demo interpreta solo gli ID 1 e 2 e la modalità compact.</p></div>
+    <div><h2 class="lesson-subtitle">Una rotta trovata può non avere dati</h2><p class="lesson-text">detail/999 corrisponde alla configurazione, ma la scheda non esiste. missing-demo non corrisponde ad alcuna rotta e raggiunge **. Sono due stati diversi; entrambi offrono un recupero all'interno della lezione.</p></div>
+    <div><h2 class="lesson-subtitle">Caricamento e pulizia</h2><p class="lesson-text">loadComponent e loadChildren dividono il codice in parti caricate durante la navigazione. I figli cambiano dentro l'outlet; il padre resta finché la sua rotta è attiva. toSignal lega la sottoscrizione al ciclo di vita del componente e la chiude alla distruzione. Lo stato da conservare oltre quella durata richiede una responsabilità esplicita, per esempio un servizio.</p></div>
+    <p class="lesson-text">Prova anche i pulsanti Indietro e Avanti del browser: l'URL conserva percorso e query, mentre il promemoria dipende dalla durata del componente padre.</p>
+    <p class="lesson-text">Riferimenti: <a href="https://angular.dev/guide/routing/read-route-state">stato della rotta</a> e <a href="https://angular.dev/guide/routing/show-routes-with-outlets">viste e outlet</a>.</p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

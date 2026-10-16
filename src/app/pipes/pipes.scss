@@ -1,0 +1,7 @@
+@use 'globals' as *;
+
+.pipes-demo {
+  display: grid;
+  gap: space(6);
+  min-width: 0;
+}
