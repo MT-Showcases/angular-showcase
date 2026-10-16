@@ -1,0 +1,105 @@
+<app-lesson-shell topicId="components">
+  <section id="demo" class="lesson-panel" aria-labelledby="communication-demo-title">
+    <h2 id="communication-demo-title" class="lesson-title">Il padre possiede i dati, il figlio comunica un'intenzione</h2>
+    <p class="lesson-text">Questa pagina è il <strong>padre</strong>: conserva titoli e voti.
+      Le due schede sono due istanze dello stesso componente <strong>figlio</strong> VoteCard.
+      Ognuna riceve un'opzione tramite un input e può emettere un output con il suo identificatore.
+      Il figlio non aumenta i voti da solo: chiede al padre di farlo.</p>
+    <p class="lesson-text"><strong>Prova:</strong> rinomina la prima opzione in «Componenti»;
+      cambia solo il titolo della prima scheda. Poi richiedi un voto da ciascun figlio:
+      osserva il payload dell'evento e i dati del padre. Dopo tre voti un'opzione raggiunge il limite;
+      l'altra resta indipendente. I voti sono solo locali a questa demo.</p>
+
+    <h3 class="lesson-subtitle">1. Dal padre al figlio: dati in ingresso</h3>
+    <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Titolo della prima opzione, controllato dal padre</mat-label>
+      <input matInput id="communication-title" [value]="options[0].title" (input)="renameFirst($event)" />
+    </mat-form-field>
+    <div class="lesson-actions">
+      <button matButton="outlined" type="button" id="communication-pause"
+        [attr.aria-pressed]="votingPaused" (click)="togglePause()">Pausa votazione</button>
+      <button matButton="outlined" type="button" id="communication-reset" (click)="reset()">Ripristina tutta la demo</button>
+    </div>
+    <p class="lesson-text">Stato deciso dal padre: {{ votingPaused ? 'votazione in pausa' : 'votazione attiva' }}.
+      Limite dimostrativo: {{ maxVotes }} voti per opzione. Il reset ripristina titoli, voti, pausa e ultimo evento.</p>
+
+    <h3 class="lesson-subtitle">2. Dal figlio al padre: richiesta di voto</h3>
+    <div class="lesson-grid">
+      @for (option of options; track option.id) {
+        <app-vote-card [option]="option" [disabledReason]="reasonFor(option)"
+          (voteRequested)="recordVote($event)" />
+      }
+    </div>
+    <p class="lesson-status" role="status">{{ status }}</p>
+
+    <h3 class="lesson-subtitle">3. Lo stato osservabile del padre</h3>
+    <ul class="lesson-list" id="communication-parent-state" aria-label="Opzioni possedute dal padre">
+      @for (option of options; track option.id) {
+        <li>{{ option.id }} — {{ option.title || 'Opzione senza titolo' }}: {{ option.votes }} voti</li>
+      }
+    </ul>
+    <p class="lesson-result" id="communication-last-request">Ultimo payload di voteRequested: {{ lastRequest || 'nessuno' }}.
+      Richieste accolte dal padre: {{ handledRequests }}.</p>
+    <p class="lesson-text">Il percorso è: click nel figlio → output con un id → metodo del padre → nuovo oggetto passato al figlio.
+      Rinominare dal padre non emette un voto. Un output non è un comando che modifica automaticamente i dati.</p>
+  </section>
+
+  <app-lesson-disclosure anchor="code" title="Guarda il contratto input/output e il padre">
+    <section aria-labelledby="communication-child-code-title">
+      <h2 class="lesson-title" id="communication-child-code-title">Un figlio riutilizzabile</h2>
+      <p class="lesson-text">Componente standalone minimo completo con controlli HTML nativi, senza dipendenza da Material.
+        La demo usa lo stesso contratto e un pulsante Material. input.required impone al padre di fornire l'opzione;
+        disabledReason è invece un input facoltativo con valore iniziale vuoto.</p>
+      <p class="lesson-text">input() espone un <strong>signal di sola lettura</strong>: le parentesi in option()
+        leggono il valore corrente ricevuto dal padre. Non puoi chiamare set sull'input.
+        output&lt;string&gt; dichiara che il payload emesso è una stringa, qui l'id dell'opzione.</p>
+      <app-code-block [code]="childExample" />
+    </section>
+    <section aria-labelledby="communication-parent-code-title">
+      <h2 class="lesson-title" id="communication-parent-code-title">Un padre che gestisce lo stato</h2>
+      <p class="lesson-text">Componente padre minimo completo da usare dentro un progetto Angular esistente.
+        Importa VoteCard e può ripeterlo con dati diversi. Il binding [option] porta i dati verso il basso;
+        (voteRequested) porta il payload verso recordVote. Questo esempio include voto, limite e reset;
+        la demo aggiunge anche rinomina, pausa e contatore delle richieste.</p>
+      <app-code-block [code]="parentExample" />
+      <h3 class="lesson-subtitle">La rinomina nella demo</h3>
+      <p class="lesson-text">Frammento aggiuntivo del padre: cambia il titolo mantenendo lo stesso id e i voti.
+        L'evento input del campo è un Event DOM; $event dell'output voteRequested è invece la stringa emessa dal figlio.</p>
+      <app-code-block [code]="renameExample" />
+    </section>
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="deepen" title="Approfondisci responsabilità, identità e riuso">
+    <section aria-labelledby="communication-ownership-title">
+      <h2 class="lesson-title" id="communication-ownership-title">Una sola fonte per lo stato condiviso</h2>
+      <p class="lesson-text">Il padre applica le regole: pausa e massimo tre voti. Il figlio presenta il motivo
+        dell'eventuale disabilitazione e comunica un'intenzione. recordVote mantiene anche un controllo locale,
+        così la regola non dipende soltanto dal pulsante. In un'applicazione reale, le regole di sicurezza vanno verificate anche dal server.</p>
+      <p class="lesson-text">Non copiare l'input in un secondo contatore locale da mantenere sincronizzato.
+        La scheda legge option().votes: appena il padre invia la nuova opzione, mostra il valore aggiornato.
+        Un figlio che emette un evento non conosce la decisione del padre finché non riceve il nuovo stato.</p>
+      <p class="lesson-text">readonly nel tipo VotingOption impedisce alcune assegnazioni in TypeScript,
+        ma non congela gli oggetti a runtime. Anche se l'input è un signal di sola lettura, mutare un oggetto ricevuto
+        sarebbe tecnicamente possibile: questa demo sceglie esplicitamente di non farlo.</p>
+    </section>
+    <section aria-labelledby="communication-identity-title">
+      <h2 class="lesson-title" id="communication-identity-title">Nuovi dati, stessa istanza del figlio</h2>
+      <p class="lesson-text">map costruisce un nuovo array e lo spread copia l'opzione modificata:
+        il padre cambia il riferimento dell'input senza alterare il vecchio oggetto.
+        Il blocco for usa track option.id: rinominare o votare non cambia l'identità del figlio.
+        Le due schede condividono il codice, non i rispettivi voti.</p>
+      <p class="lesson-text">Il figlio usa OnPush, che può aggiornare la vista quando riceve nuovi input o gestisce eventi.
+        Aggiornare il riferimento evita di dipendere da una mutazione nascosta.
+        Cambiare strategia di rilevamento non sostituisce una chiara ownership dello stato.</p>
+    </section>
+    <section aria-labelledby="communication-events-title">
+      <h2 class="lesson-title" id="communication-events-title">Un output Angular non è un evento DOM</h2>
+      <p class="lesson-text">voteRequested è un nome scelto dal componente, sensibile alle maiuscole.
+        Il padre ascolta direttamente quel figlio: gli output Angular non risalgono il DOM con il bubbling dei click.
+        Qui il payload è un identificatore stabile, non l'intero oggetto né un riferimento al bottone.</p>
+      <p class="lesson-text">Un contratto piccolo rende il figlio riutilizzabile: in un altro padre la stessa richiesta
+        potrebbe aprire una conferma invece di aumentare subito i voti. Non serve al figlio sapere come il padre
+        conserva i dati. Aprire e chiudere questi approfondimenti mantiene l'esperimento corrente.</p>
+    </section>
+  </app-lesson-disclosure>
+</app-lesson-shell>

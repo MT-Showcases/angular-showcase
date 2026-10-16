@@ -46,6 +46,7 @@
             [routerLink]="item.route"
             routerLinkActive="active"
             ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: true }"
             class="dropdown-item"
             (click)="closeDropdown()"
           >

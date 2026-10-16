@@ -17,9 +17,9 @@
       </p>
     }
     <nav class="lesson-shell__sections" aria-label="Livelli della lezione">
-      <a class="lesson-shell__link" [routerLink]="[]" fragment="demo">1. Capisci e prova</a>
-      <a class="lesson-shell__link" [routerLink]="[]" fragment="code">2. Guarda il codice</a>
-      <a class="lesson-shell__link" [routerLink]="[]" fragment="deepen">3. Approfondisci</a>
+      <a class="lesson-shell__link" [routerLink]="sectionLinks().demo">1. Capisci e prova</a>
+      <a class="lesson-shell__link" [routerLink]="sectionLinks().code">2. Guarda il codice</a>
+      <a class="lesson-shell__link" [routerLink]="sectionLinks().deepen">3. Approfondisci</a>
     </nav>
     <details class="lesson-shell__glossary">
       <summary>Un termine non è chiaro? Apri il glossario</summary>

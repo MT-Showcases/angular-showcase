@@ -1,0 +1,12 @@
+<section class="vote-card" [attr.aria-labelledby]="'vote-title-' + option().id">
+  <h3 class="vote-card__title" [id]="'vote-title-' + option().id">{{ option().title || 'Opzione senza titolo' }}</h3>
+  <p class="vote-card__text" [id]="'vote-count-' + option().id">Voti ricevuti dal padre: {{ option().votes }}</p>
+  <button matButton="filled" type="button" [disabled]="disabledReason() !== ''"
+    [attr.aria-label]="'Vota ' + (option().title || 'opzione senza titolo')"
+    [attr.aria-describedby]="'vote-reason-' + option().id" (click)="requestVote()">
+    Richiedi un voto
+  </button>
+  <p class="vote-card__text" [id]="'vote-reason-' + option().id">
+    {{ disabledReason() || 'Il figlio chiede; il padre decide come aggiornare i voti.' }}
+  </p>
+</section>

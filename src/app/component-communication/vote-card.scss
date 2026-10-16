@@ -1,0 +1,23 @@
+/** Shared appearance for every instance; no parent or Material private selectors. */
+@use 'globals' as *;
+
+.vote-card {
+  height: 100%;
+  padding: space(4);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: radius(md);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+
+  &__title {
+    margin-bottom: space(3);
+    font: var(--mat-sys-title-large);
+    overflow-wrap: anywhere;
+  }
+
+  &__text {
+    margin-block: space(3);
+    font: var(--mat-sys-body-large);
+    overflow-wrap: anywhere;
+  }
+}

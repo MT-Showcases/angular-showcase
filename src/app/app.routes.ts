@@ -10,6 +10,15 @@ export const routes: Routes = [
     path: 'basics',
     children: [
       { path: '', pathMatch: 'full', data: { category: 'basics' }, loadComponent: () => import('./learning/category/category').then(m => m.LearningCategory) },
+      { path: 'getting-started', loadComponent: () => import('./getting-started/getting-started').then(m => m.GettingStarted) },
+      { path: 'components', loadComponent: () => import('./component-communication/component-communication').then(m => m.ComponentCommunication) },
+      { path: 'pipes', loadComponent: () => import('./pipes/pipes').then(m => m.PipesLesson) },
+      { path: 'services', loadComponent: () => import('./services-lesson/services-lesson').then(m => m.ServicesLesson) },
+      {
+        path: 'routing',
+        loadComponent: () => import('./routing-lesson/routing-lesson').then(m => m.RoutingLesson),
+        loadChildren: () => import('./routing-lesson/demo.routes').then(m => m.DEMO_ROUTES),
+      },
       {
         path: 'data-binding',
         loadComponent: () =>

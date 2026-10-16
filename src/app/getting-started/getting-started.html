@@ -1,0 +1,109 @@
+<app-lesson-shell topicId="start">
+  <section id="demo" class="lesson-panel" aria-labelledby="starter-demo-title">
+    <h2 id="starter-demo-title" class="lesson-title">Un componente è una piccola parte dell'interfaccia</h2>
+    <p class="lesson-text">Angular collega una <strong>classe</strong>, che conserva i dati e i comportamenti,
+      a un <strong>template</strong>, che descrive cosa mostrare, e agli <strong>stili</strong>, che ne definiscono l'aspetto.
+      Il riquadro qui sotto cambia con le tue azioni: non serve modificare file per fare il primo esperimento.</p>
+    <p class="lesson-text"><strong>Prova:</strong> scrivi «Benvenuta, Ada!», premi «Aggiungi 1» due volte
+      e attiva «Evidenzia scheda». Vedrai cambiare rispettivamente testo, numero e aspetto.
+      Il reset ripristina tutte e tre le cose. Le modifiche sono locali a questa pagina.</p>
+
+    <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Testo del componente</mat-label>
+      <input matInput id="starter-message" [value]="message" (input)="updateMessage($event)" />
+    </mat-form-field>
+    <section class="starter-preview" [class.starter-preview--highlighted]="highlighted"
+      aria-labelledby="starter-preview-title">
+      <h3 class="starter-preview__title" id="starter-preview-title">{{ message || 'Scrivi un messaggio' }}</h3>
+      <p class="starter-preview__text" id="starter-count">Conteggio locale: {{ count }}</p>
+      <p class="starter-preview__text">Stile: {{ highlighted ? 'evidenziato' : 'normale' }}.</p>
+    </section>
+    <div class="lesson-actions">
+      <button matButton="filled" type="button" id="starter-increment" (click)="increment()">Aggiungi 1</button>
+      <button matButton="outlined" type="button" id="starter-highlight"
+        [attr.aria-pressed]="highlighted" (click)="toggleHighlight()">Evidenzia scheda</button>
+      <button matButton="outlined" type="button" id="starter-reset" (click)="reset()">Ripristina tutto</button>
+    </div>
+    <p class="lesson-status" role="status">{{ status }}</p>
+
+    <h3 class="lesson-subtitle">Che cosa hai cambiato?</h3>
+    <ul class="lesson-list">
+      <li><strong>Classe:</strong> message contiene una stringa, count un numero e highlighted un booleano, cioè vero o falso.
+        Sono campi dell'istanza: un'altra istanza dello stesso componente avrebbe i propri valori.</li>
+      <li><strong>Template:</strong> le doppie graffe mostrano i campi, le parentesi tonde ascoltano le azioni,
+        le quadre collegano un valore a una proprietà. La lezione Data Binding approfondisce queste direzioni.</li>
+      <li><strong>Stili:</strong> una classe CSS aggiunta quando highlighted è vero cambia il riquadro;
+        il messaggio e il conteggio non vengono modificati dallo stile.</li>
+    </ul>
+  </section>
+
+  <app-lesson-disclosure anchor="code" title="Guarda i file e come usare il componente">
+    <section aria-labelledby="starter-files-title">
+      <h2 id="starter-files-title" class="lesson-title">Tre file, una responsabilità per file</h2>
+      <p class="lesson-text">Questo è un esempio completo di componente, suddiviso in tre file adiacenti,
+        pronto per questo progetto con il suo tema e i suoi helper SCSS.
+        Non è un editor live: i blocchi spiegano la demo e puoi copiarli nel tuo progetto.</p>
+      <h3 class="lesson-subtitle">welcome-card.ts: configurazione e stato</h3>
+      <p class="lesson-text">Il decoratore Component associa la classe ai file HTML e SCSS.
+        Il selector app-welcome-card è il nome con cui il padre la inserisce nel proprio template.
+        In Angular 22 i componenti sono standalone per impostazione predefinita: non serve un NgModule.</p>
+      <app-code-block [code]="componentExample" />
+      <h3 class="lesson-subtitle">welcome-card.html: vista e azioni</h3>
+      <p class="lesson-text">La demo usa gli stessi tre campi. Il suo contatore chiama un metodo per annunciare il risultato;
+        nell'esempio minimo l'assegnazione è direttamente nell'evento click.</p>
+      <app-code-block language="html" [code]="templateExample" />
+      <h3 class="lesson-subtitle">welcome-card.scss: aspetto locale</h3>
+      <p class="lesson-text">Il suffisso highlighted è una variante della classe della scheda.
+        I colori arrivano dal tema Material dell'applicazione; space, rem e radius sono helper del file condiviso globals.
+        Per portare l'esempio in un altro progetto occorre fornire anche questi helper o sostituirli con valori CSS.
+        Il CSS dei componenti è normalmente incapsulato:
+        non occorre cambiare lo stile di tutte le sezioni del sito.</p>
+      <app-code-block language="css" [code]="styleExample" />
+    </section>
+    <section aria-labelledby="starter-imports-title">
+      <h2 id="starter-imports-title" class="lesson-title">Due tipi di import da non confondere</h2>
+      <p class="lesson-text">L'import TypeScript in cima al file rende un simbolo disponibile al codice.
+        L'elenco imports dentro Component rende disponibili componenti, direttive e pipe nel template.
+        Qui abilita mat-form-field, matInput e i pulsanti Material.</p>
+      <p class="lesson-text">Questo componente padre completo importa WelcomeCard e usa il suo selector.
+        Puoi collocarlo nello stesso progetto e renderlo raggiungibile tramite la configurazione dell'applicazione.</p>
+      <app-code-block [code]="hostExample" />
+    </section>
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="deepen" title="Approfondisci TypeScript, progetto e ciclo di vita">
+    <section aria-labelledby="starter-types-title">
+      <h2 id="starter-types-title" class="lesson-title">Leggere la classe senza conoscere tutto TypeScript</h2>
+      <p class="lesson-text">TypeScript aggiunge controlli sui tipi a JavaScript.
+        Da message = 'Ciao, Angular!' deduce il tipo string, da count = 0 il tipo number,
+        e da highlighted = false il tipo boolean. Assegnare un numero a message sarebbe un errore di tipo.</p>
+      <p class="lesson-text">Un metodo è una funzione della classe. Nel metodo, this.message indica il campo
+        di questa istanza; nel template basta scrivere message. Il tipo void dopo un metodo significa
+        che non restituisce un risultato. updateMessage riceve un Event e verifica che la sua origine sia un input
+        prima di leggere value. Questa demo usa campi normali: non richiede Signals.</p>
+    </section>
+    <section aria-labelledby="starter-project-title">
+      <h2 id="starter-project-title" class="lesson-title">Dove guardare in questo progetto</h2>
+      <ul class="lesson-list">
+        <li>src/main.ts avvia l'applicazione; src/app/app.ts e app.html compongono la struttura principale.</li>
+        <li>src/app/app.config.ts registra i provider dell'app; src/app/app.routes.ts associa indirizzi e pagine.</li>
+        <li>Ogni cartella di lezione contiene classe, template, stili ed eventuali test di comportamento.</li>
+        <li>src/styles.scss e src/styles/ raccolgono tema e regole condivise; public/ contiene file statici.</li>
+        <li>I file spec.ts verificano interazioni e risultati. Un file non diventa componente soltanto per il suo nome: conta la configurazione Component.</li>
+      </ul>
+    </section>
+    <section aria-labelledby="starter-lifecycle-title">
+      <h2 id="starter-lifecycle-title" class="lesson-title">La vista ha un ciclo di vita</h2>
+      <p class="lesson-text">Angular costruisce l'istanza, imposta gli input e chiama ngOnInit se è presente.
+        Aggiorna poi la vista in risposta alle modifiche. Quando il componente esce dalla vista,
+        lo distrugge: è il momento di rilasciare le risorse create manualmente.
+        Chiudere una spiegazione in questa lezione non distrugge la demo.</p>
+      <p class="lesson-text">Frammento opzionale per una classe: importa DestroyRef e inject da Angular core.
+        Un timer manuale continua a funzionare finché non lo cancelli; onDestroy registra la pulizia.
+        Questo frammento non viene eseguito dalla demo e non aggiorna una vista: stampa soltanto tick in console.</p>
+      <app-code-block [code]="cleanupExample" />
+      <p class="lesson-text">Non avviare timer o richieste dentro un'espressione del template.
+        Per le sottoscrizioni studierai anche async pipe e takeUntilDestroyed, che collegano la pulizia alla durata della vista.</p>
+    </section>
+  </app-lesson-disclosure>
+</app-lesson-shell>
