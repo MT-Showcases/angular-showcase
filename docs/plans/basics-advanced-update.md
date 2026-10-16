@@ -1,6 +1,6 @@
 # Basics and Advanced learning experience update
 
-Status: implementation in progress; shared learning foundation and Binding prototype prepared.
+Status: implementation delivered and automated acceptance passed; final responsive/zoom browser acceptance remains pending because the preview was in active use.
 
 Prepared: 2026-10-16. Baseline: `0782efb` (`main`). No push was performed.
 
@@ -8,9 +8,9 @@ Prepared: 2026-10-16. Baseline: `0782efb` (`main`). No push was performed.
 
 Build a coherent Angular learning journey for both newcomers and experienced developers, with progressive depth. Assume familiarity with HTML, CSS and elementary JavaScript; explain necessary TypeScript concepts where they first appear. Do not require React knowledge.
 
-The current scope contains three Basics pages (Data Binding, Directives, Forms) and two Advanced pages (Signals, HTTP). Home and navigation are part of the learning entry experience. State Management and Examples remain separate categories and receive regression checks, not a content rewrite.
+The original audit scope contained three Basics pages (Data Binding, Directives, Forms) and two Advanced pages (Signals, HTTP). Home and navigation are part of the learning entry experience. The delivered curriculum now includes eight Basics lessons and two Advanced lessons. State Management and Examples remain separate categories and receive regression checks, not a content rewrite.
 
-Improve the existing three Basics lessons first, then fill the missing foundations, then complete the two Advanced lessons. The expanded curriculum below is a proposal, not a description of existing functionality. Do not publish navigation cards for lessons that have not been delivered.
+Improve the existing three Basics lessons first, then fill the missing foundations, then complete the two Advanced lessons. The expanded curriculum below was approved and implemented. Only delivered lessons are published in the registry.
 
 Keep Angular 22, the existing runtime, Material theming and port 4200. Dependency upgrades are not part of this content project. Preserve the distinction between Reactive Forms, Signals, RxJS and NgRx. Do not combine this work with a general zoneless or change-detection migration.
 
@@ -107,7 +107,7 @@ The registry must distinguish planned and published lessons. During waves 0–1,
 
 ## 5. Execution sequence and worktree ownership
 
-No worktrees or implementation changes are created by this plan. The baseline commit now allows ordinary independent branches/worktrees; the earlier uncommitted-baseline obstacle has been resolved.
+Implementation used separate branches and worktrees from a verified common base for each parallel wave. See the execution record below for actual results.
 
 Use at most three worker agents plus the coordinator concurrently. Select the available Codex agents at execution time; do not assume a model or concurrency level that the environment does not provide.
 
@@ -180,3 +180,34 @@ Home/category promises match shipped lessons. The learning path works for both a
 - [Git worktrees](https://git-scm.com/docs/git-worktree), [applying patches](https://git-scm.com/docs/git-apply)
 
 Confirm the exact API signatures against the installed Angular/Material version when implementing a new example. The goal is accurate teaching, not adoption of every newly available API.
+
+
+## 8. Execution record and remaining manual acceptance
+
+Implementation date: 2026-10-16. No push or publication was performed.
+
+- Shared shell/disclosure, typed registry, category hubs, Home/navigation and design-system catalog are integrated.
+- Wave 1 used independent Binding, Control Flow and Forms worktrees. The integrated gate passed 76 tests.
+- Wave 2 used independent Components/Getting Started, Pipes/Routing and Services worktrees from `1dc92b6`. The integrated gate passed 110 tests. One worker reached the account usage limit after saving its files; the coordinator recovered both lessons and reran their 11 tests before committing them.
+- The coordinator completed Signals and HTTP directly after the usage-limit interruption, without launching further agents.
+- The nested Routing section-link regression is covered: child path, query and parent state survive fragment navigation.
+- A direct-fragment focus test exposed that initial expanded panels do not always emit `afterExpand`; the shared disclosure now uses `afterRenderEffect` to focus its public header after rendering as well.
+- Signals tests cover stable identities for duplicate products, cart reset, state preservation, opt-in browser-title integration and cleanup.
+- HTTP interaction tests exercise the actual service with HttpTestingController: methods/URLs/payloads, loading, list/detail/empty/error recovery, every mutation success/failure, repeated fake POST IDs, confirmation/cancellation, reset and pending-request teardown. An application-route test also verifies cancellation on navigation away.
+- Users, NgRx and BehaviorSubject routed regressions remain green. No unrelated content rewrite was included.
+
+Final integrated verification: **122 tests / 24 files passed**, production initial **451.06 kB** (500 kB warning threshold), **zero npm audit vulnerabilities**. The final suite includes the initial-fragment focus and actual navigation-away cancellation regressions. `git diff --check` passed. The port-4200 preview remains running. All implementation and documentation changes are committed locally; no push was performed.
+
+Existing stylesheet warnings remain: BehaviorSubject **15.61 kB** and NgRx concepts **11.63 kB**. There are no new stylesheet warnings and budgets were not raised.
+
+A manual real GET on port 4200 returned **100 JSONPlaceholder posts**, with the first 10 rendered and request/response visible. Integrated desktop views of Binding, the first component and HTTP were inspected. Native browser control was then interrupted because VS Code was in active use. The full new-page matrix at 360/768/1440 CSS pixels, 200% zoom and runtime computed-color review is **not yet signed off**; earlier baseline checks do not substitute for those checks on the new pages.
+
+Contrast calculations from compiled theme pairs (not a complete computed-style/browser audit): on-surface/surface 16.32:1, on-primary/primary 6.47:1, on-secondary-container/secondary-container 7.27:1, on-error-container/error-container 7.24:1. Code comments were improved to 5.71:1 and copy success to 5.48:1 for their declared backgrounds.
+
+Remaining manual checklist:
+
+- Inspect Home, category hubs and all new/revised lessons at 360, 768 and 1440 CSS pixels; open both disclosures and verify that long code scrolls locally.
+- Check 200% zoom, keyboard expansion/section focus, accessible status/error associations and focus after removing dynamic content.
+- Check computed text/background colors, including gradient navigation, against the actual rendered background.
+
+The code and automated checks are delivered; the above manual acceptance items remain explicit follow-up work.

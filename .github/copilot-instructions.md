@@ -71,7 +71,7 @@ This is an Angular 22 standalone project showcasing the main framework features 
 ### Routing
 - **Hierarchical structure**:
   - `/` - Home
-  - `/basics/*` - Basic concepts (data-binding, directives, forms)
+  - `/basics/*` - Guided basics (first component, binding, control flow, components, pipes, forms, services, routing)
   - `/advanced/*` - Advanced concepts (signals, http)
   - `/state/*` - State management (ngrx, behavior-subject)
   - `/examples/*` - Practical examples (users)
@@ -349,3 +349,15 @@ npm test           # Run tests
 - Clean and maintainable code
 - Practical and interactive examples
 - Performance and accessibility
+
+
+## Progressive lesson contract
+
+- Publish routes and navigation through `src/app/learning/topics.ts` only after integration.
+- Wrap feature demos with LessonShell. Keep the demo mounted; use LessonDisclosure for optional `code` and `deepen` sections.
+- Section links preserve the complete current route and query, including nested routing sandbox views.
+- Use fragment navigation and public Material header APIs for disclosure focus; verify initial direct links as well as later fragment changes.
+- Label snippets as complete examples or fragments and state their setup/import requirements.
+- Use real interactions and meaningful tests for claims made by Home cards. Do not advertise a live editor or persistence that the demo does not implement.
+- JSONPlaceholder writes are simulated. Keep POST history separate from fetched GET resources and assign unique local operation IDs.
+- Feature-local DI providers are teaching scopes; do not describe them as application-wide root singletons.
