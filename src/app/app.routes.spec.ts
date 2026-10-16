@@ -1,12 +1,13 @@
 import { vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
 import { appReducers } from './store/app.reducers';
+import { TOPICS } from './learning/topics';
 
 // Verify lazy imports, templates and required providers together after dependency upgrades.
 describe('Showcase routes', () => {
@@ -30,8 +31,13 @@ describe('Showcase routes', () => {
     ['/basics/data-binding', 'Data Binding'],
     ['/basics/directives', 'Control flow e direttive'],
     ['/basics/forms', 'Reactive Forms'],
-    ['/advanced/signals', 'Signals API'],
-    ['/advanced/http', 'HTTP & Service Facade'],
+    ['/basics/getting-started', 'Il primo componente'],
+    ['/basics/components', 'Comunicazione tra componenti'],
+    ['/basics/pipes', 'Pipes'],
+    ['/basics/services', 'Servizi e dependency injection'],
+    ['/basics/routing', 'Routing'],
+    ['/advanced/signals', 'Signals'],
+    ['/advanced/http', 'HTTP e servizi'],
     ['/state/ngrx', 'NgRx - State Management'],
     ['/state/behavior-subject', 'BehaviorSubject'],
     ['/examples/users', 'Lista Utenti'],
@@ -52,6 +58,36 @@ describe('Showcase routes', () => {
       expect(harness.routeNativeElement?.textContent).toContain(title);
     });
   }
+
+  it('exposes every published topic from its category and Home', async () => {
+    const harness = await RouterTestingHarness.create('/');
+    const home = harness.routeNativeElement!;
+    for (const topic of TOPICS.filter(topic => topic.published)) {
+      expect(home.querySelector(`a[href="${topic.route}"]`)).not.toBeNull();
+    }
+    for (const category of ['basics', 'advanced']) {
+      await harness.navigateByUrl('/' + category);
+      for (const topic of TOPICS.filter(topic => topic.category === category && topic.published)) {
+        expect(harness.routeNativeElement!.querySelector(`a[href="${topic.route}"]`)).not.toBeNull();
+      }
+    }
+  });
+
+  it('keeps nested detail, query and parent state while opening a lesson section', async () => {
+    const harness = await RouterTestingHarness.create('/basics/routing/detail/2?mode=compact');
+    const page = harness.routeNativeElement!;
+    Array.from(page.querySelectorAll<HTMLButtonElement>('button'))
+      .find(button => button.textContent?.trim() === 'Incrementa promemoria')!.click();
+    await harness.fixture.whenStable();
+    const section = Array.from(page.querySelectorAll<HTMLAnchorElement>('a'))
+      .find(link => link.textContent?.trim() === '2. Guarda il codice')!;
+    section.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Router).url).toBe('/basics/routing/detail/2?mode=compact#code');
+    expect(page.querySelector('[data-testid="detail-content"]')?.textContent).toContain('Scheda 2');
+    expect(page.querySelector('[data-testid="parent-state"]')?.textContent).toContain('Promemoria del padre: 1');
+    expect(page.querySelector('#code mat-expansion-panel-header')?.getAttribute('aria-expanded')).toBe('true');
+  });
 
   it('updates computed values after a Signals counter click', async () => {
     const harness = await RouterTestingHarness.create('/advanced/signals');
@@ -82,10 +118,19 @@ describe('Showcase routes', () => {
     expect(page.querySelector('.log-list')?.textContent).toContain('INCREMENT');
   });
 
+  it('aborts a pending HTTP request when leaving the route', async () => {
+    const harness = await RouterTestingHarness.create('/advanced/http');
+    harness.routeNativeElement!.querySelector<HTMLButtonElement>('.load-posts')!.click();
+    const pending = TestBed.inject(HttpTestingController).expectOne('https://jsonplaceholder.typicode.com/posts');
+    await harness.navigateByUrl('/basics');
+    expect(pending.cancelled).toBe(true);
+    expect(harness.routeNativeElement?.textContent).toContain('Le basi di Angular');
+  });
+
   it('renders posts returned by the HTTP facade after loading', async () => {
     const harness = await RouterTestingHarness.create('/advanced/http');
     const page = harness.routeNativeElement!;
-    page.querySelector<HTMLButtonElement>('.button--secondary')!.click();
+    page.querySelector<HTMLButtonElement>('.load-posts')!.click();
     TestBed.inject(HttpTestingController)
       .expectOne('https://jsonplaceholder.typicode.com/posts')
       .flush([{ userId: 1, id: 1, title: 'A test post', body: 'Loaded successfully' }]);
@@ -165,13 +210,13 @@ describe('Showcase routes', () => {
     const page = harness.routeNativeElement!;
     const errorLog = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     try {
-      page.querySelector<HTMLButtonElement>('.button--secondary')!.click();
+      page.querySelector<HTMLButtonElement>('.load-posts')!.click();
       TestBed.inject(HttpTestingController)
         .expectOne('https://jsonplaceholder.typicode.com/posts')
         .flush('Unavailable', { status: 503, statusText: 'Service Unavailable' });
       await harness.fixture.whenStable();
-      expect(page.textContent).toContain('Errore nel caricamento dei post');
-      const retry = page.querySelector<HTMLButtonElement>('.button--secondary')!;
+      expect(page.textContent).toContain('GET non riuscito');
+      const retry = page.querySelector<HTMLButtonElement>('.load-posts')!;
       expect(retry.disabled).toBe(false);
       retry.click();
       TestBed.inject(HttpTestingController)
@@ -179,7 +224,7 @@ describe('Showcase routes', () => {
         .flush([{ id: 1, userId: 1, title: 'Recovered', body: 'Available again' }]);
       await harness.fixture.whenStable();
       expect(page.querySelector('.post-card')?.textContent).toContain('Recovered');
-      expect(page.textContent).not.toContain('Errore nel caricamento dei post');
+      expect(page.textContent).not.toContain('GET non riuscito');
     } finally {
       errorLog.mockRestore();
     }

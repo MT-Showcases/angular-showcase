@@ -2,6 +2,7 @@ import { HarnessLoader } from '@angular/cdk/testing';
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatButtonHarness } from '@angular/material/button/testing';
+import { provideRouter } from '@angular/router';
 import { Signals } from './signals';
 
 describe('Signals', () => {
@@ -9,7 +10,7 @@ describe('Signals', () => {
   let loader: HarnessLoader;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [Signals] }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [Signals], providers: [provideRouter([])] }).compileComponents();
     fixture = TestBed.createComponent(Signals);
     loader = TestbedHarnessEnvironment.loader(fixture);
     await fixture.whenStable();
@@ -74,4 +75,40 @@ describe('Signals', () => {
     );
     expect(entries).toEqual([2, 3, 4, 5, 6].map((count) => `Conteggio aggiornato: ${count}`));
   });
+  it('keeps duplicate products distinct and preserves the remaining DOM row when one is removed', async () => {
+    const add = await loader.getHarness(MatButtonHarness.with({ text: 'Aggiungi Magic Mouse' }));
+    await add.click(); await add.click();
+    const first = fixture.nativeElement.querySelector('[data-item-id="4"]');
+    const second = fixture.nativeElement.querySelector('[data-item-id="5"]');
+    first.querySelector('[aria-label="Rimuovi Magic Mouse"]').click();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('[data-item-id="4"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-item-id="5"]')).toBe(second);
+    await (await loader.getHarness(MatButtonHarness.with({ text: 'Ripristina carrello' }))).click();
+    expect(fixture.componentInstance.total()).toBe(4746);
+    expect(fixture.nativeElement.querySelectorAll('.cart-item')).toHaveLength(3);
+  });
+
+  it('opts into an imperative title effect and restores the title when disabled or destroyed', async () => {
+    const originalTitle = document.title;
+    const header: HTMLElement = fixture.nativeElement.querySelector('#deepen mat-expansion-panel-header');
+    header.click(); await fixture.whenStable();
+    const toggle = await loader.getHarness(MatButtonHarness.with({ text: 'Sincronizza titolo browser' }));
+    await toggle.click(); await clickAction('Aumenta contatore');
+    expect(document.title).toBe('Contatore 1 · Angular Showcase');
+    await toggle.click(); expect(document.title).toBe(originalTitle);
+    await clickAction('Aumenta contatore'); expect(document.title).toBe(originalTitle);
+    await toggle.click(); expect(document.title).toBe('Contatore 2 · Angular Showcase');
+    fixture.destroy(); expect(document.title).toBe(originalTitle);
+  });
+
+  it('retains the counter and cart while opening and closing explanations', async () => {
+    await clickAction('Aumenta contatore');
+    await clickAction('Rimuovi iPhone 15');
+    const header: HTMLElement = fixture.nativeElement.querySelector('#code mat-expansion-panel-header');
+    header.click(); await fixture.whenStable(); header.click(); await fixture.whenStable();
+    expect(computedValues()).toEqual(['1', '2', '3']);
+    expect(fixture.componentInstance.total()).toBe(2748);
+  });
+
 });

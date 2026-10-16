@@ -1,196 +1,90 @@
-<app-page-header
-  title="HTTP & Service Facade"
-  subtitle="Esempi pratici di richieste HTTP con Service Pattern"
-/>
-
-<div class="http-container">
-  <!-- Sezione spiegazione Service Facade -->
-  <section class="section section--explanation">
-    <h2 class="section__title">🏛️ Cos'è un Service Facade?</h2>
-    <div class="explanation-grid">
-      <div class="explanation-card">
-        <h3 class="explanation-card__title">📦 Separazione delle Responsabilità</h3>
-        <p class="explanation-card__text">
-          Il componente si occupa solo della UI. Il service gestisce tutta la logica HTTP e i dati.
-        </p>
-      </div>
-
-      <div class="explanation-card">
-        <h3 class="explanation-card__title">♻️ Riusabilità</h3>
-        <p class="explanation-card__text">
-          Il service può essere usato da più componenti. Scrivi la logica HTTP una volta sola.
-        </p>
-      </div>
-
-      <div class="explanation-card">
-        <h3 class="explanation-card__title">🧪 Testabilità</h3>
-        <p class="explanation-card__text">
-          Facile creare mock del service. Testa UI e logica separatamente.
-        </p>
-      </div>
-
-      <div class="explanation-card">
-        <h3 class="explanation-card__title">🔧 Manutenibilità</h3>
-        <p class="explanation-card__text">
-          Se l'API cambia, modifichi solo il service. Tutti i componenti continuano a funzionare.
-        </p>
-      </div>
+<app-lesson-shell topicId="http">
+  <section id="demo" class="lesson-panel" aria-labelledby="http-title">
+    <h2 id="http-title" class="lesson-title">Dall’azione alla risposta</h2>
+    <p class="lesson-text">Il componente chiede i dati al servizio; il servizio usa <strong>HttpClient</strong>.
+      La richiesta attraversa la rete e la risposta arriva più tardi. L’interfaccia mostra l’attesa e poi il risultato oppure l’errore.</p>
+    <p class="lesson-result"><strong>API online di prova: JSONPlaceholder.</strong> GET legge dati remoti; POST, PUT e DELETE simulano il successo e non salvano modifiche.
+      Ricaricare la lista ripristina i dati remoti. Non inserire dati personali: usa testi inventati per gli esperimenti.</p>
+    <p class="lesson-text"><strong>Prova:</strong> carica la lista, apri un dettaglio e modifica il primo titolo. Ricarica: torna il dato remoto.
+      Poi invia due POST: lo stesso ID simulato può tornare due volte; la cronologia distingue le due operazioni.</p>
+    <div class="lesson-actions">
+      <button matButton="filled" type="button" class="load-posts" (click)="loadPosts()" [disabled]="loading()">{{ loaded() ? 'Ricarica lista GET' : 'Carica lista GET' }}</button>
+      @if (loading()) { <button matButton="outlined" type="button" (click)="cancelRequest()">Annulla richiesta</button> }
+      <button matButton="outlined" type="button" (click)="reset()">Ripristina demo</button>
     </div>
-  </section>
+    <p class="lesson-status" role="status">{{ status() }}</p>
+    @if (error()) { <p class="http-error" role="alert">{{ error() }}</p> }
 
-  <!-- Messaggio di errore globale -->
-  @if (error()) {
-    <div class="error-message">⚠️ {{ error() }}</div>
-  }
-
-  <!-- Indicatore di caricamento globale -->
-  @if (loading()) {
-    <div class="loading-indicator">
-      <div class="loading-spinner"></div>
-      <span>Caricamento in corso...</span>
-    </div>
-  }
-
-  <!-- Sezione CREATE - POST -->
-  <section class="section">
-    <h2 class="section__title">✨ CREATE - POST Request</h2>
-    <p class="section__description">
-      Crea un nuovo post inviando dati al server. Il service usa
-      <code class="code-inline">http.post()</code>
-    </p>
-
-    <div class="create-form">
-      <div class="form-group">
-        <label class="form-group__label" for="title">Titolo</label>
-        <input
-          id="title"
-          type="text"
-          class="form-group__input"
-          [value]="newPost().title"
-          (input)="updateTitle($event)"
-          placeholder="Inserisci il titolo del post..."
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="form-group__label" for="body">Contenuto</label>
-        <textarea
-          id="body"
-          class="form-group__textarea"
-          [value]="newPost().body"
-          (input)="updateBody($event)"
-          placeholder="Inserisci il contenuto del post..."
-          rows="4"
-        ></textarea>
-      </div>
-
-      <button class="button button--primary" (click)="createPost()" [disabled]="loading()">
-        📤 Crea Post
-      </button>
-    </div>
-  </section>
-
-  <!-- Sezione READ - GET -->
-  <section class="section">
-    <h2 class="section__title">📚 READ - GET Request</h2>
-    <p class="section__description">
-      Recupera dati dal server. Il service usa
-      <code class="code-inline">http.get()</code>
-    </p>
-
-    <button class="button button--secondary" (click)="loadPosts()" [disabled]="loading()">
-      🔄 Carica Post (primi 10)
-    </button>
-
-    <!-- Lista dei post -->
-    @if (posts().length > 0) {
-      <div class="posts-grid">
-        @for (post of posts(); track post.id) {
-          <div class="post-card">
-            <div class="post-card__header">
-              <span class="post-card__id">ID: {{ post.id }}</span>
-              <span class="post-card__user">User: {{ post.userId }}</span>
-            </div>
-
-            <h3 class="post-card__title">{{ post.title }}</h3>
-            <p class="post-card__body">{{ post.body }}</p>
-
-            <div class="post-card__actions">
-              <button
-                class="button button--small button--warning"
-                (click)="updatePost(post)"
-                [disabled]="loading()"
-              >
-                ✏️ Modifica
-              </button>
-
-              <button
-                class="button button--small button--danger"
-                (click)="deletePost(post.id)"
-                [disabled]="loading()"
-              >
-                🗑️ Elimina
-              </button>
-            </div>
+    <h3 class="lesson-subtitle">1. GET: risorse ricevute</h3>
+    <div [attr.aria-busy]="loading()">
+      @for (post of posts(); track post.id) {
+        <article class="post-card" [attr.data-post-id]="post.id">
+          <h4 class="lesson-subtitle">{{ post.id }}. {{ post.title }}</h4>
+          <p class="lesson-text">{{ post.body }}</p>
+          <div class="lesson-actions">
+            <button matButton="text" type="button" (click)="loadPost(post.id)" [disabled]="loading()" [attr.aria-label]="'Leggi post ' + post.id">Leggi dettaglio</button>
+            <button matButton="tonal" type="button" (click)="updatePost(post)" [disabled]="loading()" [attr.aria-label]="'Modifica post ' + post.id">Simula PUT del titolo</button>
+            <button matButton="outlined" type="button" (click)="requestDelete(post.id)" [disabled]="loading()" [attr.aria-label]="'Elimina post ' + post.id">Prepara DELETE</button>
           </div>
-        }
-      </div>
-    } @else {
-      <div class="empty-state">Nessun post caricato. Clicca "Carica Post" per iniziare.</div>
-    }
-  </section>
-
-  <!-- Sezione Code Example -->
-  <section class="section">
-    <h2 class="section__title">💻 Esempio di Codice</h2>
-
-    <app-code-block language="typescript" [code]="serviceExampleCode" />
-  </section>
-
-  <!-- Benefici del pattern -->
-  <section class="section section--benefits">
-    <h2 class="section__title">✅ Vantaggi del Service Facade Pattern</h2>
-
-    <div class="benefits-list">
-      <div class="benefit-item">
-        <span class="benefit-item__icon">🎯</span>
-        <div class="benefit-item__content">
-          <h3 class="benefit-item__title">Single Responsibility</h3>
-          <p class="benefit-item__text">
-            Ogni classe ha un solo scopo: il componente gestisce la UI, il service gestisce i dati.
-          </p>
-        </div>
-      </div>
-
-      <div class="benefit-item">
-        <span class="benefit-item__icon">🔒</span>
-        <div class="benefit-item__content">
-          <h3 class="benefit-item__title">Encapsulation</h3>
-          <p class="benefit-item__text">
-            I dettagli dell'API (URL, headers, parsing) sono nascosti nel service.
-          </p>
-        </div>
-      </div>
-
-      <div class="benefit-item">
-        <span class="benefit-item__icon">⚡</span>
-        <div class="benefit-item__content">
-          <h3 class="benefit-item__title">Performance</h3>
-          <p class="benefit-item__text">
-            Puoi aggiungere caching, debouncing, retry logic nel service senza toccare i componenti.
-          </p>
-        </div>
-      </div>
-
-      <div class="benefit-item">
-        <span class="benefit-item__icon">🔄</span>
-        <div class="benefit-item__content">
-          <h3 class="benefit-item__title">Consistency</h3>
-          <p class="benefit-item__text">
-            Tutti i componenti usano la stessa logica HTTP. Nessuna duplicazione o inconsistenza.
-          </p>
-        </div>
-      </div>
+          @if (deleteConfirmation() === post.id) {
+            <div class="lesson-result">
+              <p>Vuoi simulare DELETE del post {{ post.id }}? Verrà rimosso solo dall’anteprima.</p>
+              <div class="lesson-actions"><button matButton="filled" type="button" (click)="deletePost(post.id)">Conferma DELETE {{ post.id }}</button>
+                <button matButton="outlined" type="button" (click)="cancelDelete()">Annulla eliminazione</button></div>
+            </div>
+          }
+        </article>
+      } @empty { <p class="lesson-text">{{ loaded() ? 'La lista è vuota. Ricarica per riprovare.' : 'Nessuna lista caricata: premi Carica lista GET.' }}</p> }
     </div>
+    <h3 class="lesson-subtitle">2. GET per ID: un dettaglio</h3>
+    <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>ID del post da leggere</mat-label><input matInput type="number" min="1" step="1" [ngModel]="detailId()" (ngModelChange)="detailId.set($event)" [disabled]="loading()" />
+      <mat-hint>Un intero positivo. Prova 1, poi un ID assente come 999.</mat-hint>
+    </mat-form-field>
+    <button matButton="tonal" type="button" (click)="loadPost(detailId())" [disabled]="loading() || !validId()">Leggi ID</button>
+    @if (selectedPost(); as post) { <div class="lesson-result" data-testid="post-detail"><h4 class="lesson-subtitle">Dettaglio {{ post.id }}</h4><p>{{ post.title }}</p><p>{{ post.body }}</p></div> }
+
+    <h3 class="lesson-subtitle">3. POST: invia un nuovo contenuto</h3>
+    <p class="lesson-text">Titolo e testo sono obbligatori e non possono contenere solo spazi. Gli spazi iniziali e finali vengono rimossi prima dell’invio.</p>
+    <mat-form-field class="lesson-field" appearance="outline"><mat-label>Titolo del nuovo post</mat-label>
+      <input matInput [ngModel]="newPost().title" (ngModelChange)="updateTitle($event)" [disabled]="loading()" required /></mat-form-field>
+    <mat-form-field class="lesson-field" appearance="outline"><mat-label>Testo del nuovo post</mat-label>
+      <textarea matInput rows="3" [ngModel]="newPost().body" (ngModelChange)="updateBody($event)" [disabled]="loading()" required></textarea></mat-form-field>
+    <p id="post-reason" class="lesson-status">{{ canCreate() ? 'Contenuto pronto per l’invio simulato.' : 'POST disabilitato: completa titolo e testo con almeno un carattere diverso da spazio.' }}</p>
+    <button matButton="filled" type="button" (click)="createPost()" [disabled]="loading() || !canCreate()" aria-describedby="post-reason">Invia POST simulato</button>
+    <h4 class="lesson-subtitle">Cronologia POST di questa visita</h4>
+    <p class="lesson-text">Queste risposte non sono risorse persistite: non espongono PUT o DELETE. L’ID operazione è locale e distinto dall’ID restituito dall’API.</p>
+    @for (result of creations(); track result.operationId) {
+      <div class="lesson-result" [attr.data-operation-id]="result.operationId">Operazione {{ result.operationId }} · ID API {{ result.post.id }} · {{ result.post.title }}</div>
+    } @empty { <p class="lesson-text">Nessuna risposta POST ancora ricevuta.</p> }
   </section>
-</div>
+  <section class="lesson-panel" aria-labelledby="exchange-title">
+    <h2 id="exchange-title" class="lesson-title">Osserva l’ultimo scambio</h2>
+    <p class="lesson-text">Il metodo indica l’operazione, l’URL la risorsa; il body contiene i dati inviati. La risposta compare solo dopo il successo.</p>
+    <h3 class="lesson-subtitle">Richiesta</h3><pre class="lesson-output" aria-label="Ultima richiesta">{{ request() | json }}</pre>
+    <h3 class="lesson-subtitle">Risposta</h3><pre class="lesson-output http-response" tabindex="0" role="region" aria-label="Ultima risposta HTTP">{{ response() | json }}</pre>
+  </section>
+  <app-lesson-disclosure anchor="code" title="Guarda servizio, sottoscrizione e metodi HTTP">
+    <h2 class="lesson-title">Separare trasporto e interfaccia</h2>
+    <p class="lesson-text">Il servizio restituisce un <strong>Observable</strong>, una sorgente di notifiche: una sottoscrizione avvia la richiesta e riceve il valore oppure l’errore.
+      Non è il risultato già disponibile. HttpClient completa normalmente dopo la risposta. Più sottoscrizioni possono inviare più richieste.</p>
+    <p class="lesson-text">Frammento di setup e servizio: importa anche l’interfaccia Post (id, userId, title, body) nella tua applicazione.</p>
+    <app-code-block [code]="setupCode" />
+    <p class="lesson-text">Frammento di componente per GET. Lo stesso schema di attesa, errore e cleanup è applicato agli altri metodi della demo.</p>
+    <app-code-block [code]="subscriptionCode" />
+    <p class="lesson-text">Frammenti delle chiamate per le scritture: ciascuna richiede una sottoscrizione. PUT invia la rappresentazione completa usata in questa API; PATCH sarebbe una modifica parziale e qui non viene dimostrato.</p>
+    <app-code-block [code]="mutationCode" />
+  </app-lesson-disclosure>
+  <app-lesson-disclosure anchor="deepen" title="Approfondisci errori, cancellazione e contratti">
+    <h2 class="lesson-title">Il tipo non convalida il server</h2>
+    <p class="lesson-text">get&lt;Post&gt; descrive il tipo atteso per TypeScript; non controlla la struttura del JSON a runtime.
+      In un’app reale valida i dati al confine del servizio quando il contratto lo richiede. Un errore HTTP può avere status 404 o 500; lo status 0 può indicare un problema di rete o browser.</p>
+    <h3 class="lesson-subtitle">Una richiesta alla volta</h3>
+    <p class="lesson-text">Durante l’attesa la demo disabilita le altre operazioni. L’annullamento esegue unsubscribe; takeUntilDestroyed scollega la sottoscrizione quando esci dalla pagina.
+      finalize ripristina l’indicatore anche su errore o cancellazione. Il client interrompe l’attesa; non può garantire che una scrittura già arrivata al server venga annullata.</p>
+    <h3 class="lesson-subtitle">Risposta, anteprima e persistenza</h3>
+    <p class="lesson-text">JSONPlaceholder può restituire ID 101 a più POST. Perciò conserviamo una cronologia con ID locali univoci e manteniamo separata la lista GET.
+      PUT e DELETE operano sui post effettivamente caricati e modificano l’anteprima dopo il successo. Una nuova GET mostra di nuovo il server: non è una prova di persistenza.</p>
+    <p class="lesson-text">Per riprodurre un errore reale puoi provare un ID assente. I test coprono anche rete, risposte vuote, fallimenti delle scritture, recupero e uscita con richiesta pendente senza dipendere dalla disponibilità dell’API pubblica.</p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

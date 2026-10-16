@@ -1,220 +1,197 @@
 // COMPONENT TYPE: Container
-// SECTION: HTTP and Async Operations
-//
-// ROLE:
-// - Demonstrate HttpClient usage with Service Facade pattern
-// - Show complete CRUD operations (GET, POST, PUT, DELETE)
-// - Handle loading states, errors, and data management
-//
-// PATTERNS USED:
-// - Service Facade pattern (PostsService abstracts HTTP details)
-// - Signals for reactive state management
-// - Modern inject() function for dependency injection
-// - Observable subscription with manual state updates
-//
-// NOTES FOR CONTRIBUTORS:
-// - Keep HTTP logic in services, not in components
-// - Use signals for state (loading, error, data)
-// - Show code examples with CodeBlock component
-// - Handle all async states (loading, success, error)
-
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+// ROLE: Make request, response and transient UI state visible without implying persistence.
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { JsonPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, Subscription, finalize } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { PostsService, Post } from '../../services/posts.service';
-import { PageHeader } from '../page-header/page-header';
 import { CodeBlock } from '../components/code-block/code-block';
+import { LessonShell } from '../components/lesson-shell/lesson-shell';
+import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
+
+interface RequestPreview { method: string; url: string; body?: unknown }
+interface CreationResult { operationId: number; post: Post }
+const API = 'https://jsonplaceholder.typicode.com/posts';
 
 @Component({
   selector: 'app-http-example',
-  imports: [PageHeader, CodeBlock],
+  imports: [JsonPipe, FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule, CodeBlock, LessonShell, LessonDisclosure],
   templateUrl: './http-example.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './http-example.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HttpExample {
-  // Dependency Injection of PostsService
-  private postsService = inject(PostsService);
+  private readonly postsService = inject(PostsService);
+  private readonly destroyRef = inject(DestroyRef);
+  private requestSubscription?: Subscription;
+  private operationId = 0;
+  readonly posts = signal<Post[]>([]);
+  readonly selectedPost = signal<Post | null>(null);
+  readonly creations = signal<CreationResult[]>([]);
+  readonly loading = signal(false);
+  readonly loaded = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly status = signal('Nessuna richiesta inviata. Inizia caricando la lista.');
+  readonly request = signal<RequestPreview | null>(null);
+  readonly response = signal<unknown>(null);
+  readonly detailId = signal(1);
+  readonly validId = computed(() => Number.isInteger(this.detailId()) && this.detailId() > 0);
+  readonly newPost = signal({ userId: 1, title: '', body: '' });
+  readonly canCreate = computed(() => !!this.newPost().title.trim() && !!this.newPost().body.trim());
+  readonly deleteConfirmation = signal<number | null>(null);
 
-  // ═══════════════════════════════════════════════════════════════════
-  // STATE - Using Signals for reactivity
-  // ═══════════════════════════════════════════════════════════════════
-  posts = signal<Post[]>([]); // List of all posts
-  selectedPost = signal<Post | null>(null); // Selected post for display
-  loading = signal(false); // Loading indicator
-  error = signal<string | null>(null); // Error message
+  readonly setupCode = `// app.config.ts: provide the HTTP client once in the application.
+import { provideHttpClient } from '@angular/common/http';
+// Add provideHttpClient() to ApplicationConfig.providers.
 
-  // Form data to create a new post
-  newPost = signal({
-    userId: 1,
-    title: '',
-    body: '',
-  });
+// posts.service.ts: facade fragment (Post is the response interface).
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
-  // Example code for the section
-  serviceExampleCode = `// 1. Define the Service Facade
 @Injectable({ providedIn: 'root' })
 export class PostsService {
-  private http = inject(HttpClient);
-
-  getPosts(): Observable<Post[]> {
-    return this.http.get<Post[]>('api/posts');
+  private readonly http = inject(HttpClient);
+  private readonly url = 'https://jsonplaceholder.typicode.com/posts';
+  getPosts(): Observable<Post[]> { return this.http.get<Post[]>(this.url); }
+  getPost(id: number): Observable<Post> { return this.http.get<Post>(this.url + '/' + id); }
+  createPost(body: Omit<Post, 'id'>): Observable<Post> {
+    return this.http.post<Post>(this.url, body);
   }
-}
-
-// 2. Use the Service in the Component
-@Component({ ... })
-export class MyComponent {
-  private postsService = inject(PostsService);
-  posts = signal<Post[]>([]);
-
-  loadPosts() {
-    this.postsService.getPosts().subscribe(
-      posts => this.posts.set(posts)
-    );
+  updatePost(id: number, body: Post): Observable<Post> {
+    return this.http.put<Post>(this.url + '/' + id, body);
+  }
+  deletePost(id: number): Observable<void> {
+    return this.http.delete<void>(this.url + '/' + id);
   }
 }`;
+  readonly subscriptionCode = `// Component class fragment. Import inject, DestroyRef, signal from @angular/core,
+// takeUntilDestroyed from @angular/core/rxjs-interop, finalize from rxjs.
+private readonly service = inject(PostsService);
+private readonly destroyRef = inject(DestroyRef);
+posts = signal<Post[]>([]);
+loading = signal(false);
+error = signal<string | null>(null);
 
-  // ═══════════════════════════════════════════════════════════════════
-  // HTTP METHODS - Examples of all CRUD operations
-  // ═══════════════════════════════════════════════════════════════════
+loadPosts(): void {
+  if (this.loading()) return;
+  this.loading.set(true);
+  this.error.set(null);
+  this.service.getPosts().pipe(
+    takeUntilDestroyed(this.destroyRef),
+    finalize(() => this.loading.set(false)),
+  ).subscribe({
+    next: posts => this.posts.set(posts.slice(0, 10)),
+    error: () => this.error.set('Caricamento non riuscito. Riprova.'),
+  });
+}
+// Retain the returned Subscription to allow an explicit unsubscribe() cancellation,
+// as the live demo does. Do not subscribe a second time just to log the same request.`;
+  readonly mutationCode = `// Component method fragments; subscribe using the same loading/error/cleanup
+// pattern as GET. Read results only inside next, not immediately after subscribe().
+this.service.createPost({ userId: 1, title: 'Titolo', body: 'Testo' }); // POST
+this.service.updatePost(1, { id: 1, userId: 1, title: 'Nuovo', body: 'Testo' }); // PUT
+this.service.deletePost(1); // DELETE
+// These calls RETURN cold Observables: subscribe() starts each request.
+// JSONPlaceholder simulates writes. Keep POST response history separate from GET resources.
+// PUT/DELETE change only the local preview after the simulated response succeeds.`;
 
-  /**
-   * GET - Load all posts
-   * Example of how to handle an HTTP request with Observable
-   */
-  loadPosts() {
-    this.loading.set(true);
-    this.error.set(null);
-
-    // subscribe() allows "listening" to the Observable
-    this.postsService.getPosts().subscribe({
-      // next: called when data arrives
-      next: (posts) => {
-        this.posts.set(posts.slice(0, 10)); // Take only first 10 for brevity
-        this.loading.set(false);
-      },
-      // error: called in case of HTTP error
-      error: (err) => {
-        this.error.set('Errore nel caricamento dei post: ' + err.message);
-        this.loading.set(false);
-        console.error('HTTP Error:', err);
-      },
+  loadPosts(): void {
+    this.execute('GET', '', undefined, this.postsService.getPosts(), posts => {
+      this.posts.set(posts.slice(0, 10));
+      this.selectedPost.set(null);
+      this.loaded.set(true);
+      this.status.set(`Lista ricevuta: ${posts.length} post, anteprima dei primi 10. Le modifiche locali sono sostituite dai dati remoti.`);
     });
   }
 
-  /**
-   * GET by ID - Load a single post
-   */
-  loadPost(id: number) {
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.postsService.getPost(id).subscribe({
-      next: (post) => {
-        this.selectedPost.set(post);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set('Errore nel caricamento del post: ' + err.message);
-        this.loading.set(false);
-      },
+  loadPost(id: number): void {
+    if (!Number.isInteger(id) || id < 1) return;
+    if (this.loading()) return;
+    this.selectedPost.set(null);
+    this.execute('GET', '/' + id, undefined, this.postsService.getPost(id), post => {
+      this.selectedPost.set(post);
+      this.status.set(`Dettaglio ${post.id} ricevuto. Non modifica la lista.`);
     });
   }
 
-  /**
-   * POST - Create a new post
-   * JSONPlaceholder simulates creation, returns a fake ID
-   */
-  createPost() {
-    const post = this.newPost();
-
-    if (!post.title || !post.body) {
-      this.error.set('Titolo e contenuto sono obbligatori!');
-      return;
-    }
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    this.postsService.createPost(post).subscribe({
-      next: (createdPost) => {
-        // Add created post to the beginning of the list
-        this.posts.update((posts) => [createdPost, ...posts]);
-
-        // Reset form
-        this.newPost.set({ userId: 1, title: '', body: '' });
-        this.loading.set(false);
-
-        alert(`Post creato con ID: ${createdPost.id}`);
-      },
-      error: (err) => {
-        this.error.set('Errore nella creazione del post: ' + err.message);
-        this.loading.set(false);
-      },
+  createPost(): void {
+    if (!this.canCreate()) return;
+    const payload = { ...this.newPost(), title: this.newPost().title.trim(), body: this.newPost().body.trim() };
+    this.execute('POST', '', payload, this.postsService.createPost(payload), post => {
+      this.creations.update(results => [...results, { operationId: ++this.operationId, post }]);
+      this.newPost.set({ userId: 1, title: '', body: '' });
+      this.status.set(`POST simulato ricevuto con ID ${post.id}. Non è stato salvato e non è aggiunto alla lista GET.`);
     });
   }
 
-  /**
-   * PUT - Update an existing post
-   */
-  updatePost(post: Post) {
-    const updatedPost = {
-      ...post,
-      title: post.title + ' (MODIFICATO)',
-    };
-
-    this.loading.set(true);
-
-    this.postsService.updatePost(post.id, updatedPost).subscribe({
-      next: (updated) => {
-        // Update post in the list
-        this.posts.update((posts) => posts.map((p) => (p.id === updated.id ? updated : p)));
-        this.loading.set(false);
-        alert('Post aggiornato con successo!');
-      },
-      error: (err) => {
-        this.error.set("Errore nell'aggiornamento: " + err.message);
-        this.loading.set(false);
-      },
+  updatePost(post: Post): void {
+    if (!this.posts().some(resource => resource.id === post.id)) return;
+    const payload = { ...post, title: post.title + ' (modificato)' };
+    this.execute('PUT', '/' + post.id, payload, this.postsService.updatePost(post.id, payload), updated => {
+      this.posts.update(posts => posts.map(item => item.id === post.id ? updated : item));
+      if (this.selectedPost()?.id === post.id) this.selectedPost.set(updated);
+      this.status.set(`PUT ${post.id} riuscito: anteprima locale aggiornata. Il server non conserva la modifica.`);
     });
   }
 
-  /**
-   * DELETE - Delete a post
-   */
-  deletePost(id: number) {
-    if (!confirm('Sei sicuro di voler eliminare questo post?')) {
-      return;
-    }
+  requestDelete(id: number): void {
+    if (this.loading() || !this.posts().some(post => post.id === id)) return;
+    this.deleteConfirmation.set(id);
+  }
 
-    this.loading.set(true);
+  cancelDelete(): void {
+    this.deleteConfirmation.set(null);
+    this.status.set('Eliminazione annullata: nessuna richiesta DELETE inviata.');
+  }
 
-    this.postsService.deletePost(id).subscribe({
-      next: () => {
-        // Remove post from the list
-        this.posts.update((posts) => posts.filter((p) => p.id !== id));
-        this.loading.set(false);
-        alert('Post eliminato con successo!');
-      },
-      error: (err) => {
-        this.error.set("Errore nell'eliminazione: " + err.message);
-        this.loading.set(false);
-      },
+  deletePost(id: number): void {
+    if (this.deleteConfirmation() !== id || !this.posts().some(post => post.id === id)) return;
+    this.execute('DELETE', '/' + id, undefined, this.postsService.deletePost(id), () => {
+      this.posts.update(posts => posts.filter(post => post.id !== id));
+      if (this.selectedPost()?.id === id) this.selectedPost.set(null);
+      this.status.set(`DELETE ${id} riuscito: rimosso dall’anteprima locale. Una nuova GET lo ripristina.`);
     });
   }
 
-  /**
-   * Update the title field of the form
-   */
-  updateTitle(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.newPost.update((post) => ({ ...post, title: input.value }));
+  cancelRequest(): void {
+    if (!this.loading()) return;
+    this.requestSubscription?.unsubscribe();
+    this.status.set('Richiesta annullata dal client. Nessun risultato applicato; una scrittura già ricevuta dal server non viene annullata automaticamente.');
   }
 
-  /**
-   * Update the body field of the form
-   */
-  updateBody(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    this.newPost.update((post) => ({ ...post, body: textarea.value }));
+  reset(): void {
+    this.requestSubscription?.unsubscribe();
+    this.posts.set([]); this.selectedPost.set(null); this.creations.set([]);
+    this.loaded.set(false); this.error.set(null); this.request.set(null); this.response.set(null);
+    this.deleteConfirmation.set(null); this.detailId.set(1);
+    this.newPost.set({ userId: 1, title: '', body: '' });
+    this.status.set('Demo ripristinata. Nessuna richiesta in corso.');
+  }
+
+  updateTitle(title: string): void { this.newPost.update(post => ({ ...post, title })); }
+  updateBody(body: string): void { this.newPost.update(post => ({ ...post, body })); }
+
+  private execute<T>(method: string, path: string, body: unknown, source: Observable<T>, success: (value: T) => void): void {
+    if (this.loading()) return;
+    this.loading.set(true); this.error.set(null); this.response.set(null);
+    this.deleteConfirmation.set(null);
+    this.request.set({ method, url: API + path, ...(body === undefined ? {} : { body }) });
+    this.status.set(`${method} in corso. Puoi annullare l’attesa.`);
+    this.requestSubscription = source.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.loading.set(false)),
+    ).subscribe({
+      next: value => { this.response.set(value ?? {}); success(value); },
+      error: (error: HttpErrorResponse) => {
+        this.error.set(`${method} non riuscito (${error.status || 'rete'}). Controlla la connessione e riprova l’operazione.`);
+        this.status.set('Richiesta terminata con errore. I dati precedenti sono conservati.');
+      },
+    });
   }
 }

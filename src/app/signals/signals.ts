@@ -18,30 +18,59 @@
 // - Add new signal patterns as separate, well-labeled sections
 // - Avoid introducing complex state management (keep it educational)
 
-import { Component, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { PageHeader } from '../page-header/page-header';
+import { DOCUMENT } from '@angular/common';
+import { LessonShell } from '../components/lesson-shell/lesson-shell';
+import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { CodeBlock } from '../components/code-block/code-block';
 
 @Component({
   selector: 'app-signals',
-  imports: [PageHeader, MatButtonModule, CodeBlock],
+  imports: [LessonShell, LessonDisclosure, MatButtonModule, CodeBlock],
   templateUrl: './signals.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './signals.scss',
 })
 export class Signals {
-  readonly writableExample = `count = signal(0);
+  readonly writableExample = `// Class fragment. Import signal from '@angular/core'.
+count = signal(0);
+// Read with count(); set replaces the value, update derives from its current value.
 increment() { this.count.update(value => value + 1); }`;
-  readonly computedExample = `doubleCount = computed(() => this.count() * 2);
+  readonly computedExample = `// Class fragment. Import computed from '@angular/core'.
+doubleCount = computed(() => this.count() * 2);
 tripleCount = computed(() => this.count() * 3);`;
-  readonly cartExample = `items = signal([{ name: 'Magic Mouse', price: 99, quantity: 1 }]);
+  readonly cartExample = `// Class fragment. Import signal and computed from '@angular/core'.
+items = signal([{ id: 1, name: 'Magic Mouse', price: 99, quantity: 1 }]);
 total = computed(() => this.items().reduce(
   (sum, item) => sum + item.price * item.quantity, 0
-));`;
-  readonly effectExample = `effect(() => {
-  console.log('Count:', this.count());
-});`;
+));
+// Replace the array and the changed object; keep item IDs stable.
+this.items.update(items => items.map(item => item.id === 1
+  ? { ...item, quantity: item.quantity + 1 } : item));
+// Template loop: @for (item of items(); track item.id) { ... }`;
+  readonly effectExample = `// Component class fragment, created in an injection context.
+// Import DOCUMENT from '@angular/common'; effect, inject, signal from '@angular/core'.
+private readonly document = inject(DOCUMENT);
+private readonly originalTitle = this.document.title;
+titleSync = signal(false);
+count = signal(0);
+constructor() {
+  effect(onCleanup => {
+    if (!this.titleSync()) return;
+    this.document.title = 'Contatore ' + this.count() + ' · Angular Showcase';
+    onCleanup(() => { this.document.title = this.originalTitle; });
+  });
+}
+// titleSync.set(true) opts in; false restores the title.
+// Angular also runs cleanup when the component is destroyed.`;
+  private readonly document = inject(DOCUMENT);
+  private readonly originalTitle = this.document.title;
+  readonly titleSync = signal(false);
+  readonly toggle = (value: boolean): boolean => !value;
+  private nextId = 4;
+  readonly titleStatus = computed(() => this.titleSync()
+    ? 'Contatore ' + this.count() + ' · Angular Showcase' : 'Sincronizzazione disattivata');
 
   // ═══════════════════════════════════════════════════════════════════
   // 1. WRITABLE SIGNAL - Signal that can be modified
@@ -67,7 +96,7 @@ total = computed(() => this.items().reduce(
   // ═══════════════════════════════════════════════════════════════════
   // 2. COMPUTED SIGNAL - Derived from other signals (reactive)
   // ═══════════════════════════════════════════════════════════════════
-  // Computed signals automatically recalculate when their dependent signals change
+  // A dependency change invalidates the cache; the next read recomputes lazily.
   // They are read-only and memoize the result to avoid unnecessary calculations
   doubleCount = computed(() => this.count() * 2);
   tripleCount = computed(() => this.count() * 3);
@@ -77,13 +106,13 @@ total = computed(() => this.items().reduce(
   // ═══════════════════════════════════════════════════════════════════
   // Signal containing an array of objects (cart items)
   items = signal([
-    { name: 'MacBook Pro', price: 2499, quantity: 1 },
-    { name: 'iPhone 15', price: 999, quantity: 2 },
-    { name: 'AirPods Pro', price: 249, quantity: 1 },
+    { id: 1, name: 'MacBook Pro', price: 2499, quantity: 1 },
+    { id: 2, name: 'iPhone 15', price: 999, quantity: 2 },
+    { id: 3, name: 'AirPods Pro', price: 249, quantity: 1 },
   ]);
 
   // Computed that automatically calculates total whenever items changes
-  // This is much more efficient than manually recalculating total after each modification
+  // Keep the total derived from items rather than synchronizing a second writable value.
   total = computed(() => {
     return this.items().reduce((sum, item) => sum + item.price * item.quantity, 0);
   });
@@ -91,22 +120,31 @@ total = computed(() => this.items().reduce(
   addItem() {
     this.items.update((currentItems) => [
       ...currentItems,
-      { name: 'Magic Mouse', price: 99, quantity: 1 },
+      { id: this.nextId++, name: 'Magic Mouse', price: 99, quantity: 1 },
     ]);
   }
 
-  removeItem(index: number) {
-    this.items.update((currentItems) => currentItems.filter((_, i) => i !== index));
+  removeItem(id: number) {
+    this.items.update((currentItems) => currentItems.filter(item => item.id !== id));
   }
 
-  updateQuantity(index: number, delta: number) {
+  updateQuantity(id: number, delta: number) {
     // Update item quantity by creating a new array (immutability)
     // Math.max(0, ...) prevents negative quantities
     this.items.update((currentItems) =>
-      currentItems.map((item, i) =>
-        i === index ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
+      currentItems.map((item) =>
+        item.id === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
       )
     );
+  }
+
+  resetCart(): void {
+    this.nextId = 4;
+    this.items.set([
+      { id: 1, name: 'MacBook Pro', price: 2499, quantity: 1 },
+      { id: 2, name: 'iPhone 15', price: 999, quantity: 2 },
+      { id: 3, name: 'AirPods Pro', price: 249, quantity: 1 },
+    ]);
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -115,8 +153,14 @@ total = computed(() => this.items().reduce(
   effectLogs = signal<string[]>([]);
 
   constructor() {
+    effect(onCleanup => {
+      if (!this.titleSync()) return;
+      this.document.title = 'Contatore ' + this.count() + ' · Angular Showcase';
+      onCleanup(() => { this.document.title = this.originalTitle; });
+    });
+    // This separate bounded log is educational instrumentation, not state derivation.
     // Effect: executes automatically when signals used inside it change
-    // Useful for logging, analytics, API calls, localStorage, etc.
+    // Use computed for derived state; effects connect to imperative APIs.
     effect(() => {
       const currentCount = this.count();
       const log = `Conteggio aggiornato: ${currentCount}`;
