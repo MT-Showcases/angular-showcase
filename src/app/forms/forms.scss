@@ -1,49 +1,8 @@
-/** Reactive Forms layout; controls inherit the shared Material theme. */
+/** Feature layout only: shared lesson classes and Material own visual presentation. */
 @use 'globals' as *;
 
-.form {
-  &__container {
-    display: flex;
-    justify-content: center;
-  }
-
-  &__card {
-    @include surface-panel(6);
-    width: 100%;
-    max-width: rem(560);
-
-    @include media-min-breakpoint(md) {
-      padding: space(10);
-    }
-  }
-
-  &__title {
-    margin: 0 0 space(2);
-    color: var(--mat-sys-on-surface);
-    font: var(--mat-sys-headline-small);
-    text-align: center;
-  }
-
-  &__subtitle {
-    margin: 0 0 space(8);
-    color: var(--mat-sys-on-surface-variant);
-    font: var(--mat-sys-body-medium);
-    text-align: center;
-  }
-
-  &__fields {
-    display: grid;
-    gap: space(6);
-    min-width: 0;
-  }
-
-  &__actions {
-    display: grid;
-    gap: space(3);
-    margin-top: space(2);
-
-    @include media-min-breakpoint(sm) {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
+.form__fields {
+  display: grid;
+  gap: space(4);
+  min-width: 0;
 }
