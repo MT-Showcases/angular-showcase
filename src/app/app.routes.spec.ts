@@ -25,8 +25,10 @@ describe('Showcase routes', () => {
 
   const pages = [
     ['/', 'Angular Showcase'],
-    ['/basics/data-binding', 'Data Binding in Angular'],
-    ['/basics/directives', 'Direttive Angular'],
+    ['/basics', 'Le basi di Angular'],
+    ['/advanced', 'Approfondisci Angular'],
+    ['/basics/data-binding', 'Data Binding'],
+    ['/basics/directives', 'Control flow e direttive'],
     ['/basics/forms', 'Reactive Forms'],
     ['/advanced/signals', 'Signals API'],
     ['/advanced/http', 'HTTP & Service Facade'],
@@ -186,11 +188,12 @@ describe('Showcase routes', () => {
   it('shows and hides the built-in control flow examples', async () => {
     const harness = await RouterTestingHarness.create('/basics/directives');
     const page = harness.routeNativeElement!;
-    expect(page.querySelector('.message')).toBeTruthy();
-    page.querySelector<HTMLButtonElement>('.section__button')!.click();
+    expect(page.querySelector('[data-testid="conditional-message"]')).toBeTruthy();
+    Array.from(page.querySelectorAll<HTMLButtonElement>('button'))
+      .find(button => button.textContent?.trim() === 'Mostra messaggio')!.click();
     await harness.fixture.whenStable();
-    expect(page.querySelector('.message')).toBeNull();
-    expect(page.querySelectorAll('.section__list-item').length).toBe(3);
+    expect(page.querySelector('[data-testid="conditional-message"]')).toBeNull();
+    expect(page.querySelectorAll('[data-item-id]').length).toBe(3);
   });
 
 });
