@@ -37,6 +37,7 @@ export class CodeBlock {
 
   private sanitizer = inject(DomSanitizer);
   copied = signal(false);
+  copyError = signal(false);
 
   get highlightedCode(): SafeHtml {
     const highlighted = this.highlightCode(this.code, this.language);
@@ -44,9 +45,15 @@ export class CodeBlock {
   }
 
   async copyCode(): Promise<void> {
-    await navigator.clipboard.writeText(this.code);
-    this.copied.set(true);
-    setTimeout(() => this.copied.set(false), 2000);
+    this.copyError.set(false);
+    try {
+      await navigator.clipboard.writeText(this.code);
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
+    } catch {
+      this.copied.set(false);
+      this.copyError.set(true);
+    }
   }
 
   private highlightCode(code: string, language: string): string {

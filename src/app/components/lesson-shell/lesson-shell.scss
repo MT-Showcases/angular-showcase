@@ -1,0 +1,16 @@
+@use 'globals' as *;
+.lesson-shell {
+  max-width: rem(1100); margin-inline: auto; min-width: 0;
+  &__link { color: inherit; text-underline-offset: rem(4); }
+  &__intro .lesson-shell__link { color: var(--mat-sys-primary); }
+  &__breadcrumbs { display: flex; flex-wrap: wrap; gap: space(2); margin-bottom: space(4); color: $white; }
+  &__intro { @include surface-panel(6); margin-bottom: space(6); }
+  &__lead { font: var(--mat-sys-title-medium); margin-bottom: space(3); }
+  &__text { margin-bottom: space(4); }
+  &__sections { display: flex; flex-wrap: wrap; gap: space(4); margin-block: space(4); }
+  &__glossary { margin-top: space(4); }
+  &__definitions { margin-top: space(4); display: grid; gap: space(2); }
+  &__term { font-weight: 700; }
+  &__content { display: grid; gap: space(6); min-width: 0; }
+  &__footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: space(4); margin-top: space(8); color: $white; }
+}

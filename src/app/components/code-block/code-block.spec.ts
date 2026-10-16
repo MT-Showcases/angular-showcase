@@ -43,5 +43,13 @@ describe('CodeBlock', () => {
     expect(component.copied()).toBe(true);
   });
 
+  it('offers manual copying when the clipboard rejects access', async () => {
+    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('Denied')) } });
+    await component.copyCode();
+    fixture.detectChanges();
+    expect(component.copied()).toBe(false);
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Seleziona il codice');
+  });
+
   afterEach(() => vi.unstubAllGlobals());
 });

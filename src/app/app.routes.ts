@@ -9,6 +9,7 @@ export const routes: Routes = [
   {
     path: 'basics',
     children: [
+      { path: '', pathMatch: 'full', data: { category: 'basics' }, loadComponent: () => import('./learning/category/category').then(m => m.LearningCategory) },
       {
         path: 'data-binding',
         loadComponent: () =>
@@ -27,6 +28,7 @@ export const routes: Routes = [
   {
     path: 'advanced',
     children: [
+      { path: '', pathMatch: 'full', data: { category: 'advanced' }, loadComponent: () => import('./learning/category/category').then(m => m.LearningCategory) },
       {
         path: 'signals',
         loadComponent: () => import('./signals/signals').then((module) => module.Signals),

@@ -2,6 +2,7 @@
   <div class="code-block-header">
     <span class="code-block-language">{{ language }}</span>
     <button
+      type="button"
       class="code-block-copy-btn"
       [attr.aria-label]="copied() ? 'Codice copiato' : 'Copia codice'"
       (click)="copyCode()"
@@ -16,7 +17,8 @@
       }
     </button>
   </div>
-  <div class="code-block-content">
+  @if (copyError()) { <p role="status">Copia non disponibile. Seleziona il codice e copialo con la tastiera.</p> }
+  <div class="code-block-content" tabindex="0" role="region" aria-label="Codice dell’esempio">
     <pre><code [innerHTML]="highlightedCode"></code></pre>
   </div>
 </div>

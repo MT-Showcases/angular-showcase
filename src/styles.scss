@@ -1,5 +1,6 @@
 @use 'typography';
 @use 'theme';
+@use 'lessons';
 @use 'globals' as *;
 
 // Zero-specificity reset lets Material retain its component typography and spacing.

@@ -1,0 +1,14 @@
+/** Shared lesson composition. Feature demos use native Material controls directly. */
+@use 'globals' as *;
+.lesson-panel { @include surface-panel(6); min-width: 0; scroll-margin-top: rem(120); }
+.lesson-title { font: var(--mat-sys-headline-small); color: var(--mat-sys-on-surface); margin-bottom: space(4); overflow-wrap: anywhere; }
+.lesson-subtitle { font: var(--mat-sys-title-large); margin-block: space(4); color: var(--mat-sys-on-surface); }
+.lesson-text { font: var(--mat-sys-body-large); margin-bottom: space(4); color: var(--mat-sys-on-surface); overflow-wrap: anywhere; }
+.lesson-actions { display: flex; flex-wrap: wrap; gap: space(3); align-items: center; margin-block: space(4); }
+.lesson-grid { display: grid; gap: space(4); min-width: 0; @include media-min-breakpoint(md) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lesson-field { width: 100%; min-width: 0; }
+.lesson-result { padding: space(4); border-radius: radius(sm); color: var(--mat-sys-on-secondary-container); background: var(--mat-sys-secondary-container); margin-block: space(4); overflow-wrap: anywhere; }
+.lesson-output { white-space: pre-wrap; overflow-wrap: anywhere; font-family: monospace; margin-block: space(4); }
+.lesson-list { padding-inline-start: space(6); line-height: 1.8; }
+.lesson-code-inline { font-family: monospace; overflow-wrap: anywhere; }
+.lesson-status { margin-block: space(4); color: var(--mat-sys-on-surface-variant); }
