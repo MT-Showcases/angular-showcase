@@ -1,0 +1,10 @@
+@use 'globals' as *;
+
+:host { display: block; min-width: 0; }
+
+.service-counter {
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: radius(md);
+  padding: space(4);
+  height: 100%;
+}

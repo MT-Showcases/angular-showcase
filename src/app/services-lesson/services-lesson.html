@@ -1,0 +1,100 @@
+<app-lesson-shell topicId="services">
+  <section id="demo" class="lesson-panel" aria-labelledby="services-demo-title">
+    <h2 id="services-demo-title" class="lesson-title">Estrai il comportamento, poi scegli chi lo condivide</h2>
+    <p class="lesson-text">Un <strong>servizio</strong> è una classe con un compito riutilizzabile.
+      Qui conserva un numero e sa aumentarlo o azzerarlo. I componenti mostrano i pulsanti e il risultato:
+      non duplicano le regole del contatore.</p>
+    <p class="lesson-text">Con <code class="lesson-code-inline">inject(LessonCounterService)</code>
+      il componente chiede il servizio ad Angular. Un <strong>provider</strong> indica ad Angular come fornirlo.
+      Mettere il provider nel contenitore della lezione consente alle viste figlie di usare la stessa istanza,
+      cioè lo stesso oggetto in memoria.</p>
+    <p class="lesson-text"><strong>Prova:</strong> aumenta «Condivisa A»: cambierà anche B.
+      Aumenta «Isolata A»: cambierà solo quella vista. Azzera da B: si azzerano entrambe le condivise,
+      mentre le isolate conservano il proprio conteggio.</p>
+
+    <h3 class="lesson-subtitle">Un provider nel contenitore della lezione</h3>
+    <p class="lesson-text">Le due viste ereditano lo stesso servizio. Questa istanza appartiene alla lezione,
+      non è un contatore globale per tutto il sito.</p>
+    <div class="lesson-grid">
+      <app-lesson-counter label="Condivisa A" (action)="feedback.set($event)" />
+      <app-lesson-counter label="Condivisa B" (action)="feedback.set($event)" />
+    </div>
+
+    <h3 class="lesson-subtitle">Un provider per ciascun componente isolato</h3>
+    <p class="lesson-text">Ogni contenitore isolato dichiara il proprio provider. La vista al suo interno riceve
+      quell'istanza locale al posto di quella della lezione. La classe del servizio è la stessa; gli oggetti sono diversi.</p>
+    @if (isolatedVisible()) {
+      <div id="isolated-counters" class="lesson-grid">
+        <app-isolated-lesson-counter label="Isolata A" (action)="feedback.set($event)" />
+        <app-isolated-lesson-counter label="Isolata B" (action)="feedback.set($event)" />
+      </div>
+    } @else {
+      <p id="isolated-counters" class="lesson-status">I componenti isolati sono stati rimossi.
+        Ricreali nell'approfondimento per ottenere due nuovi servizi a zero.</p>
+    }
+    <div class="lesson-actions">
+      <button matButton="outlined" type="button" (click)="resetAll()">Azzera tutti i contatori</button>
+    </div>
+    <p class="lesson-result" role="status">{{ feedback() }}</p>
+    <p class="lesson-text">Nel codice usiamo un <strong>signal</strong> per il numero: è un valore che Angular
+      osserva per aggiornare la vista. <code class="lesson-code-inline">count()</code> ne legge il valore corrente.
+      Per questa lezione basta seguire la lettura e le due operazioni del servizio.</p>
+  </section>
+
+  <app-lesson-disclosure anchor="code" title="Guarda servizio, inject e provider">
+    <h2 class="lesson-title">Una classe riutilizzabile, viste separate</h2>
+    <p class="lesson-text">File completo del servizio. <code class="lesson-code-inline">@Injectable()</code>
+      rende la classe utilizzabile dal sistema di dependency injection: Angular può gestire le sue dipendenze.
+      Qui non registra un provider globale; la registrazione avviene nei componenti mostrati sotto.
+      Lo stato modificabile è privato, mentre le viste ricevono una lettura pubblica e due metodi.</p>
+    <app-code-block [code]="serviceExample" />
+    <p class="lesson-text">Frammento della classe della vista: inject cerca un provider disponibile nel suo contesto.
+      Si usa qui nell'inizializzazione della classe, durante la creazione del componente gestita da Angular.
+      Non è necessario fare <code class="lesson-code-inline">new LessonCounterService()</code> a ogni clic.</p>
+    <app-code-block [code]="consumerExample" />
+    <p class="lesson-text">Frammento minimo del template. La demo aggiunge le etichette delle quattro viste
+      e un annuncio dell'azione eseguita; la variazione del numero usa sempre gli stessi metodi.</p>
+    <app-code-block language="html" [code]="templateExample" />
+    <h3 class="lesson-subtitle">Lo scope dipende da dove registri il provider</h3>
+    <p class="lesson-text">Frammenti dei decorator: il primo provider è sul contenitore della lezione;
+      il secondo su ciascun componente isolato. Le altre sezioni e gli annunci sono omessi per evidenziare la differenza.</p>
+    <app-code-block [code]="providerExample" />
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="deepen" title="Approfondisci gerarchia, durata e HttpClient">
+    <h2 class="lesson-title">Il provider più vicino cambia la condivisione</h2>
+    <p class="lesson-text">Un <strong>injector</strong> gestisce i provider e risolve le richieste di dipendenze.
+      Per il servizio della demo, Angular cerca nel componente e risale agli antenati finché trova un provider.
+      Un provider locale intercetta la richiesta prima di quello del contenitore.
+      Più chiamate a inject nello stesso scope non significano più istanze indipendenti.</p>
+    <h3 class="lesson-subtitle">Cosa cambia con providedIn: 'root'?</h3>
+    <p class="lesson-text">Con questa registrazione alternativa il servizio è disponibile nell'injector radice
+      dell'applicazione. I consumatori che non incontrano un provider più vicino condividono quell'istanza.
+      Non significa «un oggetto unico in qualunque circostanza»: un provider di componente può ancora creare
+      un'istanza locale. La demo usa provider di componente, non root.</p>
+    <app-code-block [code]="rootExample" />
+    <h3 class="lesson-subtitle">La durata segue il contenitore</h3>
+    <p class="lesson-text">Aumenta un contatore condiviso e uno isolato, poi rimuovi e ricrea gli isolati.
+      I servizi dei componenti rimossi terminano con il loro scope; alla ricreazione ne ottieni di nuovi a zero.
+      Il contenitore della lezione rimane montato e conserva il condiviso.</p>
+    <div class="lesson-actions">
+      <button matButton="tonal" type="button" aria-controls="isolated-counters" [attr.aria-expanded]="isolatedVisible()" (click)="toggleIsolated()">
+        {{ isolatedVisible() ? 'Rimuovi i contatori isolati' : 'Ricrea i contatori isolati' }}
+      </button>
+    </div>
+    <p class="lesson-text">Chiudere questo approfondimento non rimuove i contatori: ne conserva lo stato.
+      Lasciare la lezione normalmente distrugge invece il suo contenitore e il servizio locale.
+      Un servizio root può vivere per tutta la durata dell'applicazione. Se un servizio apre risorse proprie,
+      deve gestirne la pulizia alla distruzione; questo contatore non apre connessioni o timer.</p>
+    <h3 class="lesson-subtitle">Il passo successivo: un servizio che usa HttpClient</h3>
+    <p class="lesson-text">Un servizio può ricevere a sua volta un'altra dipendenza.
+      Per leggere dati da un'API, ad esempio, può chiedere <code class="lesson-code-inline">inject(HttpClient)</code>.
+      Occorre prima configurarne il provider con <code class="lesson-code-inline">provideHttpClient()</code>
+      nell'applicazione, come avviene già in questo sito.</p>
+    <p class="lesson-text">Il nostro contatore opera subito in memoria. HTTP è asincrono: la risposta arriva in seguito.
+      HttpClient restituisce un <strong>Observable</strong>, una sorgente di notifiche cui ci si sottoscrive
+      per avviare la richiesta e ricevere dati o errori. Non serve aggiungere RxJS a questo contatore per capire DI.</p>
+    <p class="lesson-text"><a routerLink="/advanced/http">Prosegui con richieste HTTP e servizi</a>:
+      lì seguirai richiesta, attesa, risposta ed errore senza confonderli con lo scope del servizio.</p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

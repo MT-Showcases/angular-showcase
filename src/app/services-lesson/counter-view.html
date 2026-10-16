@@ -1,0 +1,8 @@
+<section class="service-counter" [attr.aria-label]="label()">
+  <h4 class="lesson-subtitle">{{ label() }}</h4>
+  <p class="lesson-result">Conteggio: <strong class="service-counter__value">{{ counter.count() }}</strong></p>
+  <div class="lesson-actions">
+    <button matButton="filled" type="button" [attr.aria-label]="'Aumenta ' + label()" (click)="increment()">Aumenta</button>
+    <button matButton="outlined" type="button" [attr.aria-label]="'Azzera ' + label()" (click)="reset()">Azzera questo servizio</button>
+  </div>
+</section>
