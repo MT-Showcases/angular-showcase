@@ -2,7 +2,7 @@
 
 An Italian-language Angular 22 learning site for newcomers and experienced developers. Lessons put a useful interaction first, with concise context and optional deeper discussion. The UI uses Angular Material and the project's purple theme.
 
-Project workflow rules live in [AGENTS.md](AGENTS.md). The current [product direction](docs/product-direction.md) puts a live preview first and editable, commented code directly below it. First Component, Data Binding, Control Flow and Component Communication use the shared playground.
+Project workflow rules live in [AGENTS.md](AGENTS.md). The current [product direction](docs/product-direction.md) puts a live preview first and editable, commented code directly below it. First Component, Data Binding, Control Flow and Component Communication use the shared playground. Control Flow presents independent `@if`, `@for`, `@switch` and attribute-directive examples; Component Communication separates input, output and their combination. Switching examples retains source drafts within the page and mounts only one preview at a time.
 
 ## Learning paths
 
@@ -21,7 +21,7 @@ Start at `/basics` and follow the suggested order, or open a lesson directly:
 
 The `/advanced` path covers Signals (`/advanced/signals`) and HTTP (`/advanced/http`). Separate examples for NgRx, BehaviorSubject and users retain their existing URLs.
 
-The first four Basics lessons have real Angular previews and editable TypeScript/HTML/CSS directly below them. The remaining lessons currently have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. The component runner supports one default-exported root, inline child components/directives in the same TypeScript module and bundled Angular core/common/forms. It uses decorator inputs/outputs; signal input/output initializer transforms are not available in this JIT runner. Preview height follows content within bounds; full project editing and package installation remain future work. External documentation links provide optional supporting material.
+The first four Basics lessons have real Angular previews and editable TypeScript/HTML/CSS directly below them. The remaining lessons currently have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. The component runner supports one default-exported root, inline child components/directives in the same TypeScript module and bundled Angular core/common/forms. It supports direct `input()`, `input.required()` and `output()` fields through a narrow Angular 22 JIT metadata bridge. The introductory examples use these APIs; decorators remain supported. Inline literal aliases and input transforms are covered by executable tests. This bridge uses Angular-internal signal metadata and must be reviewed on upgrades; the build rejects an unreviewed Angular major version. `model()`, initializer queries, indirect initializer factories and full ngc transforms are not implemented. Preview height follows content within bounds; full project editing and package installation remain future work. External documentation links provide optional supporting material.
 
 ### HTTP demonstration
 
@@ -47,7 +47,7 @@ npm run build
 npm audit
 ```
 
-`npm start`, `npm run build` and `npm test` generate the isolated playground runtime first. `npm test -- --watch=false` also runs the generated runtime tests after the Angular suite. Use `npm run playground:test` to verify the runtime on its own. Direct `ng` commands bypass npm lifecycle hooks; run `npm run playground:build` first when using them. Generated preview assets are ignored by Git and included in production build assets.
+`npm start`, `npm run build` and `npm test` type-check and generate the isolated playground runtime first. Use `npm run playground:check` for its standalone strict TypeScript check. `npm test -- --watch=false` also runs the generated runtime tests after the Angular suite. Use `npm run playground:test` to verify the runtime on its own. Direct `ng` commands bypass npm lifecycle hooks; run `npm run playground:build` first when using them. Generated preview assets are ignored by Git and included in production build assets.
 
 The app uses Angular/Material 22.2.3, NgRx 22, TypeScript 6.0.x and Vitest 5. Existing components retain Angular 22's explicit `ChangeDetectionStrategy.Eager`; this project does not perform a blanket change-detection migration. npm's version-pinned `allowScripts` entries allow the required native build dependencies.
 

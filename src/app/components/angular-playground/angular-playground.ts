@@ -1,6 +1,6 @@
 // COMPONENT TYPE: Shared UI
 // ROLE: Keep editable source in the host and execute it only in an isolated Angular preview.
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, signal, viewChild, viewChildren } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, input, output, signal, viewChild, viewChildren } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { EditorState } from '@codemirror/state';
@@ -22,6 +22,9 @@ import { PlaygroundFile, PlaygroundSources } from './playground.types';
 export class AngularPlayground implements AfterViewInit {
   readonly id = 'playground-' + crypto.randomUUID();
   readonly initial = input.required<PlaygroundSources>();
+  readonly draft = input<PlaygroundSources>();
+  readonly title = input('Il tuo componente, dal vivo');
+  readonly sourceChange = output<PlaygroundSources>();
   readonly activeFile = signal<PlaygroundFile>('typescript');
   readonly automatic = signal(true);
   readonly status = signal<'loading' | 'changed' | 'building' | 'ready' | 'error'>('loading');
@@ -59,7 +62,7 @@ export class AngularPlayground implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.sources = { ...this.initial() };
+    this.sources = { ...(this.draft() ?? this.initial()) };
     const languages = { typescript: javascript({ typescript: true }), html: html(), css: css() };
     this.files.forEach((file, index) => {
       const editor = new EditorView({
@@ -109,6 +112,7 @@ export class AngularPlayground implements AfterViewInit {
 
   edit(file: PlaygroundFile, content: string): void {
     this.sources = { ...this.sources, [file]: content };
+    this.sourceChange.emit({ ...this.sources });
     this.status.set('changed');
     clearTimeout(this.timer);
     if (this.ready && this.automatic()) this.timer = setTimeout(() => this.run(), 500);
@@ -137,6 +141,7 @@ export class AngularPlayground implements AfterViewInit {
     this.replacing = true;
     this.editors.forEach((editor, file) => editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: this.sources[file] } }));
     this.replacing = false;
+    this.sourceChange.emit({ ...this.sources });
     if (this.ready) this.run();
   }
 

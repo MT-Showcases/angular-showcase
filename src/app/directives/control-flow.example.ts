@@ -1,47 +1,53 @@
 import type { PlaygroundSources } from '../components/angular-playground/playground.types';
-import { PLAYGROUND_STYLES } from '../learning/playground-styles';
 
-/** Reachable branches, stable row identity and a local attribute directive. */
-export const CONTROL_FLOW_EXAMPLE: PlaygroundSources = {
-  typescript: `import { Component, Directive, Input, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-
-// Una direttiva aggiunge un comportamento a un elemento esistente.
-@Directive({
-  selector: '[appHighlight]',
-  host: { '[class.active]': 'appHighlight' },
-})
-class Highlight {
-  @Input() appHighlight = false;
-}
+export const IF_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-  selector: 'app-control-flow-demo',
-  imports: [FormsModule, Highlight],
+  selector: 'app-example',
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
 })
-export default class ControlFlowDemo {
-  showMessage = true;
-  state = 'draft';
-  highlighted = false;
-  name = '';
+export default class ConditionDemo {
+  // Cambia il booleano: Angular sceglie quale ramo creare nel DOM.
+  visible = true;
+}`,
+  html: `<!-- Il clic cambia soltanto lo stato: Angular aggiorna il template. -->
+<button
+  type="button"
+  [attr.aria-pressed]="visible"
+  (click)="visible = !visible"
+>
+  Mostra il saluto
+</button>
+
+<!-- Quando visible è false, questo primo paragrafo non esiste nel DOM. -->
+@if (visible) {
+  <p id="greeting" class="result">Ciao, Angular!</p>
+} @else {
+  <p id="alternative" class="result">Il saluto è nascosto.</p>
+}`,
+  css: `/* Cambia l'aspetto dei messaggi senza cambiare la condizione. */
+.result {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: #eee7ff;
+}`,
+};
+
+export const FOR_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class ListDemo {
+  // Gli ID restano associati ai dati anche quando cambia l'ordine.
   items = this.initialItems();
-  private nextId = 4;
-
-  add(): void {
-    const name = this.name.trim();
-    if (!name || name.length > 80) return;
-
-    // L'ID identifica il dato: non dipende dalla posizione nella lista.
-    this.items = [...this.items, { id: this.nextId++, name }];
-    this.name = '';
-  }
-
-  remove(id: number): void {
-    this.items = this.items.filter(item => item.id !== id);
-  }
 
   reverse(): void {
     this.items = [...this.items].reverse();
@@ -49,7 +55,6 @@ export default class ControlFlowDemo {
 
   reset(): void {
     this.items = this.initialItems();
-    this.name = '';
   }
 
   private initialItems() {
@@ -60,72 +65,127 @@ export default class ControlFlowDemo {
     ];
   }
 }`,
-  html: `<section class="demo">
-  <h2>Una lista, più rami da esplorare</h2>
+  html: `<div class="actions">
+  <button id="reverse" type="button" (click)="reverse()">Inverti ordine</button>
+  <button id="clear" type="button" (click)="items = []">Svuota</button>
+  <button id="reset" type="button" (click)="reset()">Ripristina lista</button>
+</div>
 
-  <button type="button" [attr.aria-pressed]="showMessage" (click)="showMessage = !showMessage">
-    Mostra messaggio
-  </button>
-
-  <!-- @if crea o rimuove il contenuto dal DOM. -->
-  @if (showMessage) {
-    <p id="condition" class="result">Il ramo &#64;if è visibile.</p>
-  } @else {
-    <p id="condition" class="result">Ora stai leggendo il ramo &#64;else.</p>
+<ul aria-label="Frutta" aria-live="polite">
+  <!-- track usa l'ID per riconoscere ogni elemento, non la sua posizione. -->
+  @for (item of items; track item.id) {
+    <li [attr.data-item-id]="item.id">{{ item.name }} — ID {{ item.id }}</li>
+  } @empty {
+    <!-- Questo blocco appare solo quando items non contiene elementi. -->
+    <li id="empty">La lista è vuota.</li>
   }
+</ul>`,
+  css: `/* I controlli vanno a capo sui display stretti. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 
-  <label>
-    Nuovo elemento (massimo 80 caratteri)
-    <input #addField id="item-name" [(ngModel)]="name" maxlength="80" />
-  </label>
+li {
+  margin-block: 0.5rem;
+}`,
+};
 
-  <div class="actions">
-    <button id="add" type="button" [disabled]="!name.trim()" (click)="add()">Aggiungi</button>
-    <button id="reverse" type="button" [disabled]="items.length < 2" (click)="reverse()">Inverti ordine</button>
-    <button id="clear" type="button" (click)="items = []">Svuota</button>
-    <button id="reset" type="button" (click)="reset()">Ripristina lista</button>
-  </div>
+export const SWITCH_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
 
-  <!-- track conserva il nodo di ogni elemento anche dopo un riordino. -->
-  <ul aria-label="Lista della spesa" aria-live="polite">
-    @for (item of items; track item.id; let position = $index) {
-      <li [attr.data-item-id]="item.id">
-        {{ position + 1 }}. {{ item.name }} — ID {{ item.id }}
-        <button
-          type="button"
-          [attr.aria-label]="'Rimuovi ' + item.name + ', ID ' + item.id"
-          (click)="remove(item.id); addField.focus()"
-        >Rimuovi</button>
-      </li>
-    } @empty {
-      <li id="empty">La lista è vuota: ramo &#64;empty.</li>
-    }
-  </ul>
+@Component({
+  selector: 'app-example',
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class StatusDemo {
+  // Prova anche un valore non previsto: verrà mostrato @default.
+  state = 'draft';
+}`,
+  html: `<label>
+  Stato dell'articolo
+  <select #choice id="state" (change)="state = choice.value">
+    <option value="draft">Bozza</option>
+    <option value="review">In revisione</option>
+    <option value="published">Pubblicato</option>
+    <option value="unknown">Altro valore</option>
+  </select>
+</label>
 
-  <label>
-    Stato della pubblicazione
-    <select id="state" [(ngModel)]="state">
-      <option value="draft">Bozza</option>
-      <option value="review">In revisione</option>
-      <option value="published">Pubblicato</option>
-      <option value="unknown">Sconosciuto</option>
-    </select>
-  </label>
+<!-- Angular mostra soltanto il caso corrispondente a state. -->
+<div id="publication" class="result" role="status">
+  @switch (state) {
+    @case ('draft') { <p>Bozza: puoi scrivere.</p> }
+    @case ('review') { <p>In revisione: controlla il testo.</p> }
+    @case ('published') { <p>Pubblicato: il testo è visibile.</p> }
+    @default { <p>Stato sconosciuto.</p> }
+  }
+</div>`,
+  css: `label {
+  display: grid;
+  gap: 0.5rem;
+}
 
-  <!-- @switch sceglie un solo caso; @default copre gli altri valori. -->
-  <div id="publication" class="result">
-    @switch (state) {
-      @case ('draft') { <p>Bozza: puoi modificare.</p> }
-      @case ('review') { <p>In revisione: controlla il contenuto.</p> }
-      @case ('published') { <p>Pubblicato: il contenuto è visibile.</p> }
-      @default { <p>Stato sconosciuto: scegli uno stato valido.</p> }
-    }
-  </div>
+.result {
+  padding: 1rem;
+  background: #eee7ff;
+}`,
+};
 
-  <button type="button" [attr.aria-pressed]="highlighted" (click)="highlighted = !highlighted">
-    Attiva direttiva
-  </button>
-  <p id="highlight" [appHighlight]="highlighted">La direttiva modifica la classe di questo paragrafo.</p>
-</section>`,
-  css: PLAYGROUND_STYLES,
+export const DIRECTIVE_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, Directive, ChangeDetectionStrategy } from '@angular/core';
+
+// Il selettore riconosce l'attributo appHighlight nel template.
+// La direttiva aggiunge un comportamento al pulsante, senza creare una nuova vista.
+@Directive({
+  selector: '[appHighlight]',
+  host: {
+    // Applica la classe CSS soltanto quando highlighted è true.
+    '[class.highlighted]': 'highlighted',
+
+    // Espone lo stato anche a chi usa un lettore di schermo.
+    '[attr.aria-pressed]': 'highlighted',
+
+    // Ogni clic inverte lo stato locale di questa direttiva.
+    '(click)': 'highlighted = !highlighted',
+  },
+})
+class Highlight {
+  highlighted = false;
+}
+
+@Component({
+  selector: 'app-directive-demo',
+
+  // L'import rende la direttiva disponibile in questo template.
+  imports: [Highlight],
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class DirectiveDemo {}`,
+  html: `<!-- appHighlight attiva la direttiva sul pulsante esistente. -->
+<!-- Anche Invio e Spazio producono il clic, grazie al pulsante nativo. -->
+<button appHighlight type="button">
+  Clicca per evidenziarmi
+</button>`,
+  css: `/* La direttiva sceglie QUANDO aggiungere la classe; il CSS decide l'aspetto. */
+button {
+  min-height: 2.75rem;
+  padding: 1rem;
+  border: 2px solid #6746c3;
+  border-radius: 0.5rem;
+  font: inherit;
+  color: #4c318e;
+  background: white;
+}
+
+.highlighted {
+  color: #2f1466;
+  background: #eee7ff;
+  border-style: dashed;
+}`,
 };

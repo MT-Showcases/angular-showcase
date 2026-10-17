@@ -10,8 +10,8 @@ async function fixture(path) {
 }
 const { FIRST_COMPONENT } = await fixture('src/app/getting-started/first-component.example.ts');
 const { BINDING_EXAMPLE } = await fixture('src/app/data-binding/binding.example.ts');
-const { CONTROL_FLOW_EXAMPLE } = await fixture('src/app/directives/control-flow.example.ts');
-const { COMMUNICATION_EXAMPLE } = await fixture('src/app/component-communication/communication.example.ts');
+const { IF_EXAMPLE, FOR_EXAMPLE, SWITCH_EXAMPLE, DIRECTIVE_EXAMPLE } = await fixture('src/app/directives/control-flow.example.ts');
+const { INPUT_EXAMPLE, OUTPUT_EXAMPLE, COMMUNICATION_EXAMPLE } = await fixture('src/app/component-communication/communication.example.ts');
 
 const source = await readFile('public/playground/generated/preview.html', 'utf8');
 function listen(window, kind, revision) {
@@ -83,70 +83,150 @@ test('binding seed synchronizes both input directions, properties, escaped text 
   } finally { dom.window.close(); }
 });
 
-test('control-flow seed preserves DOM identity, accepts duplicate labels and reaches every branch', async () => {
+test('@if creates only the selected branch', async () => {
   const dom = await environment();
   try {
-    await render(dom, CONTROL_FLOW_EXAMPLE, 1);
+    await render(dom, IF_EXAMPLE, 1);
     const doc = dom.window.document;
-    const first = doc.querySelector('[data-item-id="1"]');
-    await click(dom, '#reverse');
-    assert.equal(doc.querySelector('[data-item-id="1"]'), first);
-    assert.equal([...doc.querySelectorAll('[data-item-id]')].at(-1), first);
-    for (let i = 0; i < 2; i++) {
-      await input(dom, '#item-name', '  Mela  ');
-      await click(dom, '#add');
-    }
-    const ids = [...doc.querySelectorAll('[data-item-id]')].map(row => row.dataset.itemId);
-    assert.equal(new Set(ids).size, 5);
-    await input(dom, '#item-name', '   ');
-    assert.equal(doc.querySelector('#add').disabled, true);
-    await click(dom, '[data-item-id="1"] button');
-    assert.equal(doc.querySelector('[data-item-id="1"]'), null);
-    assert.equal(doc.activeElement, doc.querySelector('#item-name'));
-    await click(dom, '#clear');
-    assert.ok(doc.querySelector('#empty'));
-    assert.equal(doc.querySelector('#reverse').disabled, true);
-    await click(dom, '#reset');
-    assert.equal(doc.querySelectorAll('[data-item-id]').length, 3);
-    await click(dom, '.demo > button');
-    assert.match(doc.querySelector('#condition').textContent, /@else/);
-    for (const [state, text] of [['review', 'In revisione'], ['published', 'Pubblicato'], ['unknown', 'Stato sconosciuto'], ['draft', 'Bozza']]) {
-      await input(dom, '#state', state, 'change');
-      assert.match(doc.querySelector('#publication').textContent, new RegExp(text));
-    }
-    const highlight = doc.querySelector('#highlight');
-    await click(dom, '.demo > button:last-of-type');
-    assert.equal(doc.querySelector('#highlight'), highlight);
-    assert.equal(highlight.classList.contains('active'), true);
+    assert.ok(doc.querySelector('#greeting'));
+    assert.equal(doc.querySelector('#alternative'), null);
+    await click(dom, 'button');
+    assert.equal(doc.querySelector('#greeting'), null);
+    assert.ok(doc.querySelector('#alternative'));
+    await click(dom, 'button');
+    assert.ok(doc.querySelector('#greeting'));
   } finally { dom.window.close(); }
 });
 
-test('actual parent and child communicate, enforce limits/pause and leave data ownership with the parent', async () => {
+test('@for preserves actual DOM rows when reordered and reaches @empty', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, FOR_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const first = doc.querySelector('[data-item-id="1"]');
+    await click(dom, '#reverse');
+    assert.equal([...doc.querySelectorAll('[data-item-id]')].at(-1), first);
+    await click(dom, '#clear');
+    assert.ok(doc.querySelector('#empty'));
+    assert.equal(doc.querySelectorAll('[data-item-id]').length, 0);
+    await click(dom, '#reset');
+    assert.equal(doc.querySelectorAll('[data-item-id]').length, 3);
+    assert.equal(doc.querySelector('#empty'), null);
+  } finally { dom.window.close(); }
+});
+
+test('@switch exposes every case and its default', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, SWITCH_EXAMPLE, 1);
+    for (const [state, text] of [['review', 'In revisione'], ['published', 'Pubblicato'], ['unknown', 'Stato sconosciuto'], ['draft', 'Bozza']]) {
+      await input(dom, '#state', state, 'change');
+      assert.match(dom.window.document.querySelector('#publication').textContent, new RegExp(text));
+    }
+  } finally { dom.window.close(); }
+});
+
+test('attribute directive updates the same native button and its accessible state', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, DIRECTIVE_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const button = doc.querySelector('button');
+    assert.equal(button.getAttribute('aria-pressed'), 'false');
+    await click(dom, 'button');
+    assert.equal(doc.querySelector('button'), button);
+    assert.equal(button.classList.contains('highlighted'), true);
+    assert.equal(button.getAttribute('aria-pressed'), 'true');
+    await click(dom, 'button');
+    assert.equal(button.classList.contains('highlighted'), false);
+  } finally { dom.window.close(); }
+});
+
+test('input() receives and reacts to the actual parent value', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, INPUT_EXAMPLE, 1);
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, Ada!');
+    await input(dom, '#name', 'Grace');
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, Grace!');
+    await render(dom, { ...INPUT_EXAMPLE, html: INPUT_EXAMPLE.html.replace('[name]="name"', '') }, 2);
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, visitatore!');
+  } finally { dom.window.close(); }
+});
+
+test('output() delivers the emitted string to the parent', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, OUTPUT_EXAMPLE, 1);
+    assert.match(dom.window.document.querySelector('#message').textContent, /Nessun messaggio/);
+    await click(dom, 'app-message-button button');
+    assert.equal(dom.window.document.querySelector('#message').textContent, 'Ciao dal figlio!');
+  } finally { dom.window.close(); }
+});
+
+test('combined input/output keeps ownership in the parent; an unhandled event cannot change it', async () => {
   const dom = await environment();
   try {
     await render(dom, COMMUNICATION_EXAMPLE, 1);
     const doc = dom.window.document;
-    const cards = doc.querySelectorAll('app-vote-card');
-    await click(dom, 'app-vote-card button');
-    assert.equal(cards[0].querySelector('strong').textContent, '1');
-    assert.equal(cards[1].querySelector('strong').textContent, '0');
-    assert.match(doc.querySelector('#last-request').textContent, /templates/);
-    await input(dom, '#title', 'Pratica');
-    assert.equal(cards[0].querySelector('h3').textContent, 'Pratica');
-    await click(dom, '#pause');
-    assert.equal(cards[0].querySelector('button').disabled, true);
-    await click(dom, '#pause');
-    await click(dom, 'app-vote-card button');
-    await click(dom, 'app-vote-card button');
-    assert.equal(cards[0].querySelector('strong').textContent, '3');
-    assert.equal(cards[0].querySelector('button').disabled, true);
+    await click(dom, 'app-counter-button button');
+    assert.equal(doc.querySelector('#count').textContent, 'Totale: 1');
     await click(dom, '#reset');
-    assert.equal(cards[0].querySelector('strong').textContent, '0');
-    assert.equal(cards[0].querySelector('h3').textContent, 'Template');
-    // Remove the handler: the child still emits, but cannot change the parent's votes.
-    await render(dom, { ...COMMUNICATION_EXAMPLE, html: COMMUNICATION_EXAMPLE.html.replace('(voteRequested)="recordVote($event)"', '') }, 2);
-    await click(dom, 'app-vote-card button');
-    assert.equal(doc.querySelector('app-vote-card strong').textContent, '0');
+    assert.equal(doc.querySelector('#count').textContent, 'Totale: 0');
+    await render(dom, { ...COMMUNICATION_EXAMPLE, html: COMMUNICATION_EXAMPLE.html.replace('(incremented)="count = count + 1"', '') }, 2);
+    await click(dom, 'app-counter-button button');
+    assert.equal(doc.querySelector('#count').textContent, 'Totale: 0');
+  } finally { dom.window.close(); }
+});
+
+test('JIT input bridge supports required inputs, static aliases, import aliases and signal transforms', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, {
+      ...INPUT_EXAMPLE,
+      typescript: INPUT_EXAMPLE.typescript
+        .replace('Component, input,', 'Component, input as accept,')
+        .replace("input('visitatore')", "accept.required<string>({ alias: 'displayName', transform: value => String(value).toUpperCase() })"),
+      html: INPUT_EXAMPLE.html.replace('[name]', '[displayName]'),
+    }, 1);
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, ADA!');
+    await input(dom, '#name', 'Grace');
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, GRACE!');
+    await render(dom, {
+      ...OUTPUT_EXAMPLE,
+      typescript: OUTPUT_EXAMPLE.typescript
+        .replace('Component, output,', 'Component, output as emitEvent,')
+        .replace('output<string>()', "emitEvent<string>({ alias: 'messageSent' })"),
+      html: OUTPUT_EXAMPLE.html.replace('(sent)', '(messageSent)'),
+    }, 2);
+    await click(dom, 'app-message-button button');
+    assert.equal(dom.window.document.querySelector('#message').textContent, 'Ciao dal figlio!');
+  } finally { dom.window.close(); }
+});
+
+test('unsupported initializer options fail visibly and corrected modern code recovers', async () => {
+  const dom = await environment();
+  try {
+    const error = await render(dom, {
+      ...INPUT_EXAMPLE,
+      typescript: INPUT_EXAMPLE.typescript.replace("input('visitatore')", "input('visitatore', { alias: ['dynamic'].join('') })"),
+    }, 1, 'error');
+    assert.match(error.message, /alias.*stringa letterale/);
+    const model = await render(dom, {
+      ...INPUT_EXAMPLE,
+      typescript: INPUT_EXAMPLE.typescript.replace('Component, input,', 'Component, model,').replace("input('visitatore')", "model('visitatore')"),
+    }, 2, 'error');
+    assert.match(model.message, /model\(\).*non è ancora supportato/);
+    await render(dom, INPUT_EXAMPLE, 3);
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, Ada!');
+    const missing = await render(dom, {
+      ...INPUT_EXAMPLE,
+      typescript: INPUT_EXAMPLE.typescript.replace("input('visitatore')", 'input.required<string>()'),
+      html: INPUT_EXAMPLE.html.replace('[name]="name"', ''),
+    }, 4, 'error');
+    assert.match(missing.message, /NG0950|Input is required/i);
+    await render(dom, INPUT_EXAMPLE, 5);
+    assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, Ada!');
   } finally { dom.window.close(); }
 });
 

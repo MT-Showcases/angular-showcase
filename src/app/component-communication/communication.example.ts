@@ -1,139 +1,165 @@
 import type { PlaygroundSources } from '../components/angular-playground/playground.types';
-import { PLAYGROUND_STYLES } from '../learning/playground-styles';
 
-/** Two actual Angular components share one editable TS module in the component runner. */
-export const COMMUNICATION_EXAMPLE: PlaygroundSources = {
-  typescript: `import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+export const INPUT_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
-interface VotingOption {
-  readonly id: string;
-  readonly title: string;
-  readonly votes: number;
-}
-
-// FIGLIO: riceve dati e invia una richiesta. Non modifica l'oggetto ricevuto.
+// FIGLIO: input() dichiara un dato ricevuto dal padre, letto come un signal.
 @Component({
-  selector: 'app-vote-card',
-  template: \`
-    <article>
-      <h3>{{ option.title || 'Opzione senza titolo' }}</h3>
-      <p>Voti: <strong>{{ option.votes }}</strong></p>
-
-      <button
-        type="button"
-        [disabled]="disabledReason !== ''"
-        [attr.aria-label]="'Vota ' + (option.title || 'opzione senza titolo')"
-        (click)="requestVote()"
-      >Richiedi un voto</button>
-
-      <p>{{ disabledReason || 'Il padre decide come aggiornare i voti.' }}</p>
-    </article>
-  \`,
-  styles: [\`
-    article {
-      padding: 1rem;
-      border: 1px solid #6746c3;
-      border-radius: 0.5rem;
-    }
-
-    button {
-      min-height: 2.75rem;
-      max-width: 100%;
-      padding: 0.5rem 0.75rem;
-      font: inherit;
-      color: #4c318e;
-    }
-  \`],
+  selector: 'app-greeting',
+  template: '<h3 id="greeting">Ciao, {{ name() }}!</h3>',
   changeDetection: ChangeDetectionStrategy.Eager,
 })
-class VoteCard {
-  @Input({ required: true }) option!: VotingOption;
-  @Input() disabledReason = '';
-  @Output() voteRequested = new EventEmitter<string>();
-
-  requestVote(): void {
-    if (!this.disabledReason) this.voteRequested.emit(this.option.id);
-  }
+class Greeting {
+  // Se il padre non passa un valore, viene usato questo valore iniziale.
+  readonly name = input('visitatore');
 }
 
-// PADRE: possiede lo stato e sceglie se accettare l'evento del figlio.
+// PADRE: collega il figlio e possiede lo stato della pagina.
 @Component({
-  selector: 'app-voting-demo',
-  imports: [FormsModule, VoteCard],
+  selector: 'app-input-demo',
+  imports: [Greeting],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
 })
-export default class VotingDemo {
-  options = this.initialOptions();
-  maxVotes = 3;
-  paused = false;
-  lastRequest = 'nessuna';
-
-  recordVote(id: string): void {
-    const option = this.options.find(item => item.id === id);
-    if (!option || this.paused || option.votes >= this.maxVotes) return;
-
-    // Sostituiamo il dato del solo elemento votato.
-    this.options = this.options.map(item => item.id === id
-      ? { ...item, votes: item.votes + 1 }
-      : item);
-    this.lastRequest = id;
-  }
-
-  reasonFor(option: VotingOption): string {
-    if (this.paused) return 'Votazione in pausa.';
-    return option.votes >= this.maxVotes ? 'Limite raggiunto.' : '';
-  }
-
-  rename(event: Event): void {
-    if (event.target instanceof HTMLInputElement) {
-      const title = event.target.value;
-      this.options = this.options.map((item, index) => index === 0
-        ? { ...item, title }
-        : item);
-    }
-  }
-
-  reset(): void {
-    this.options = this.initialOptions();
-    this.paused = false;
-    this.lastRequest = 'nessuna';
-  }
-
-  private initialOptions(): VotingOption[] {
-    return [
-      { id: 'templates', title: 'Template', votes: 0 },
-      { id: 'events', title: 'Eventi', votes: 0 },
-    ];
-  }
+export default class InputDemo {
+  // Il padre possiede lo stato; il figlio riceve solo il valore.
+  name = 'Ada';
 }`,
-  html: `<section class="demo">
-  <h2>Il padre possiede i voti, il figlio chiede di cambiarli</h2>
+  html: `<label>
+  Nome nello stato del padre
+  <input #field id="name" [value]="name" (input)="name = field.value" />
+</label>
 
-  <label>
-    Titolo della prima opzione (stato del padre)
-    <input id="title" [value]="options[0].title" (input)="rename($event)" />
-  </label>
+<!-- Le parentesi quadre passano il valore al figlio: padre → figlio. -->
+<app-greeting [name]="name" />`,
+  css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
+label {
+  display: grid;
+  gap: 0.5rem;
+}
 
-  <!-- [option] invia il dato; (voteRequested) riceve l'ID emesso. -->
-  @for (option of options; track option.id) {
-    <app-vote-card
-      [option]="option"
-      [disabledReason]="reasonFor(option)"
-      (voteRequested)="recordVote($event)"
-    />
-  }
+input {
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+}
 
-  <p id="last-request" class="result" role="status">Ultima richiesta ricevuta: {{ lastRequest }}</p>
+.result {
+  padding: 1rem;
+  background: #eee7ff;
+}`,
+};
 
-  <div class="actions">
-    <button id="pause" type="button" [attr.aria-pressed]="paused" (click)="paused = !paused">
-      {{ paused ? 'Riprendi votazione' : 'Metti in pausa' }}
+export const OUTPUT_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, output, ChangeDetectionStrategy } from '@angular/core';
+
+// FIGLIO: emette un messaggio senza cambiare lo stato del padre.
+@Component({
+  selector: 'app-message-button',
+  template: \`
+    <button type="button" (click)="sent.emit('Ciao dal figlio!')">
+      Invia un messaggio
     </button>
-    <button id="reset" type="button" (click)="reset()">Ripristina demo</button>
-  </div>
-</section>`,
-  css: PLAYGROUND_STYLES,
+  \`,
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+class MessageButton {
+  // output() dichiara un evento: emit() trasmette un valore al padre.
+  // Non è un signal e non conserva lo stato della pagina.
+  readonly sent = output<string>();
+}
+
+// PADRE: collega il figlio e possiede lo stato della pagina.
+@Component({
+  selector: 'app-output-demo',
+  imports: [MessageButton],
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class OutputDemo {
+  // Soltanto il padre decide come usare il messaggio ricevuto.
+  message = 'Nessun messaggio ricevuto.';
+}`,
+  html: `<!-- Le parentesi tonde ascoltano l'evento del figlio. -->
+<!-- $event contiene la stringa passata a emit(), non un evento DOM. -->
+<app-message-button (sent)="message = $event" />
+
+<p id="message" class="result" role="status">{{ message }}</p>`,
+  css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
+label {
+  display: grid;
+  gap: 0.5rem;
+}
+
+input {
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.result {
+  padding: 1rem;
+  background: #eee7ff;
+}`,
+};
+
+export const COMMUNICATION_EXAMPLE: PlaygroundSources = {
+  typescript: `import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+
+@Component({
+  selector: 'app-counter-button',
+  template: \`
+    <button type="button" (click)="incremented.emit()">{{ label() }}</button>
+  \`,
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+class CounterButton {
+  // Il testo entra dal padre. La richiesta esce verso il padre.
+  readonly label = input('Aggiungi 1');
+  readonly incremented = output<void>();
+}
+
+// PADRE: collega il figlio e possiede lo stato della pagina.
+@Component({
+  selector: 'app-combined-demo',
+  imports: [CounterButton],
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class CombinedDemo {
+  // Il contatore appartiene al padre, non al pulsante figlio.
+  count = 0;
+}`,
+  html: `<!-- Il figlio riceve un'etichetta, ma non ha accesso al contatore. -->
+<app-counter-button
+  [label]="'Aggiungi 1'"
+  (incremented)="count = count + 1"
+/>
+
+<p id="count" class="result" role="status">Totale: {{ count }}</p>
+
+<!-- Togli il gestore (incremented): il clic non cambierà più il totale. -->
+<button id="reset" type="button" (click)="count = 0">Ripristina</button>`,
+  css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
+label {
+  display: grid;
+  gap: 0.5rem;
+}
+
+input {
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.5rem;
+  font: inherit;
+}
+
+.result {
+  padding: 1rem;
+  background: #eee7ff;
+}`,
 };

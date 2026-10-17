@@ -5,6 +5,7 @@ import * as common from '@angular/common';
 import * as forms from '@angular/forms';
 import { createApplication } from '@angular/platform-browser';
 import * as ts from 'typescript';
+import { initializerTransform } from './initializer-transform';
 
 interface Sources { typescript: string; html: string; css: string }
 const channel = decodeURIComponent(location.hash.slice(1));
@@ -30,6 +31,7 @@ function evaluate(sources: Sources): core.Type<unknown> {
   let componentIndex = 0;
   const result = ts.transpileModule(sources.typescript, {
     fileName: 'component.ts', reportDiagnostics: true,
+    transformers: { before: [initializerTransform] },
     compilerOptions: {
       target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
       experimentalDecorators: true, useDefineForClassFields: false,
@@ -68,7 +70,7 @@ function evaluate(sources: Sources): core.Type<unknown> {
   // Intentionally evaluate learner code only in the sandbox, never in the showcase application.
   new Function('require', 'exports', result.outputText)(require, exports);
   if (typeof exports.default !== 'function' || !core.reflectComponentType(exports.default)) {
-    throw new Error('Esporta il componente con export default class WelcomeCard.');
+    throw new Error('Esporta il componente principale con export default class NomeComponente.');
   }
   return exports.default;
 }

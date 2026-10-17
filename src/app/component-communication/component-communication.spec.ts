@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ComponentCommunication } from './component-communication';
-import { COMMUNICATION_EXAMPLE } from './communication.example';
+import { INPUT_EXAMPLE } from './communication.example';
 import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { By } from '@angular/platform-browser';
 
@@ -12,7 +12,7 @@ describe('ComponentCommunication playground lesson', () => {
     await fixture.whenStable();
     const page: HTMLElement = fixture.nativeElement;
     const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
-    expect(playground.initial()).toBe(COMMUNICATION_EXAMPLE);
+    expect(playground.initial()).toBe(INPUT_EXAMPLE);
     expect(page.querySelector('.lesson-shell__intro')).toBeNull();
     expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();

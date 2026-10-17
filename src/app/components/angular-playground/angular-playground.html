@@ -1,7 +1,7 @@
 <div class="playground">
   <section class="playground__preview" [attr.aria-labelledby]="id + '-preview-title'">
     <div class="playground__bar">
-      <h2 [id]="id + '-preview-title'" class="playground__title">Il tuo componente, dal vivo</h2>
+      <h2 [id]="id + '-preview-title'" class="playground__title">{{ title() }}</h2>
       <span class="playground__badge">Angular 22</span>
     </div>
     @for (frame of [channel()]; track frame) {

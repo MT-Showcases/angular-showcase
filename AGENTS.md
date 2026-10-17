@@ -3,6 +3,7 @@
 ## Product direction
 
 - Build an Italian-language Angular playground with progressive depth for beginners and experienced developers.
+- Give each basic control-flow construct its own short example. Introduce component input and output separately before combining them; use input()/output() for new teaching examples and explain decorators as supported existing syntax.
 - Put a useful interaction at the center of each lesson. Keep the initial explanation short and adjacent to the action it explains.
 - Show the effect of a change immediately: input, state, output or relevant code. Opening an accordion alone is not a learning interaction.
 - Put each example’s editable, syntax-highlighted source directly below its interactive preview. Keep the main code visible; use accordions for optional depth or secondary examples.

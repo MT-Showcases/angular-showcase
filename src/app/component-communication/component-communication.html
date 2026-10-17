@@ -1,15 +1,9 @@
 <app-lesson-shell topicId="components" [compact]="true">
-  <p id="demo" class="playground-lesson__prompt"><strong>Prova subito:</strong> Vota su una scheda e rinomina la prima opzione. Poi cambia <code>maxVotes</code> nel TypeScript: il padre decide quando accettare la richiesta del figlio.</p>
-  <app-angular-playground [initial]="example" />
+  <p id="demo" class="playground-lesson__prompt">Prima un dato in ingresso, poi un evento in uscita. L’ultimo esempio li combina.</p>
+  <app-lesson-examples [examples]="examples" />
 
-  <section class="lesson-grid" aria-label="Dati in ingresso, richieste in uscita">
-    <p class="lesson-panel"><strong>Padre</strong><br />Possiede la lista e i voti. Aggiorna soltanto l’oggetto identificato dall’evento.</p>
-    <p class="lesson-panel"><strong>Figlio</strong><br />Riceve <code>option</code> e un motivo di blocco. Non modifica direttamente i dati ricevuti.</p>
-    <p class="lesson-panel"><strong>Evento</strong><br /><code>voteRequested</code> emette l’ID; <code>recordVote</code> decide cosa fare.</p>
-  </section>
-
-  <app-lesson-disclosure anchor="deepen" title="Dove sono i due componenti?">
-    <p class="lesson-text">Nel TypeScript trovi prima <strong>VoteCard</strong>, poi <strong>VotingDemo</strong>, esportato come componente di ingresso. Il template HTML e il CSS separati appartengono al padre; il figlio ha template e stili accanto alla propria classe. Sono due vere istanze Angular, non una simulazione.</p>
-    <p class="lesson-text">Il runner usa <code>@Input</code>, <code>@Output</code> ed <code>EventEmitter</code>, supportati dalla compilazione JIT. Le API <code>input()</code> e <code>output()</code> richiedono trasformazioni del compilatore Angular che questo runner non applica ancora. Separare i componenti in file importabili richiederà il runtime per progetti completi.</p>
+  <app-lesson-disclosure anchor="deepen" title="Come leggere i due componenti?">
+    <p class="lesson-text">Nel TypeScript trovi <strong>prima il figlio</strong>, con un template breve accanto alla classe. <strong>Il padre</strong> è il componente esportato: usa il file HTML e il CSS separati. I commenti indicano chi possiede lo stato e in quale direzione viaggiano dati ed eventi.</p>
+    <p class="lesson-text"><code>input()</code> restituisce un signal da leggere con <code>name()</code>. <code>output()</code> dichiara un evento da inviare con <code>emit()</code>: non è un signal. Per gli esempi nuovi usiamo queste API; <code>&#64;Input</code> e <code>&#64;Output</code> restano supportati per il codice esistente.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>
