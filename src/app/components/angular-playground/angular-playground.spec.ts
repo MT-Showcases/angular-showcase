@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditorView } from '@codemirror/view';
+import { undo } from '@codemirror/commands';
 import { vi } from 'vitest';
 import { AngularPlayground } from './angular-playground';
 import { FIRST_COMPONENT } from '../../getting-started/first-component.example';
@@ -85,5 +86,37 @@ describe('Angular playground host', () => {
     second.componentRef.setInput('initial', FIRST_COMPONENT); second.detectChanges();
     expect(second.nativeElement.querySelector('[role="tab"]').id).not.toBe(tabs[0].id);
     second.destroy();
+  });
+
+  it('replaces only the selected occurrence and preserves selection through preview updates and undo', () => {
+    receive('ready');
+    page.querySelector<HTMLButtonElement>('[role="tab"][id$="file-html"]')!.click();
+    fixture.detectChanges();
+    const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>('[id$="editor-html"] .cm-editor')!)!;
+    const original = editor.state.doc.toString();
+    const first = original.indexOf('count');
+    const second = original.indexOf('count', first + 5);
+    expect(second).toBeGreaterThan(first);
+
+    editor.focus();
+    editor.dispatch({ selection: { anchor: second, head: second + 5 } });
+    send.mockClear();
+    receive('rendered');
+    expect(editor.state.selection.main.from).toBe(second);
+    expect(editor.state.selection.main.to).toBe(second + 5);
+    expect(document.activeElement).toBe(editor.contentDOM);
+    expect(send).not.toHaveBeenCalled();
+
+    editor.dispatch(editor.state.replaceSelection('clicks'));
+    expect(editor.state.doc.toString()).toBe(original.slice(0, second) + 'clicks' + original.slice(second + 5));
+    click('Esegui');
+    receive('rendered', { revision: 2 });
+    expect(EditorView.findFromDOM(editor.dom)).toBe(editor);
+    expect(editor.state.selection.main.head).toBe(second + 6);
+
+    expect(undo(editor)).toBe(true);
+    expect(editor.state.doc.toString()).toBe(original);
+    expect(editor.state.selection.main.from).toBe(second);
+    expect(editor.state.selection.main.to).toBe(second + 5);
   });
 });

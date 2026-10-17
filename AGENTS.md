@@ -34,6 +34,7 @@
 
 - Implementation identifiers, internal comments and technical docs are English. Product text and comments inside user-visible teaching code are Italian.
 - Use standalone Angular components and existing public Angular Material APIs and design tokens. Read the relevant `.github/copilot-instructions/` reference for technical changes.
+- Use Angular Material `mat-icon` for all product UI icons. Do not introduce emoji, other icon libraries or hand-drawn SVG icons as UI icons. Give icon-only controls an accessible label; hide decorative icons from assistive technology.
 - Keep feature state local and shared navigation/configuration coordinated. Preserve established lesson URLs.
 - Test meaningful behavior changed by the task. Documentation-only changes do not require an application test run.
 - Keep JSONPlaceholder's simulated writes explicit; never present them as persisted resources.

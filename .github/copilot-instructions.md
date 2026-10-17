@@ -2,6 +2,8 @@
 
 Follow [project rules](../AGENTS.md) and the current [product direction](../docs/product-direction.md). The technical references below do not require retaining the existing verbose lesson layout.
 
+All product UI icons must use Angular Material `mat-icon`; do not introduce emoji, alternative icon libraries or hand-drawn SVG UI icons. Label icon-only controls accessibly.
+
 > **📚 Detailed Documentation**: This file provides a high-level overview. For detailed guidelines, see:
 > - [Project Structure](./copilot-instructions/project-structure.md) - Directory organization and file naming
 > - [Styling Conventions](./copilot-instructions/styling-conventions.md) - SCSS best practices (mobile-first, rem(), BEM)

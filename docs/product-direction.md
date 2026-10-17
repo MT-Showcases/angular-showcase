@@ -10,6 +10,7 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 4. **Short, formatted context.** Use meaningful headings, bold terms, code styling and semantic accent colors. Explain only what helps the current experiment.
 5. **Optional depth.** Accordions can hold extra theory or secondary examples to reduce crowding. Changing tabs or explanations preserves the current experiment.
 6. **Useful editing feedback.** Refresh after a short typing pause, show errors inline and provide run, pause and restore actions. Recompiling resets the component's runtime state; switching file tabs does not.
+7. **Consistent icons.** Use Angular Material `mat-icon` for all site UI icons, with accessible labels on icon-only controls. Do not use emoji or other icon libraries as UI icons.
 
 ## What is implemented
 
@@ -41,6 +42,8 @@ References: [Angular JIT/AOT](https://angular.dev/tools/cli/aot-compiler), [crea
 
 ## Verification of the reference implementation
 
-On 2026-10-17: 123 Angular tests and 3 generated-runtime tests passed. The runtime tests render the actual lesson source, click its controls, edit all three files and exercise error recovery. Host tests cover debouncing, pause/run/reset, tab state and message validation. Production initial bundle remains 451.06 kB; the separate preview/compiler asset is 4.57 MB raw. npm audit reports zero vulnerabilities. Only the existing NgRx/BehaviorSubject stylesheet warnings remain.
+On 2026-10-17: 124 Angular tests and 3 generated-runtime tests passed. The runtime tests render the actual lesson source, click its controls, edit all three files and exercise error recovery. Host tests cover debouncing, pause/run/reset, tab state, message validation, replacing one selected occurrence and preserving selection through preview updates and undo. Production initial bundle remains 451.06 kB; the lesson chunk is 488.28 kB and the separate preview/compiler asset is 4.57 MB raw. npm audit reports zero vulnerabilities. Only the existing NgRx/BehaviorSubject stylesheet warnings remain.
+
+After selection feedback, the editor uses a single native selection, without automatic occurrence marks or a second drawn selection layer. The font is set on the scroller so text and measurement inherit the same metrics. Automated selection tests pass; real pointer-drag verification is still pending because VS Code UI control was interrupted.
 
 The reference preview and highlighted editor were inspected in VS Code's browser, including successful Angular startup. The complete responsive and keyboard acceptance matrix remains to be checked; automated DOM tests do not certify it.

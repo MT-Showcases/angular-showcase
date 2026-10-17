@@ -4,11 +4,10 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementR
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatButtonModule } from '@angular/material/button';
 import { EditorState } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
-import { indentWithTab } from '@codemirror/commands';
-import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { EditorView, highlightSpecialChars, keymap, lineNumbers } from '@codemirror/view';
+import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { HighlightStyle, bracketMatching, indentOnInput, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
-import { basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
@@ -65,21 +64,23 @@ export class AngularPlayground implements AfterViewInit {
       const editor = new EditorView({
         parent: this.editorHosts()[index].nativeElement,
         state: EditorState.create({ doc: this.sources[file.id], extensions: [
-          basicSetup, languages[file.id], syntaxHighlighting(HighlightStyle.define([
+          // Keep selection native and singular: occurrence marks and a second drawn
+          // selection layer make dragging/replacing repeated words hard to interpret.
+          lineNumbers(), highlightSpecialChars(), history(), bracketMatching(), indentOnInput(),
+          EditorState.allowMultipleSelections.of(false),
+          languages[file.id], syntaxHighlighting(HighlightStyle.define([
             { tag: tags.keyword, color: '#c4b5fd' }, { tag: tags.string, color: '#a5f3fc' },
             { tag: tags.comment, color: '#94a3b8' }, { tag: tags.number, color: '#fdba74' },
             { tag: tags.tagName, color: '#f9a8d4' }, { tag: tags.attributeName, color: '#c4b5fd' },
             { tag: tags.typeName, color: '#93c5fd' }, { tag: tags.variableName, color: '#e2e8f0' },
-          ])), keymap.of([indentWithTab]), EditorView.lineWrapping,
+          ])), keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]), EditorView.lineWrapping,
           EditorView.contentAttributes.of({ 'aria-label': `Codice ${file.label}`, 'aria-describedby': this.id + '-keyboard-help' }),
           EditorView.theme({
             '&': { backgroundColor: '#101a2e', color: '#e2e8f0', fontSize: '0.875em' },
-            '.cm-content': { fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', caretColor: '#fff', padding: '16px 0' },
+            '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', lineHeight: '1.6', overflow: 'auto', maxHeight: '36em' },
+            '.cm-content': { caretColor: '#fff', padding: '16px 0' },
             '.cm-gutters': { backgroundColor: '#101a2e', color: '#94a3b8', border: 'none' },
-            '.cm-activeLine, .cm-activeLineGutter': { backgroundColor: '#1e293b' },
-            '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': { backgroundColor: '#334a71 !important' },
-            '.cm-cursor': { borderLeftColor: '#fff' },
-            '.cm-scroller': { overflow: 'auto', maxHeight: '36em' },
+            '.cm-content ::selection': { backgroundColor: '#496491', color: '#fff' },
           }, { dark: true }),
           EditorView.updateListener.of(update => {
             if (update.docChanged && !this.replacing) this.edit(file.id, update.state.doc.toString());
