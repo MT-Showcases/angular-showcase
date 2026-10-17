@@ -11,6 +11,7 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 5. **Optional depth.** Accordions can hold extra theory or secondary examples to reduce crowding. Changing tabs or explanations preserves the current experiment.
 6. **Useful editing feedback.** Refresh after a short typing pause, show errors inline and provide run, pause and restore actions. Recompiling resets the component's runtime state; switching file tabs does not.
 7. **Consistent icons.** Use Angular Material `mat-icon` for all site UI icons, with accessible labels on icon-only controls. Do not use emoji or other icon libraries as UI icons.
+8. **Mobile sizing.** Keep editable text at least 16px, avoid automatic text inflation and keep menus within the viewport. Preserve manual pinch zoom and scroll code/file tabs inside their own panels.
 
 ## What is implemented
 
@@ -47,3 +48,5 @@ On 2026-10-17: 124 Angular tests and 3 generated-runtime tests passed. The runti
 After selection feedback, the editor uses a single native selection, without automatic occurrence marks or a second drawn selection layer. The font is set on the scroller so text and measurement inherit the same metrics. Automated selection tests pass; real pointer-drag verification is still pending because VS Code UI control was interrupted.
 
 The reference preview and highlighted editor were inspected in VS Code's browser, including successful Angular startup. The complete responsive and keyboard acceptance matrix remains to be checked; automated DOM tests do not certify it.
+
+Mobile follow-up on 2026-10-17: navigation icons now use `mat-icon` with the official self-hosted Material Icons font. Mobile dropdowns are anchored to the whole navbar, and editable text is at least 16px. Automatic text inflation is set to 100%; manual zoom stays available. Seven targeted navbar/editor tests and the production build pass (initial bundle approximately 467.3 kB). The font is served successfully on port 4200. Real mobile layout/focus verification is pending: browser control timed out, so these checks do not establish that every reported overflow/zoom case is resolved.

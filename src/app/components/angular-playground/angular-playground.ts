@@ -76,7 +76,7 @@ export class AngularPlayground implements AfterViewInit {
           ])), keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]), EditorView.lineWrapping,
           EditorView.contentAttributes.of({ 'aria-label': `Codice ${file.label}`, 'aria-describedby': this.id + '-keyboard-help' }),
           EditorView.theme({
-            '&': { backgroundColor: '#101a2e', color: '#e2e8f0', fontSize: '0.875em' },
+            '&': { backgroundColor: '#101a2e', color: '#e2e8f0', fontSize: 'max(1rem, 16px)' },
             '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', lineHeight: '1.6', overflow: 'auto', maxHeight: '36em' },
             '.cm-content': { caretColor: '#fff', padding: '16px 0' },
             '.cm-gutters': { backgroundColor: '#101a2e', color: '#94a3b8', border: 'none' },

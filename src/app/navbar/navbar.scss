@@ -12,6 +12,7 @@
 }
 
 .nav {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -68,18 +69,40 @@
   width: rem(22);
   height: rem(22);
   flex-shrink: 0;
+  font-size: rem(22);
 }
 
 .nav-label {
   white-space: nowrap;
 }
 
-.nav-dropdown {
-  position: relative;
+.nav-group-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: rem(2);
 
-  &:nth-last-child(-n + 2) .dropdown-menu {
-    left: auto;
-    right: 0;
+  @include media-min-breakpoint(md) {
+    display: contents;
+  }
+}
+
+.dropdown-trigger .nav-label {
+  @include media-min-breakpoint(md) {
+    order: 1;
+  }
+}
+
+.nav-dropdown {
+  // Mobile menus span the navigation, instead of overflowing from a middle tab.
+  position: static;
+
+  @include media-min-breakpoint(md) {
+    position: relative;
+
+    &:nth-last-child(-n + 2) .dropdown-menu {
+      left: auto;
+      right: 0;
+    }
   }
 
   &.open {
@@ -96,13 +119,15 @@
 }
 
 .dropdown-arrow {
-  position: absolute;
-  top: rem(5);
-  right: rem(2);
-  transition: $transition-fast;
+  width: rem(16);
+  height: rem(16);
+  font-size: rem(16);
+  line-height: 1;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
 
   @include media-min-breakpoint(md) {
-    position: static;
+    order: 2;
   }
 }
 
@@ -112,10 +137,10 @@
   gap: rem(4);
   position: absolute;
   top: calc(100% + rem(8));
-  left: 0;
-  width: max-content;
-  min-width: rem(184);
-  max-width: calc(100vw - rem(32));
+  left: rem(8);
+  right: rem(8);
+  width: auto;
+  min-width: 0;
   max-height: calc(100dvh - rem(96));
   overflow-y: auto;
   background: linear-gradient(135deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
@@ -127,6 +152,14 @@
   visibility: hidden;
   transform: translateY(rem(-8));
   transition: $transition-fast;
+
+  @include media-min-breakpoint(md) {
+    left: 0;
+    right: auto;
+    width: max-content;
+    min-width: rem(184);
+    max-width: calc(100vw - rem(32));
+  }
 }
 
 .dropdown-item {
@@ -150,4 +183,10 @@
   width: rem(20);
   height: rem(20);
   flex-shrink: 0;
+  font-size: rem(20);
+}
+
+.dropdown-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

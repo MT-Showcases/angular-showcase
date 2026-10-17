@@ -9,6 +9,7 @@
 - Runnable examples must include concise comments explaining key decisions and blank lines between logical blocks. Use multiline formatting for attributes and style declarations; avoid compressed teaching code.
 - Reveal theory, prerequisites and glossary when useful; avoid repeating the same introductory scaffolding on every page.
 - Preserve demo state while switching explanations. Support keyboard use, labels, feedback, reset and narrow viewports.
+- Prevent mobile text inflation and focus magnification through readable editable text (at least 16px) and responsive containment. Keep manual pinch zoom available; do not use viewport scale limits to conceal overflow.
 - Use the First Component lesson as the reference for the new playground experience before extending it across the curriculum.
 - See `docs/product-direction.md` for open design decisions and the next steps. Earlier implementation plans describe history, not a mandate to retain the current layout.
 

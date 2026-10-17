@@ -1,5 +1,6 @@
 /** The preview precedes the editor at every viewport width. */
 @use 'globals' as *;
+:host { display: block; min-width: 0; max-width: 100%; }
 .playground {
   display: grid; gap: space(4); min-width: 0;
   &__preview, &__source { overflow: hidden; min-width: 0; border-radius: radius(lg); background: var(--mat-sys-surface); color: var(--mat-sys-on-surface); box-shadow: shadow(card); }
