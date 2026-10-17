@@ -17,14 +17,14 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 
 `/basics/getting-started` now uses the shared AngularPlayground component. Its preview precedes a CodeMirror editor with three virtual files. The former long introduction and code accordion have been replaced by a compact header, one prompt, three short concept cards and optional context.
 
-The other lessons still use their existing demos. They have not yet been converted to editable playgrounds.
+Data Binding, Control Flow and Component Communication now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Other lessons retain their existing demos.
 
 ## Runtime choice
 
 - **Component prototype, delivered:** TypeScript transpilation and Angular JIT execute in a separate iframe, using the installed Angular version. The example's external HTML/CSS filenames are resolved from the editor. CodeMirror and the 4.57 MB raw compiler/runtime are loaded by the lesson/preview, not the host's initial bundle.
 - **Project playground, next:** multiple linked component/service files, package dependencies and the Angular CLI build pipeline need a broader runtime. WebContainers is a candidate; evaluate browser support, startup cost and current usage/licensing terms before choosing it. The current component runner is not a full project IDE.
 
-The prototype supports one default-exported component and the bundled Angular core/common/forms modules. It reports TypeScript syntax and Angular runtime/template errors, without full TypeScript semantic checking or Angular's full AOT transformation pipeline. CSS is plain, self-contained CSS.
+The runner supports one default-exported root component, inline child components/directives in the same TypeScript module and the bundled Angular core/common/forms modules. Decorator inputs/outputs work in JIT; signal input/output initializer APIs still require Angular compiler transforms and are not supported by this runner. It reports TypeScript syntax and Angular runtime/template errors, without full TypeScript semantic checking or Angular's full AOT transformation pipeline. CSS is plain, self-contained CSS.
 
 ## Execution boundary
 
@@ -34,14 +34,16 @@ This isolation protects the host's DOM and origin data; it is not a resource-quo
 
 ## Next steps
 
-1. Review the First Component experience, including code comments, spacing and mobile ergonomics.
-2. Refine the shared playground from that feedback before converting additional lessons.
+1. Finish real-device iOS/Android selection, long-press and virtual keyboard acceptance.
+2. Review the first four playground lessons before converting Pipes, Forms, Services and Routing.
 3. Add a real project runtime for multi-file examples, rather than claiming the component prototype supports arbitrary projects.
 
 References: [Angular JIT/AOT](https://angular.dev/tools/cli/aot-compiler), [createApplication](https://angular.dev/api/platform-browser/createApplication), [CodeMirror](https://codemirror.net/), [WebContainers browser support](https://webcontainers.io/guides/browser-support).
 
 
 ## Verification of the reference implementation
+
+Current extension: 107 host tests in 24 files and 6 generated-runtime tests pass. Production initial bundle is 467.53 kB; the shared lazy editor chunk is 483.24 kB and the isolated compiler asset remains 4.57 MB raw. Only the existing stylesheet budget warnings remain. The first four lessons now share the editor chunk. [Browser and mobile evidence](verification/playground-mobile.md) distinguishes measured Chromium results from pending real-device checks. GitHub Actions validates locked installs, host/runtime tests and the production build; it does not gate Vercel's separate Git deployments.
 
 On 2026-10-17: 124 Angular tests and 3 generated-runtime tests passed. The runtime tests render the actual lesson source, click its controls, edit all three files and exercise error recovery. Host tests cover debouncing, pause/run/reset, tab state, message validation, replacing one selected occurrence and preserving selection through preview updates and undo. Production initial bundle remains 451.06 kB; the lesson chunk is 488.28 kB and the separate preview/compiler asset is 4.57 MB raw. npm audit reports zero vulnerabilities. Only the existing NgRx/BehaviorSubject stylesheet warnings remain.
 

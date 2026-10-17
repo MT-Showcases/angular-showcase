@@ -26,6 +26,7 @@ export class AngularPlayground implements AfterViewInit {
   readonly automatic = signal(true);
   readonly status = signal<'loading' | 'changed' | 'building' | 'ready' | 'error'>('loading');
   readonly error = signal('');
+  readonly previewHeight = signal(290);
   readonly channel = signal(crypto.randomUUID());
   private readonly sanitizer = inject(DomSanitizer);
   readonly previewUrl = computed(() => this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -33,9 +34,9 @@ export class AngularPlayground implements AfterViewInit {
   ));
   readonly statusText = computed(() => ({ loading: 'Avvio di Angular…', changed: 'Modifiche da eseguire', building: 'Aggiornamento anteprima…', ready: 'Anteprima aggiornata', error: 'Anteprima non aggiornata' })[this.status()]);
   readonly files = [
-    { id: 'typescript' as const, name: 'welcome-card.ts', label: 'TypeScript' },
-    { id: 'html' as const, name: 'welcome-card.html', label: 'HTML' },
-    { id: 'css' as const, name: 'welcome-card.css', label: 'CSS' },
+    { id: 'typescript' as const, name: 'component.ts', label: 'TypeScript' },
+    { id: 'html' as const, name: 'component.html', label: 'HTML' },
+    { id: 'css' as const, name: 'component.css', label: 'CSS' },
   ];
   private readonly editorHosts = viewChildren<ElementRef<HTMLElement>>('editorHost');
   private readonly frame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
@@ -162,6 +163,9 @@ export class AngularPlayground implements AfterViewInit {
       this.ready = true; clearTimeout(this.startupTimer); this.run(); return;
     }
     if (data.revision !== this.revision) return;
+    if (data.kind === 'resize' && typeof data.height === 'number' && Number.isFinite(data.height)) {
+      this.previewHeight.set(Math.min(680, Math.max(240, Math.ceil(data.height))));
+    }
     if (data.kind === 'rendered') { this.status.set('ready'); this.error.set(''); }
     if (data.kind === 'error' && typeof data.message === 'string') {
       this.error.set(data.message.slice(0, 5000)); this.status.set('error');

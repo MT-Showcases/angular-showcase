@@ -1,2 +1,5 @@
-/** Lesson layout uses shared panels, responsive grids and Material controls. */
+/** Keep lesson context concise and wrap technical terms on narrow screens. */
 @use 'globals' as *;
+:host { display: block; min-width: 0; }
+.playground-lesson__prompt { color: $white; line-height: 1.7; overflow-wrap: anywhere; }
+.lesson-panel { line-height: 1.6; overflow-wrap: anywhere; }

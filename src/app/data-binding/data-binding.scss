@@ -1,2 +1,5 @@
+/** Keep lesson context concise and wrap technical terms on narrow screens. */
 @use 'globals' as *;
-// Layout and controls use the shared lesson styles and Material theme.
+:host { display: block; min-width: 0; }
+.playground-lesson__prompt { color: $white; line-height: 1.7; overflow-wrap: anywhere; }
+.lesson-panel { line-height: 1.6; overflow-wrap: anywhere; }

@@ -1,117 +1,15 @@
-<app-lesson-shell topicId="binding">
-  <section id="demo" class="lesson-panel" aria-labelledby="binding-demo-title">
-    <h2 id="binding-demo-title" class="lesson-title">Un valore, quattro modi per collegarlo alla vista</h2>
-    <p class="lesson-text">
-      Il componente conserva lo <strong>stato</strong>, cioè i dati attuali: qui è il nome iniziale Ada.
-      Il <strong>template</strong> è l'HTML con cui Angular mostra quei dati e riceve le azioni.
-      Segui i passaggi: tutti i campi leggono lo stesso nome.
-    </p>
+<app-lesson-shell topicId="binding" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt"><strong>Prova subito:</strong> Scrivi un nome nella preview. Poi cambia <code>name</code> nel TypeScript o modifica <code>[(ngModel)]</code> nell’HTML. Osserva quali collegamenti vanno in una direzione e quali in entrambe.</p>
+  <app-angular-playground [initial]="example" />
 
-    <h3 class="lesson-subtitle">1. Interpolazione: dallo stato al testo</h3>
-    <p class="lesson-text">
-      Le doppie parentesi graffe mostrano un valore nel testo. Il saluto qui sotto cambia quando cambia il nome.
-      Se svuoti un campo modificabile, il nome resta vuoto e il saluto usa «visitatore» come alternativa.
-    </p>
-    <p id="binding-greeting" class="lesson-result">Ciao, {{ name || 'visitatore' }}!</p>
-
-    <h3 class="lesson-subtitle">2. Proprietà e attributi: dallo stato al DOM</h3>
-    <p class="lesson-text">
-      <code class="lesson-code-inline">[value]="name"</code> assegna il nome alla proprietà del campo.
-      Questa copia è di sola lettura per isolare la direzione componente → vista.
-      Prova a bloccarla: <code class="lesson-code-inline">[disabled]</code> riceve un booleano, cioè vero o falso.
-      Il pulsante espone invece il suo stato premuto con l'attributo accessibile
-      <code class="lesson-code-inline">[attr.aria-pressed]</code>.
-    </p>
-    <mat-form-field appearance="outline" class="lesson-field" subscriptSizing="dynamic">
-      <mat-label>Copia unidirezionale del nome</mat-label>
-      <input matInput id="binding-copy" [value]="name" [disabled]="isLocked" readonly />
-    </mat-form-field>
-    <div class="lesson-actions">
-      <button matButton="outlined" type="button" id="binding-lock"
-        [attr.aria-pressed]="isLocked" aria-controls="binding-copy" (click)="toggleLock()">
-        {{ isLocked ? 'Sblocca la copia' : 'Blocca la copia' }}
-      </button>
-    </div>
-    <p id="binding-property-state" class="lesson-text">
-      Proprietà disabled del campo: {{ isLocked }}. Attributo aria-pressed del pulsante: {{ isLocked }}.
-      Il nome non viene cancellato dal blocco.
-    </p>
-
-    <h3 class="lesson-subtitle">3. Eventi: dalla vista allo stato</h3>
-    <p class="lesson-text">
-      Scrivi qui «Luca». <code class="lesson-code-inline">(input)</code> ascolta l'evento DOM;
-      <code class="lesson-code-inline">$event</code> è l'oggetto evento passato al metodo.
-      Il metodo legge il valore dal campo che ha generato l'evento e aggiorna il nome.
-      Osserva il saluto, la copia e il campo del passaggio successivo: mostrano lo stesso valore.
-    </p>
-    <mat-form-field appearance="outline" class="lesson-field" subscriptSizing="dynamic">
-      <mat-label>Nome con evento DOM esplicito</mat-label>
-      <input matInput id="binding-event-name" [value]="name" (input)="onNameInput($event)" />
-    </mat-form-field>
-    <p id="binding-event-state" class="lesson-output">Ultimo evento: {{ lastEvent }}; eventi input: {{ inputCount }}</p>
-    <p class="lesson-text">Il contatore riguarda solo questo campo: è uno strumento per osservare l'evento, non una cronologia di tutte le modifiche al nome.</p>
-
-    <h3 class="lesson-subtitle">4. Binding bidirezionale: andata e ritorno con ngModel</h3>
-    <p class="lesson-text">
-      Scrivi qui «Marta». <code class="lesson-code-inline">[(ngModel)]="name"</code> aggiorna sia il campo
-      quando cambia lo stato, sia lo stato quando scrivi. È una direttiva per i form: richiede
-      <code class="lesson-code-inline">FormsModule</code> negli import del componente standalone.
-      Non è necessario aggiungere anche un gestore <code class="lesson-code-inline">(input)</code> a questo campo.
-    </p>
-    <mat-form-field appearance="outline" class="lesson-field" subscriptSizing="dynamic">
-      <mat-label>Nome con binding bidirezionale</mat-label>
-      <input matInput id="binding-two-way-name" [(ngModel)]="name" />
-    </mat-form-field>
-    <p id="binding-current-value" class="lesson-result">Valore attuale di name: «{{ name }}»</p>
-    <p class="lesson-text">
-      Ora premi «Usa Grace dal componente»: i tre campi e il saluto si aggiornano anche senza digitare.
-      «Ripristina tutta la demo» riporta il nome ad Ada, sblocca la copia e azzera il contatore degli eventi.
-    </p>
-    <div class="lesson-actions">
-      <button matButton="filled" type="button" id="binding-preset" (click)="usePreset()">Usa Grace dal componente</button>
-      <button matButton="outlined" type="button" id="binding-reset" (click)="reset()">Ripristina tutta la demo</button>
-    </div>
-    <p class="lesson-status" role="status">{{ status }}</p>
+  <section class="lesson-grid" aria-label="Collega un valore alla vista">
+    <p class="lesson-panel"><strong>Testo</strong><br />L’interpolazione mostra lo stato come testo, senza eseguire l’HTML digitato.</p>
+    <p class="lesson-panel"><strong>Proprietà ed eventi</strong><br /><code>[disabled]</code> aggiorna il DOM; <code>(input)</code> chiama il metodo che cambia lo stato.</p>
+    <p class="lesson-panel"><strong>Andata e ritorno</strong><br /><code>[(ngModel)]</code> sincronizza campo e stato. Richiede <code>FormsModule</code>.</p>
   </section>
 
-  <app-lesson-disclosure anchor="code" title="Guarda il codice: sintassi e componente completo">
-    <section aria-labelledby="binding-fragments-title">
-      <h2 id="binding-fragments-title" class="lesson-title">I collegamenti, uno alla volta</h2>
-      <p class="lesson-text">Frammenti di template: usano lo stato e i metodi del componente completo più sotto. I controlli nativi mantengono il codice essenziale; nella demo i campi e i pulsanti usano Angular Material.</p>
-      <h3 class="lesson-subtitle">Interpolazione</h3>
-      <app-code-block [code]="interpolationExample" language="html" />
-      <h3 class="lesson-subtitle">Proprietà DOM e attributo accessibile</h3>
-      <app-code-block [code]="propertyExample" language="html" />
-      <h3 class="lesson-subtitle">Evento DOM con $event</h3>
-      <app-code-block [code]="eventExample" language="html" />
-      <h3 class="lesson-subtitle">ngModel e forma esplicita equivalente</h3>
-      <p class="lesson-text">Le due righe con input sono alternative. ngModelChange emette il nuovo valore, mentre l'evento DOM input passa un oggetto Event: i rispettivi $event hanno significati diversi.</p>
-      <app-code-block [code]="twoWayExample" language="html" />
-    </section>
-    <section aria-labelledby="binding-complete-title">
-      <h2 id="binding-complete-title" class="lesson-title">Componente standalone completo</h2>
-      <p class="lesson-text">Esempio minimo da usare dentro un progetto Angular esistente. Contiene import, template e classe; importalo in un componente padre e inserisci il suo selettore app-binding-demo nel template del padre. Non richiede Angular Material.</p>
-      <app-code-block [code]="completeExample" language="typescript" />
-    </section>
-  </app-lesson-disclosure>
-
-  <app-lesson-disclosure anchor="deepen" title="Approfondisci: direzioni dei dati ed errori comuni">
-    <section aria-labelledby="binding-directions-title">
-      <h2 id="binding-directions-title" class="lesson-title">Scegli il collegamento che esprime l'intenzione</h2>
-      <ul class="lesson-list">
-        <li>Interpolazione: rappresenta un valore come testo. I contenuti digitati vengono mostrati come testo, non eseguiti come HTML.</li>
-        <li>Property binding: aggiorna una proprietà dell'oggetto DOM. Non trasferisce da solo le modifiche dell'utente allo stato del componente.</li>
-        <li>Attribute binding: con il prefisso attr. aggiorna un attributo HTML, per esempio aria-pressed. Impostare il valore a null rimuove l'attributo.</li>
-        <li>Event binding: reagisce a un evento e può cambiare lo stato. $event.target è generico: il controllo instanceof HTMLInputElement verifica che sia un input prima di leggerne value.</li>
-        <li>Two-way binding con ngModel: combina [ngModel] e (ngModelChange). Qui scrivere name = $event significa assegnare alla proprietà della classe il nuovo valore emesso dalla direttiva.</li>
-      </ul>
-    </section>
-    <section aria-labelledby="binding-pitfalls-title">
-      <h2 id="binding-pitfalls-title" class="lesson-title">Evita questi equivoci</h2>
-      <p class="lesson-text">disabled="false" è comunque un attributo booleano presente e disabilita un controllo HTML. Per abilitarlo o disabilitarlo dinamicamente usa [disabled] con un booleano. aria-pressed è diverso: espone un valore testuale true/false, non disabilita il pulsante.</p>
-      <p class="lesson-text">Una proprietà value descrive il valore corrente dell'input; l'attributo HTML value ne descrive il valore iniziale. Non sono intercambiabili. La demo usa [value] per aggiornare il valore corrente.</p>
-      <p class="lesson-text">FormsModule abilita ngModel; ReactiveFormsModule abilita invece i Reactive Forms della lezione dedicata. Se metti ngModel dentro un form, assegna un name al controllo o dichiaralo standalone: qui i campi sono fuori da un form.</p>
-      <p class="lesson-text">Le espressioni del template devono restare semplici. Non usare il rendering per modificare stato o fare richieste: nei nostri esempi le modifiche avvengono nei gestori degli eventi. Aprire e chiudere queste spiegazioni conserva l'esperimento.</p>
-    </section>
+  <app-lesson-disclosure anchor="deepen" title="Perché non basta [value]?">
+    <p class="lesson-text"><code>[value]</code> porta il dato verso il campo: scrivere nel campo non assegna da solo un nuovo valore alla classe. Il gestore di <code>(input)</code> fa questa assegnazione esplicita. <code>ngModel</code> riunisce le due direzioni.</p>
+    <p class="lesson-text"><code>disabled="false"</code> disabilita comunque un controllo HTML: l’attributo booleano è presente. Usa <code>[disabled]="isLocked"</code>. <code>aria-pressed</code> descrive invece lo stato di un pulsante e non lo disabilita.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>

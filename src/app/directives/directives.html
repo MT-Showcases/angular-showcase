@@ -1,129 +1,15 @@
-<app-lesson-shell topicId="control-flow">
-  <div id="demo" class="directives-demo">
-    <section class="lesson-panel" aria-labelledby="condition-title">
-      <h2 id="condition-title" class="lesson-title">1. Scegli cosa mostrare con &#64;if</h2>
-      <p class="lesson-text">Il control flow decide quali elementi creare nel template. Prova prima una condizione, poi due rami alternativi: cambia lo stato e osserva il risultato.</p>
-      <div class="lesson-actions">
-        <button matButton="filled" type="button" [attr.aria-pressed]="showMessage" (click)="showMessage = !showMessage">Mostra messaggio</button>
-        <button matButton="tonal" type="button" [attr.aria-pressed]="isLoggedIn" (click)="isLoggedIn = !isLoggedIn">Simula accesso</button>
-      </div>
-      <p class="lesson-status" role="status">Messaggio {{ showMessage ? 'visibile' : 'nascosto' }}. Accesso simulato {{ isLoggedIn ? 'attivo' : 'disattivo' }}.</p>
-      <div class="lesson-result">
-        @if (showMessage) {
-          <p class="lesson-text" data-testid="conditional-message">Questo elemento esiste solo quando la condizione è vera.</p>
-        }
-        @if (isLoggedIn) {
-          <p class="lesson-text" data-testid="login-result">Benvenuto! Stai vedendo il ramo &#64;if.</p>
-        } @else {
-          <p class="lesson-text" data-testid="login-result">Accedi per continuare: stai vedendo il ramo &#64;else.</p>
-        }
-      </div>
-      <p class="lesson-text">È una simulazione locale: il pulsante cambia un booleano, senza autenticazione reale. Quando nascondi il primo messaggio, Angular rimuove il suo elemento; non applica soltanto uno stile.</p>
-    </section>
+<app-lesson-shell topicId="control-flow" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt"><strong>Prova subito:</strong> Inverti la lista, aggiungi due elementi con lo stesso nome e poi svuotala. Nel codice osserva <code>track item.id</code>, prova un altro stato e attiva la direttiva.</p>
+  <app-angular-playground [initial]="example" />
 
-    <section class="lesson-panel" aria-labelledby="list-title">
-      <h2 id="list-title" class="lesson-title">2. Ripeti elementi con &#64;for</h2>
-      <p class="lesson-text">Aggiungi anche due nomi uguali, poi inverti l'ordine. Il nome può ripetersi; l'ID identifica ogni elemento. La posizione cambia, l'identità resta.</p>
-      <div class="lesson-actions">
-        <mat-form-field class="lesson-field" subscriptSizing="dynamic">
-          <mat-label>Nome del nuovo elemento</mat-label>
-          <input matInput #newItemInput [value]="newItemName" maxlength="80" (input)="newItemName = newItemInput.value" (keydown.enter)="addItem()" />
-          <mat-hint>Da 1 a 80 caratteri, esclusi gli spazi iniziali e finali.</mat-hint>
-        </mat-form-field>
-        <button matButton="filled" type="button" [disabled]="!newItemName.trim()" (click)="addItem()">Aggiungi elemento</button>
-      </div>
-      <div class="lesson-actions">
-        <button matButton="outlined" type="button" [disabled]="items.length < 2" (click)="reverseItems()">Inverti ordine</button>
-        <button matButton="outlined" type="button" [disabled]="!items.length" (click)="clearItems()">Svuota lista</button>
-        <button matButton="text" type="button" (click)="resetItems()">Ripristina lista</button>
-      </div>
-      <p class="lesson-status" role="status">{{ listStatus }}</p>
-      <ul class="lesson-list directives-demo__items" aria-label="Elementi della demo">
-        @for (item of items; track item.id; let position = $index) {
-          <li class="directives-demo__item" [attr.data-item-id]="item.id">
-            <span>{{ position + 1 }}. {{ item.name }} <span class="directives-demo__identity">— ID {{ item.id }}</span></span>
-            <button matButton="text" type="button" [attr.aria-label]="'Rimuovi ' + item.name + ', ID ' + item.id" (click)="removeItem(item.id); newItemInput.focus()">Rimuovi</button>
-          </li>
-        } @empty {
-          <li class="lesson-output" data-testid="empty-list">La lista è vuota: aggiungi un elemento o ripristina la lista. Questo è il ramo &#64;empty.</li>
-        }
-      </ul>
-      <p class="lesson-text"><code class="lesson-code-inline">track item.id</code> collega i dati ai nodi del DOM. <code class="lesson-code-inline">$index</code> indica la posizione: per una lista modificabile non è una chiave stabile.</p>
-    </section>
+  <section class="lesson-grid" aria-label="Scegli il ramo, cambia la lista">
+    <p class="lesson-panel"><strong>Condizioni</strong><br /><code>&#64;if</code> sceglie tra due rami. Il ramo escluso viene rimosso dal DOM.</p>
+    <p class="lesson-panel"><strong>Identità</strong><br /><code>&#64;for</code> segue gli ID durante il riordino; <code>&#64;empty</code> gestisce la lista vuota.</p>
+    <p class="lesson-panel"><strong>Comportamento</strong><br /><code>&#64;switch</code> sceglie un caso. La direttiva locale aggiunge una classe a un elemento.</p>
+  </section>
 
-    <section class="lesson-panel" aria-labelledby="switch-title">
-      <h2 id="switch-title" class="lesson-title">3. Gestisci più casi con &#64;switch</h2>
-      <p class="lesson-text">Scegli uno stato del contenuto. Ogni caso mostra un messaggio diverso; il caso sconosciuto attiva il ramo di riserva &#64;default.</p>
-      <div class="lesson-actions" role="group" aria-label="Stato del contenuto">
-        <button matButton="outlined" type="button" [attr.aria-pressed]="publicationState === 'draft'" (click)="publicationState = 'draft'">Bozza</button>
-        <button matButton="outlined" type="button" [attr.aria-pressed]="publicationState === 'review'" (click)="publicationState = 'review'">In revisione</button>
-        <button matButton="outlined" type="button" [attr.aria-pressed]="publicationState === 'published'" (click)="publicationState = 'published'">Pubblicato</button>
-        <button matButton="outlined" type="button" [attr.aria-pressed]="publicationState === 'unknown'" (click)="publicationState = 'unknown'">Sconosciuto</button>
-      </div>
-      <div class="lesson-result" role="status" data-testid="switch-result">
-        @switch (publicationState) {
-          @case ('draft') { <p class="lesson-text">Bozza: puoi modificare il contenuto.</p> }
-          @case ('review') { <p class="lesson-text">In revisione: controlla il contenuto prima di pubblicarlo.</p> }
-          @case ('published') { <p class="lesson-text">Pubblicato: il contenuto è visibile.</p> }
-          @default { <p class="lesson-text">Stato sconosciuto: scegli uno stato valido.</p> }
-        }
-      </div>
-    </section>
-
-    <section class="lesson-panel" aria-labelledby="binding-title">
-      <h2 id="binding-title" class="lesson-title">4. Cambia l'aspetto con i binding</h2>
-      <p class="lesson-text">Qui l'elemento rimane nel DOM: cambia una classe o una proprietà di stile. Questi sono binding nativi di Angular, non le direttive NgClass e NgStyle.</p>
-      <div class="lesson-actions">
-        <button matButton="tonal" type="button" [attr.aria-pressed]="isActive" (click)="isActive = !isActive">Attiva classe</button>
-        <button matButton="tonal" type="button" [attr.aria-pressed]="usePrimaryColor" (click)="usePrimaryColor = !usePrimaryColor">Usa colore primario</button>
-      </div>
-      <p class="lesson-result directives-demo__class-example" [class.active]="isActive" data-testid="class-result">Binding [class.active]: classe {{ isActive ? 'attiva' : 'disattiva' }}.</p>
-      <p class="lesson-output" [style.color]="usePrimaryColor ? 'var(--mat-sys-primary)' : 'var(--mat-sys-on-surface)'" data-testid="style-result">Binding [style.color]: colore {{ usePrimaryColor ? 'primario' : 'del testo' }}.</p>
-      <p class="lesson-status" role="status">Classe {{ isActive ? 'attiva' : 'disattiva' }}; colore {{ usePrimaryColor ? 'primario' : 'del testo' }}.</p>
-    </section>
-
-    <section class="lesson-panel" aria-labelledby="directive-title">
-      <h2 id="directive-title" class="lesson-title">5. Riusa un comportamento con una direttiva</h2>
-      <p class="lesson-text"><code class="lesson-code-inline">appLessonHighlight</code> è una vera direttiva di attributo locale: riceve un booleano e applica una classe all'elemento ospite. Puoi riutilizzarla su più elementi senza duplicare il binding della classe.</p>
-      <div class="lesson-actions">
-        <button matButton="filled" type="button" [attr.aria-pressed]="isHighlighted" (click)="isHighlighted = !isHighlighted">Evidenzia nota</button>
-      </div>
-      <p class="lesson-result directives-demo__highlight-example" [appLessonHighlight]="isHighlighted" data-testid="directive-result">Questa nota mantiene il suo contenuto e il suo significato. Evidenziazione {{ isHighlighted ? 'attiva' : 'disattiva' }}.</p>
-      <p class="lesson-status" role="status">Evidenziazione {{ isHighlighted ? 'attiva' : 'disattiva' }}. Il testo descrive lo stato anche senza percepire il colore.</p>
-    </section>
-  </div>
-
-  <app-lesson-disclosure anchor="code" title="Guarda il codice: dai blocchi alla direttiva">
-    <p class="lesson-text">Le condizioni leggono proprietà del componente. I pulsanti cambiano quelle proprietà; Angular aggiorna il template. Copia un esempio alla volta nel tuo componente.</p>
-    <app-code-block [code]="conditionCode" language="html" />
-    <app-code-block [code]="listCode" language="html" />
-    <p class="lesson-text">Il nucleo delle operazioni sulla lista: crea un nuovo array, conserva gli ID e genera un ID nuovo quando aggiungi. La demo completa aggiunge anche ripristino, pulizia del campo e annunci di stato.</p>
-    <app-code-block [code]="listStateCode" language="typescript" />
-    <app-code-block [code]="switchCode" language="html" />
-    <app-code-block [code]="bindingCode" language="html" />
-    <app-code-block [code]="directiveCode" language="typescript" />
-    <app-code-block [code]="highlightStyleCode" language="css" />
-  </app-lesson-disclosure>
-
-  <app-lesson-disclosure anchor="deepen" title="Approfondisci: scegli lo strumento giusto">
-    <div>
-      <h2 class="lesson-subtitle">Tre strumenti, tre responsabilità</h2>
-      <ul class="lesson-list">
-        <li><strong>Control flow integrato:</strong> &#64;if, &#64;for e &#64;switch decidono la struttura del template. Non richiedono import da CommonModule.</li>
-        <li><strong>Binding nativi:</strong> [class.active] e [style.color] aggiornano direttamente una classe o uno stile. Per una singola classe o proprietà sono sufficienti.</li>
-        <li><strong>Direttive di attributo:</strong> aggiungono un comportamento riutilizzabile. NgClass e NgStyle sono direttive di Angular per insiemi di classi e stili; richiedono un import. appLessonHighlight è il nostro esempio personalizzato, importato dal componente.</li>
-      </ul>
-    </div>
-    <div>
-      <h2 class="lesson-subtitle">Identità e casi alternativi</h2>
-      <p class="lesson-text">Il nome di un elemento può cambiare o ripetersi: usa un ID univoco e stabile in track. Riordinare non deve creare nuove identità. &#64;empty gestisce una collezione vuota; &#64;default gestisce un valore che non corrisponde ad alcun caso. &#64;switch confronta con uguaglianza stretta e non richiede break.</p>
-      <p class="lesson-text">Prova a prevedere il risultato: cosa resta dopo aver nascosto un elemento con &#64;if? E dopo avergli tolto una classe? Nel primo caso viene rimosso dal DOM; nel secondo conserva struttura e contenuto.</p>
-    </div>
-    <div>
-      <h2 class="lesson-subtitle">Se arrivi da un progetto precedente</h2>
-      <p class="lesson-text">Nei tutorial storici puoi incontrare *ngIf, *ngFor e [ngSwitch]: sono le direttive della sintassi precedente. In questa lezione scriviamo nuovi template con il control flow integrato; non serve memorizzare entrambe le sintassi per iniziare.</p>
-      <p class="lesson-text">Se conosci React, puoi paragonare una condizione a un'espressione condizionale e track a una key stabile. È un confronto facoltativo: Angular usa un proprio template compilato.</p>
-    </div>
-    <p class="lesson-text">Documentazione ufficiale: <a href="https://angular.dev/guide/templates/control-flow">control flow</a> e <a href="https://angular.dev/guide/directives/attribute-directives">direttive di attributo</a>.</p>
+  <app-lesson-disclosure anchor="deepen" title="Control flow, binding o direttiva?">
+    <p class="lesson-text"><code>&#64;if</code>, <code>&#64;for</code> e <code>&#64;switch</code> sono sintassi del template. <code>[class.active]</code> è un binding nativo. <code>appHighlight</code> è invece una direttiva Angular che puoi modificare nel TypeScript.</p>
+    <p class="lesson-text">Il nome non è un’identità affidabile: può ripetersi. L’indice cambia quando riordini. Un ID stabile permette ad Angular di conservare il nodo DOM associato al dato. Qui <code>&#64;Input</code> rende il parametro della direttiva disponibile al binding.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>

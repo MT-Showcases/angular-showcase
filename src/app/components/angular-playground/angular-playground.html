@@ -5,7 +5,7 @@
       <span class="playground__badge">Angular 22</span>
     </div>
     @for (frame of [channel()]; track frame) {
-      <iframe #previewFrame class="playground__frame" [src]="previewUrl()" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Anteprima interattiva del componente Angular"></iframe>
+      <iframe #previewFrame class="playground__frame" [style.height.px]="previewHeight()" [src]="previewUrl()" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Anteprima interattiva del componente Angular"></iframe>
     }
     <div class="playground__feedback"><p role="status" class="playground__status">{{ statusText() }}</p>
       <button matButton="text" type="button" (click)="restart()">Riavvia anteprima</button></div>

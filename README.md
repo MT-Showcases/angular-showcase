@@ -1,8 +1,8 @@
 # Angular Showcase
 
-An Italian-language Angular 22 learning site for newcomers and experienced developers. Each lesson starts with an explanation and a working demo, then offers optional code and deeper discussion. The UI uses Angular Material and the project's purple theme.
+An Italian-language Angular 22 learning site for newcomers and experienced developers. Lessons put a useful interaction first, with concise context and optional deeper discussion. The UI uses Angular Material and the project's purple theme.
 
-Project workflow rules live in [AGENTS.md](AGENTS.md). The current [product direction](docs/product-direction.md) puts a live preview first and editable, commented code directly below it. The First Component lesson implements the reference playground.
+Project workflow rules live in [AGENTS.md](AGENTS.md). The current [product direction](docs/product-direction.md) puts a live preview first and editable, commented code directly below it. First Component, Data Binding, Control Flow and Component Communication use the shared playground.
 
 ## Learning paths
 
@@ -21,7 +21,7 @@ Start at `/basics` and follow the suggested order, or open a lesson directly:
 
 The `/advanced` path covers Signals (`/advanced/signals`) and HTTP (`/advanced/http`). Separate examples for NgRx, BehaviorSubject and users retain their existing URLs.
 
-The First Component lesson has a real Angular preview and an editable TypeScript/HTML/CSS playground. Other lessons currently have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. The component playground supports one component and bundled Angular modules; full project editing and package installation remain future work. External documentation links provide optional supporting material.
+The first four Basics lessons have real Angular previews and editable TypeScript/HTML/CSS directly below them. The remaining lessons currently have an always-mounted demo, `#code` and `#deepen` expansion panels, prerequisites, a glossary and previous/next navigation. Section links preserve nested routes and query parameters. Floating exploration controls are opt-in on lesson pages. The component runner supports one default-exported root, inline child components/directives in the same TypeScript module and bundled Angular core/common/forms. It uses decorator inputs/outputs; signal input/output initializer transforms are not available in this JIT runner. Preview height follows content within bounds; full project editing and package installation remain future work. External documentation links provide optional supporting material.
 
 ### HTTP demonstration
 
@@ -51,6 +51,8 @@ npm audit
 
 The app uses Angular/Material 22.2.3, NgRx 22, TypeScript 6.0.x and Vitest 5. Existing components retain Angular 22's explicit `ChangeDetectionStrategy.Eager`; this project does not perform a blanket change-detection migration. npm's version-pinned `allowScripts` entries allow the required native build dependencies.
 
+GitHub Actions runs locked dependency installation, the Angular suite, the generated-runtime interaction tests and a production build on pushes to `main` and pull requests. It uses the Node/npm versions above, pinned action commits and read-only repository permissions. Vercel Git integration deploys independently; this workflow does not gate or deploy production.
+
 Production warning budgets remain 500 kB for the initial bundle and 10 kB for each component stylesheet. The existing NgRx concepts and BehaviorSubject styles exceed their warning threshold; these warnings are separate from functional failures. Do not raise budgets to hide regressions.
 
 ## Architecture and design system
@@ -74,6 +76,6 @@ For parallel development, use a separate branch/worktree, dependency directory a
 
 ## Future work
 
-Search, related-topic drawers, full project IDEs, progress persistence and AI tutoring remain future possibilities. A component editor is already available in the First Component lesson. They are not prerequisites for the current lessons and are not advertised as delivered functionality.
+Search, related-topic drawers, full project IDEs, progress persistence and AI tutoring remain future possibilities. A component editor is available in the first four Basics lessons. They are not prerequisites for the current lessons and are not advertised as delivered functionality.
 
 Licensed under [MIT](LICENSE).

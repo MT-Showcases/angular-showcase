@@ -18,10 +18,18 @@ class PreviewErrors implements core.ErrorHandler {
 const applicationOptions = { providers: [{ provide: core.ErrorHandler, useClass: PreviewErrors }] };
 let app = createApplication(applicationOptions);
 let queue = Promise.resolve();
+const reportSize = () => reply('resize', {
+  height: Math.ceil(document.querySelector('#preview')!.getBoundingClientRect().height + 48),
+});
+// Observe content, not the iframe viewport, so short examples can shrink again.
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(reportSize).observe(document.querySelector('#preview')!);
+}
 
 function evaluate(sources: Sources): core.Type<unknown> {
+  let componentIndex = 0;
   const result = ts.transpileModule(sources.typescript, {
-    fileName: 'welcome-card.ts', reportDiagnostics: true,
+    fileName: 'component.ts', reportDiagnostics: true,
     compilerOptions: {
       target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS,
       experimentalDecorators: true, useDefineForClassFields: false,
@@ -32,16 +40,19 @@ function evaluate(sources: Sources): core.Type<unknown> {
   if (errors?.length) {
     throw new Error(errors.map(item => {
       const position = item.file && item.start !== undefined ? item.file.getLineAndCharacterOfPosition(item.start) : null;
-      return `${position ? `welcome-card.ts:${position.line + 1}:${position.character + 1} — ` : ''}${ts.flattenDiagnosticMessageText(item.messageText, '\n')}`;
+      return `${position ? `component.ts:${position.line + 1}:${position.character + 1} — ` : ''}${ts.flattenDiagnosticMessageText(item.messageText, '\n')}`;
     }).join('\n'));
   }
   // Resolve the two virtual resources before asking Angular's real JIT compiler to compile them.
   const Component = (metadata: core.Component): core.TypeDecorator => {
     const { templateUrl, styleUrl, styleUrls, ...inline } = metadata;
-    if (templateUrl && templateUrl !== './welcome-card.html') throw new Error('Usa templateUrl: ./welcome-card.html per il file HTML del playground.');
-    if (styleUrl && styleUrl !== './welcome-card.css') throw new Error('Usa styleUrl: ./welcome-card.css per il file CSS del playground.');
-    if (styleUrls) throw new Error('Questo esempio usa styleUrl: ./welcome-card.css.');
+    if (templateUrl && templateUrl !== './component.html') throw new Error('Usa templateUrl: ./component.html per il file HTML del playground.');
+    if (styleUrl && styleUrl !== './component.css') throw new Error('Usa styleUrl: ./component.css per il file CSS del playground.');
+    if (styleUrls) throw new Error('Questo esempio usa styleUrl: ./component.css.');
     return core.Component({ ...inline,
+      // Re-evaluation creates new types with the same selector. Distinguish their
+      // public host metadata to avoid Angular component ID collisions (NG0912).
+      host: { ...inline.host, 'data-playground-component': `${revision}-${++componentIndex}` },
       ...(templateUrl ? { template: sources.html } : {}),
       ...(styleUrl ? { styles: [sources.css] } : {}),
     });
@@ -79,6 +90,7 @@ async function render(sources: Sources, requested: number): Promise<void> {
     component = core.createComponent(type, { hostElement: host, environmentInjector: application.injector });
     application.attachView(component.hostView);
     component.changeDetectorRef.detectChanges();
+    reportSize();
     reply('rendered');
   } catch (error) { reply('error', { message: message(error) }); }
 }

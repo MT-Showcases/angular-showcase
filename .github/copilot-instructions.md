@@ -363,6 +363,6 @@ npm test           # Run tests
 - Section links preserve the complete current route and query, including nested routing sandbox views.
 - Use fragment navigation and public Material header APIs for disclosure focus; verify initial direct links as well as later fragment changes.
 - Keep playground source editable directly below its preview. Include concise teaching comments, blank lines between logical blocks and expanded attributes/style declarations. Label remaining static snippets as complete examples or fragments and state their setup/import requirements.
-- Use real interactions and meaningful tests for claims made by Home cards. Distinguish the First Component editor from static demos and from a future full project runtime. Keep generated preview assets out of Git; npm lifecycle hooks rebuild them.
+- Use real interactions and meaningful tests for claims made by Home cards. The first four Basics lessons use editable component playgrounds; distinguish the remaining static demos and the future full project runtime. Keep generated preview assets out of Git; npm lifecycle hooks rebuild them.
 - JSONPlaceholder writes are simulated. Keep POST history separate from fetched GET resources and assign unique local operation IDs.
 - Feature-local DI providers are teaching scopes; do not describe them as application-wide root singletons.

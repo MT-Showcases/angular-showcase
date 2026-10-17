@@ -230,15 +230,19 @@ describe('Showcase routes', () => {
     }
   });
 
-  it('shows and hides the built-in control flow examples', async () => {
+  it('keeps the control-flow playground mounted while opening optional explanation', async () => {
     const harness = await RouterTestingHarness.create('/basics/directives');
     const page = harness.routeNativeElement!;
-    expect(page.querySelector('[data-testid="conditional-message"]')).toBeTruthy();
-    Array.from(page.querySelectorAll<HTMLButtonElement>('button'))
-      .find(button => button.textContent?.trim() === 'Mostra messaggio')!.click();
+    const frame = page.querySelector('iframe');
+    const editor = page.querySelector('.cm-editor');
+    const explanation = page.querySelector<HTMLElement>('#deepen mat-expansion-panel-header')!;
+    expect(frame).toBeTruthy();
+    expect(editor).toBeTruthy();
+    explanation.click();
     await harness.fixture.whenStable();
-    expect(page.querySelector('[data-testid="conditional-message"]')).toBeNull();
-    expect(page.querySelectorAll('[data-item-id]').length).toBe(3);
+    expect(explanation.getAttribute('aria-expanded')).toBe('true');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('.cm-editor')).toBe(editor);
   });
 
 });

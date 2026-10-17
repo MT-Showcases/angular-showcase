@@ -1,46 +1,5 @@
+/** Keep lesson context concise and wrap technical terms on narrow screens. */
 @use 'globals' as *;
-
-// Local examples consume public Material tokens; shared lesson classes own the layout.
-.directives-demo {
-  display: grid;
-  gap: space(6);
-  min-width: 0;
-
-  &__items {
-    list-style: none;
-    padding: 0;
-  }
-
-  &__item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: space(2);
-    padding: space(2) 0;
-    border-bottom: rem(1) solid var(--mat-sys-outline-variant);
-    overflow-wrap: anywhere;
-  }
-
-  &__identity {
-    color: var(--mat-sys-on-surface-variant);
-  }
-
-  &__class-example.active {
-    color: var(--mat-sys-on-primary-container);
-    background: var(--mat-sys-primary-container);
-    border-inline-start: rem(4) solid var(--mat-sys-primary);
-  }
-
-  &__highlight-example {
-    color: var(--mat-sys-on-surface);
-    background: var(--mat-sys-surface-container-low);
-  }
-
-  &__highlight-example.lesson-highlighted {
-    color: var(--mat-sys-on-secondary-container);
-    background: var(--mat-sys-secondary-container);
-    outline: rem(2) solid var(--mat-sys-secondary);
-    outline-offset: rem(2);
-  }
-}
+:host { display: block; min-width: 0; }
+.playground-lesson__prompt { color: $white; line-height: 1.7; overflow-wrap: anywhere; }
+.lesson-panel { line-height: 1.6; overflow-wrap: anywhere; }

@@ -45,6 +45,22 @@ describe('Angular playground host', () => {
     receive('rendered'); expect(page.textContent).toContain('Anteprima aggiornata');
   });
 
+  it('resizes only from the authenticated current preview and bounds excessive height', () => {
+    receive('ready');
+    receive('resize', { height: 520 }, window);
+    expect(frame.style.height).toBe('290px');
+    receive('resize', { height: 520, revision: 0 });
+    expect(frame.style.height).toBe('290px');
+    receive('resize', { height: 520 });
+    expect(frame.style.height).toBe('520px');
+    receive('resize', { height: 9000 });
+    expect(frame.style.height).toBe('680px');
+    receive('resize', { height: 120 });
+    expect(frame.style.height).toBe('240px');
+    receive('resize', { height: NaN });
+    expect(frame.style.height).toBe('240px');
+  });
+
   it('debounces real editor updates and preserves the preview and file contents across tab changes', async () => {
     receive('ready'); send.mockClear();
     edit('html', '<h2>Prima modifica</h2>');

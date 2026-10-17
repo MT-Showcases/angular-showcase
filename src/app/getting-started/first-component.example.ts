@@ -7,8 +7,8 @@ export const FIRST_COMPONENT: PlaygroundSources = {
 // Collega questa classe al template e al foglio di stile.
 @Component({
   selector: 'app-welcome-card',
-  templateUrl: './welcome-card.html',
-  styleUrl: './welcome-card.css',
+  templateUrl: './component.html',
+  styleUrl: './component.css',
 
   changeDetection: ChangeDetectionStrategy.Eager,
 })
