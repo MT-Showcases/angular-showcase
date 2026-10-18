@@ -9,6 +9,7 @@
 - Put each example’s editable, syntax-highlighted source directly below its interactive preview. Keep the main code visible; use accordions for optional depth or secondary examples.
 - Runnable examples must include concise comments explaining key decisions and blank lines between logical blocks. Use multiline formatting for attributes and style declarations; avoid compressed teaching code.
 - Reveal theory, prerequisites and glossary when useful; avoid repeating the same introductory scaffolding on every page.
+- Format lesson prose semantically: use <strong> for important terms, the shared primary-color emphasis style for selected keywords, and <code> for API names, bindings, selectors and inline snippets. Define prose/code colors centrally with public Material theme tokens, provide contrast-appropriate variants on branded backgrounds, and avoid per-page colors, color-only meaning or plain interpolated strings that prevent required formatting. Reserve syntax highlighting for actual code examples.
 - Preserve demo state while switching explanations. Support keyboard use, labels, feedback, reset and narrow viewports.
 - Prevent mobile text inflation and focus magnification through readable editable text (at least 16px) and responsive containment. Keep manual pinch zoom available; do not use viewport scale limits to conceal overflow.
 - Use the First Component lesson as the reference for the new playground experience before extending it across the curriculum.
