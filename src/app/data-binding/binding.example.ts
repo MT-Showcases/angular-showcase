@@ -49,7 +49,7 @@ export default class BindingDemo {
   </label>
 
   <button
-  matButton="filled"
+    matButton="filled"
     id="lock"
     type="button"
     [attr.aria-pressed]="isLocked"
@@ -78,13 +78,18 @@ export default class BindingDemo {
       id="preset"
       type="button"
       (click)="name = 'Grace'"
-    >Usa Grace</button>
+    >
+      Usa Grace
+    </button>
+
     <button
       matButton="outlined"
       id="reset"
       type="button"
       (click)="reset()"
-    >Ripristina demo</button>
+    >
+      Ripristina demo
+    </button>
   </div>
 </section>`,
   css: PLAYGROUND_STYLES,

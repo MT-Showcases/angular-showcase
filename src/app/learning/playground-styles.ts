@@ -2,7 +2,7 @@
 export const PLAYGROUND_STYLES = `/* Stili locali: prova a cambiare il colore principale. */
 :host {
   display: block;
-  color: #242033;
+  color: var(--mat-sys-on-surface);
 }
 
 .demo {
@@ -26,31 +26,14 @@ label {
 }
 
 /* Il testo modificabile resta leggibile anche su telefono. */
-input, select {
+input {
   min-height: 2.75rem;
   max-width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #6746c3;
-  border-radius: 0.5rem;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: var(--mat-sys-corner-small);
   font: inherit;
   font-size: max(1rem, 16px);
   color: inherit;
-  background: #fff;
-}
-
-
-.result {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background: #eee7ff;
-}
-
-ul {
-  display: grid;
-  gap: 0.75rem;
-  padding-left: 1.5rem;
-}
-
-.active {
-  outline: 2px solid #6746c3;
+  background: var(--mat-sys-surface);
 }`;

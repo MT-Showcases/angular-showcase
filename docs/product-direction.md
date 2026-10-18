@@ -21,10 +21,10 @@ Data Binding, Control Flow and Component Communication now use the same compact 
 
 ## Runtime choice
 
-- **Component prototype, delivered:** TypeScript transpilation and Angular JIT execute in a separate iframe, using the installed Angular version. The example's external HTML/CSS filenames are resolved from the editor. CodeMirror and the 4.57 MB raw compiler/runtime are loaded by the lesson/preview, not the host's initial bundle.
+- **Component prototype, delivered:** TypeScript transpilation and Angular JIT execute in a separate iframe, using the installed Angular version and the shared Material theme. The example's external HTML/CSS filenames are resolved from the editor. CodeMirror and the 4.75 MB raw compiler/runtime are loaded by the lesson/preview, not the host's initial bundle.
 - **Project playground, next:** multiple linked component/service files, package dependencies and the Angular CLI build pipeline need a broader runtime. WebContainers is a candidate; evaluate browser support, startup cost and current usage/licensing terms before choosing it. The current component runner is not a full project IDE.
 
-The runner supports one default-exported root component, inline child components/directives in the same TypeScript module and the bundled Angular core/common/forms modules. Direct input(), input.required() and output() class fields are supported by a narrow TypeScript AST bridge that supplies the metadata needed by Angular 22 JIT, preserving the real signal/emitter initializers. Literal aliases, aliased imports and input transforms are covered by runtime tests. The bridge depends on Angular-internal isSignal metadata; tests and an explicit major-version build guard protect upgrades. This does not provide model(), initializer query transforms or a complete ngc pipeline. Decorator inputs/outputs remain supported. It reports TypeScript syntax and Angular runtime/template errors, without full TypeScript semantic checking or Angular's full AOT transformation pipeline. CSS is plain, self-contained CSS.
+The runner supports one default-exported root component, inline child components/directives in the same TypeScript module and the bundled Angular core/common/forms and Material button modules. Direct input(), input.required() and output() class fields are supported by a narrow TypeScript AST bridge that supplies the metadata needed by Angular 22 JIT, preserving the real signal/emitter initializers. Literal aliases, aliased imports and input transforms are covered by runtime tests. The bridge depends on Angular-internal isSignal metadata; tests and an explicit major-version build guard protect upgrades. This does not provide model(), initializer query transforms or a complete ngc pipeline. Decorator inputs/outputs remain supported. It reports TypeScript syntax and Angular runtime/template errors, without full TypeScript semantic checking or Angular's full AOT transformation pipeline. CSS is plain, self-contained CSS.
 
 ## Execution boundary
 
@@ -60,3 +60,12 @@ Control flow is split into independent @if, @for, @switch and attribute-directiv
 User-visible sources use modern input/output APIs; do not choose older syntax merely to fit runner limitations. The runtime remains a bounded component runner rather than a full project compiler.
 
 Verification: 108 host tests across 25 files and 13 generated-runtime tests pass. The initializer bridge also passes a standalone TypeScript check. Production initial bundle remains 467.53 kB. Browser checks confirmed the independent @if/@for previews, input() startup and actual output() message delivery; real-device selection/keyboard acceptance remains separate.
+
+
+## Material preview and lesson polish — 2026-10-18
+
+The isolated preview compiles the same public Material theme as the host and supports real `@angular/material/button` imports, including in inline child components. All editable lesson buttons use Material directives; local button skins were removed. The focused four-lesson review removed CSS unrelated to individual examples, aligned binding input colors/shapes to theme tokens, improved teaching-code line breaks and corrected the supported-runtime explanation. Interactions and existing reset controls are unchanged.
+
+The correction diff was reviewed by the coordinating Codex session after a bounded DeepSeek audit and edit. Native browser control could not start (Sky native pipe startup failure; no available browser surface), so visual acceptance of this revision remains pending. Real-device iOS/Android selection and virtual-keyboard acceptance remain pending as well.
+
+Verification for this revision: 108 host tests and 14 generated-runtime tests passed; standalone playground type checking and production build passed. Initial bundle remains 467.53 kB; the two pre-existing stylesheet budget warnings remain.

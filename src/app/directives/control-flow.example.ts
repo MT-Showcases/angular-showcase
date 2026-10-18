@@ -77,19 +77,27 @@ export default class ListDemo {
     id="reverse"
     type="button"
     (click)="reverse()"
-  >Inverti ordine</button>
+  >
+    Inverti ordine
+  </button>
+
   <button
     matButton="outlined"
     id="clear"
     type="button"
     (click)="items = []"
-  >Svuota</button>
+  >
+    Svuota
+  </button>
+
   <button
     matButton="outlined"
     id="reset"
     type="button"
     (click)="reset()"
-  >Ripristina lista</button>
+  >
+    Ripristina lista
+  </button>
 </div>
 
 <ul aria-label="Frutta" aria-live="polite">
@@ -128,7 +136,11 @@ export default class StatusDemo {
 }`,
   html: `<label>
   Stato dell'articolo
-  <select #choice id="state" (change)="state = choice.value">
+  <select
+    #choice
+    id="state"
+    (change)="state = choice.value"
+  >
     <option value="draft">Bozza</option>
     <option value="review">In revisione</option>
     <option value="published">Pubblicato</option>
@@ -139,10 +151,21 @@ export default class StatusDemo {
 <!-- Angular mostra soltanto il caso corrispondente a state. -->
 <div id="publication" class="result" role="status">
   @switch (state) {
-    @case ('draft') { <p>Bozza: puoi scrivere.</p> }
-    @case ('review') { <p>In revisione: controlla il testo.</p> }
-    @case ('published') { <p>Pubblicato: il testo è visibile.</p> }
-    @default { <p>Stato sconosciuto.</p> }
+    @case ('draft') {
+      <p>Bozza: puoi scrivere.</p>
+    }
+
+    @case ('review') {
+      <p>In revisione: controlla il testo.</p>
+    }
+
+    @case ('published') {
+      <p>Pubblicato: il testo è visibile.</p>
+    }
+
+    @default {
+      <p>Stato sconosciuto.</p>
+    }
   }
 </div>`,
   css: `label {

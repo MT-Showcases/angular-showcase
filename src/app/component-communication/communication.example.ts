@@ -28,7 +28,12 @@ export default class InputDemo {
 }`,
   html: `<label>
   Nome nello stato del padre
-  <input #field id="name" [value]="name" (input)="name = field.value" />
+  <input
+    #field
+    id="name"
+    [value]="name"
+    (input)="name = field.value"
+  />
 </label>
 
 <!-- Le parentesi quadre passano il valore al figlio: padre → figlio. -->
@@ -44,13 +49,6 @@ input {
   min-width: 0;
   padding: 0.5rem;
   font: inherit;
-}
-
-.result {
-  padding: 1rem;
-  border-radius: var(--mat-sys-corner-medium);
-  color: var(--mat-sys-on-secondary-container);
-  background: var(--mat-sys-secondary-container);
 }`,
 };
 
@@ -97,18 +95,6 @@ export default class OutputDemo {
 
 <p id="message" class="result" role="status">{{ message }}</p>`,
   css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
-label {
-  display: grid;
-  gap: 0.5rem;
-}
-
-input {
-  max-width: 100%;
-  min-width: 0;
-  padding: 0.5rem;
-  font: inherit;
-}
-
 .result {
   padding: 1rem;
   border-radius: var(--mat-sys-corner-medium);
@@ -129,7 +115,9 @@ import { MatButtonModule } from '@angular/material/button';
       matButton="filled"
       type="button"
       (click)="incremented.emit()"
-    >{{ label() }}</button>
+    >
+      {{ label() }}
+    </button>
   \`,
   changeDetection: ChangeDetectionStrategy.Eager,
 })
@@ -165,20 +153,10 @@ export default class CombinedDemo {
   id="reset"
   type="button"
   (click)="count = 0"
->Ripristina</button>`,
+>
+  Ripristina
+</button>`,
   css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
-label {
-  display: grid;
-  gap: 0.5rem;
-}
-
-input {
-  max-width: 100%;
-  min-width: 0;
-  padding: 0.5rem;
-  font: inherit;
-}
-
 .result {
   padding: 1rem;
   border-radius: var(--mat-sys-corner-medium);
