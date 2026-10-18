@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, computed, input, signal } from '@an
 import { MatButtonModule } from '@angular/material/button';
 import { AngularPlayground } from '../angular-playground/angular-playground';
 import { PlaygroundSources } from '../angular-playground/playground.types';
+import { LessonInline } from '../lesson-inline/lesson-inline';
 
 /** One independent teaching example and its editable virtual files. */
 export interface LessonExample {
@@ -18,7 +19,7 @@ export interface LessonExample {
 /** Keeps one compiler iframe mounted, instead of loading every example at once. */
 @Component({
   selector: 'app-lesson-examples',
-  imports: [AngularPlayground, MatButtonModule],
+  imports: [AngularPlayground, LessonInline, MatButtonModule],
   templateUrl: './lesson-examples.html',
   styleUrl: './lesson-examples.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

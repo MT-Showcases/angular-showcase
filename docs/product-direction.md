@@ -69,3 +69,12 @@ The isolated preview compiles the same public Material theme as the host and sup
 The correction diff was reviewed by the coordinating Codex session after a bounded DeepSeek audit and edit. Native browser control could not start (Sky native pipe startup failure; no available browser surface), so visual acceptance of this revision remains pending. Real-device iOS/Android selection and virtual-keyboard acceptance remain pending as well.
 
 Verification for this revision: 108 host tests and 14 generated-runtime tests passed; standalone playground type checking and production build passed. Initial bundle remains 467.53 kB; the two pre-existing stylesheet budget warnings remain.
+
+
+## Shared prose typography — 2026-10-18
+
+The first four lessons now share semantic emphasis and inline-code styles. Use `lesson-prose` for prose, ordinary `<strong>` for neutral emphasis, `lesson-emphasis` for selected primary accents and `<code>` for APIs/bindings/snippets. `lesson-prose--on-brand` uses a contrasting Material container pair over the branded page background. Inline styles exclude preformatted code blocks and do not change the editor or iframe.
+
+Dynamic example prompts/takeaways use LessonInline: only `**keyword**` and backtick-delimited code are recognized; plain strings, whitespace and HTML-looking text remain literal. Nested formatting and HTML interpretation are intentionally unsupported.
+
+Verification: 111 host tests and 14 runtime tests passed, including three renderer tests for safe text, updates and delimiter behavior. Strict playground type checking and production build passed; initial bundle 468.29 kB. Static theme contrast checks passed. Browser control remains unavailable, so visual and real-device acceptance remain pending.

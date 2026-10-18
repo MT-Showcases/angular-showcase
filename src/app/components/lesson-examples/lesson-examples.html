@@ -11,14 +11,14 @@
 </nav>
 @if (active(); as selected) {
   @for (example of [selected]; track example.id) {
-    <p class="examples__prompt"><strong>Prova:</strong> {{ example.prompt }}</p>
+    <p class="examples__prompt lesson-prose lesson-prose--on-brand"><strong>Prova:</strong> <app-lesson-inline [text]="example.prompt" /></p>
     <app-angular-playground
       [title]="example.title"
       [initial]="example.sources"
       [draft]="drafts.get(example.id)"
       (sourceChange)="remember(example.id, $event)"
     />
-    <p class="examples__takeaway">{{ example.takeaway }}</p>
+    <p class="examples__takeaway lesson-prose"><app-lesson-inline [text]="example.takeaway" /></p>
   }
 }
 <p class="examples__hint">Il codice modificato resta salvato finché rimani nella pagina. Cambiando esempio, la demo riparte.</p>

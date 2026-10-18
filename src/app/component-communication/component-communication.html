@@ -1,9 +1,9 @@
 <app-lesson-shell topicId="components" [compact]="true">
-  <p id="demo" class="playground-lesson__prompt">Prima un dato in ingresso, poi un evento in uscita. L’ultimo esempio li combina.</p>
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">Prima un dato in ingresso, poi un <strong class="lesson-emphasis">evento</strong> in uscita. L’ultimo esempio li combina.</p>
   <app-lesson-examples [examples]="examples" />
 
   <app-lesson-disclosure anchor="deepen" title="Come leggere i due componenti?">
-    <p class="lesson-text">Nel TypeScript trovi <strong>prima il figlio</strong>, con un template breve accanto alla classe. <strong>Il padre</strong> è il componente esportato: usa il file HTML e il CSS separati. I commenti indicano chi possiede lo stato e in quale direzione viaggiano dati ed eventi.</p>
-    <p class="lesson-text"><code>input()</code> restituisce un signal da leggere con <code>name()</code>. <code>output()</code> dichiara un evento da inviare con <code>emit()</code>: non è un signal. Per gli esempi nuovi usiamo queste API; <code>&#64;Input</code> e <code>&#64;Output</code> restano supportati per il codice esistente.</p>
+    <p class="lesson-text lesson-prose">Nel TypeScript trovi <strong class="lesson-emphasis">prima il figlio</strong>, con un template breve accanto alla classe. <strong class="lesson-emphasis">Il padre</strong> è il componente esportato: usa il file HTML e il CSS separati. I commenti indicano chi possiede lo stato e in quale direzione viaggiano dati ed eventi.</p>
+    <p class="lesson-text lesson-prose"><code>input()</code> restituisce un signal da leggere con <code>name()</code>. <code>output()</code> dichiara un evento da inviare con <code>emit()</code>: non è un signal. Per gli esempi nuovi usiamo queste API; <code>&#64;Input</code> e <code>&#64;Output</code> restano supportati per il codice esistente.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>

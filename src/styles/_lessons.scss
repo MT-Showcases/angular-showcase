@@ -10,5 +10,27 @@
 .lesson-result { padding: space(4); border-radius: radius(sm); color: var(--mat-sys-on-secondary-container); background: var(--mat-sys-secondary-container); margin-block: space(4); overflow-wrap: anywhere; }
 .lesson-output { white-space: pre-wrap; overflow-wrap: anywhere; font-family: monospace; margin-block: space(4); }
 .lesson-list { padding-inline-start: space(6); line-height: 1.8; }
-.lesson-code-inline { font-family: monospace; overflow-wrap: anywhere; }
+.lesson-code-inline,
+.lesson-prose :where(code:not(pre code)) {
+  font-family: monospace;
+  font-size: rem(14);
+  padding: rem(2) rem(6);
+  border-radius: radius(sm);
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-primary);
+  overflow-wrap: anywhere;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.lesson-emphasis { color: var(--mat-sys-primary); font-weight: 700; overflow-wrap: anywhere; }
+// Top prompts sit on the branded gradient, so accented terms need a contrasting container.
+.lesson-prose--on-brand {
+  :where(code:not(pre code)),
+  .lesson-emphasis {
+    padding: rem(1) rem(5);
+    border-radius: radius(sm);
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
 .lesson-status { margin-block: space(4); color: var(--mat-sys-on-surface-variant); }

@@ -1,15 +1,15 @@
 <app-lesson-shell topicId="start" [compact]="true">
-  <p id="demo" class="starter__prompt"><strong>Prova subito:</strong> cambia <code>message</code> nel TypeScript, aggiungi una frase nell’HTML o scegli un nuovo colore nel CSS. La preview segue il tuo codice.</p>
+  <p id="demo" class="starter__prompt lesson-prose lesson-prose--on-brand"><strong>Prova subito:</strong> cambia <code>message</code> nel TypeScript, aggiungi una frase nell’HTML o scegli un nuovo colore nel CSS. La <strong class="lesson-emphasis">preview</strong> segue il tuo codice.</p>
   <app-angular-playground [initial]="example" />
-  <section class="starter__anatomy" aria-label="I tre file del componente">
+  <section class="starter__anatomy lesson-prose" aria-label="I tre file del componente">
     <p class="starter__concept"><strong class="starter__label">TypeScript</strong> Dati e comportamento: <code>message</code> e <code>count</code>.</p>
     <p class="starter__concept"><strong class="starter__label">HTML</strong> La vista: le doppie graffe mostrano i dati, <code>(click)</code> ascolta un’azione.</p>
     <p class="starter__concept"><strong class="starter__label">CSS</strong> L’aspetto: colori, spazi e la variante <code>card--highlighted</code>.</p>
   </section>
   <app-lesson-disclosure anchor="deepen" title="Come si collegano questi file?">
     <h2 class="lesson-title">Una classe, un template, uno stile</h2>
-    <p class="lesson-text"><strong>&#64;Component</strong> collega i tre file. <strong>selector</strong> dà al componente il nome da usare in una vista padre: <code>&lt;app-welcome-card /&gt;</code>.</p>
-    <p class="lesson-text">Ogni istanza ha i propri dati. Quando premi il pulsante, cambia <code>count</code> e Angular aggiorna il testo. Non serve riscrivere l’HTML a mano.</p>
-    <p class="lesson-text">Qui modifichi un componente standalone con Angular core, common, forms e i pulsanti Angular Material. Puoi anche definire altri componenti nello stesso file TypeScript e collegarli nella vista. I progetti completi su più file arriveranno con un playground dedicato. Gli errori mostrati riguardano sintassi ed esecuzione; non c’è ancora il controllo completo dei tipi TypeScript.</p>
+    <p class="lesson-text lesson-prose"><strong class="lesson-emphasis"><code>&#64;Component</code></strong> collega i tre file. <code>selector</code> dà al componente il nome da usare in una vista padre: <code>&lt;app-welcome-card /&gt;</code>.</p>
+    <p class="lesson-text lesson-prose">Ogni <strong class="lesson-emphasis">istanza</strong> ha i propri dati. Quando premi il pulsante, cambia <code>count</code> e Angular aggiorna il testo. Non serve riscrivere l’HTML a mano.</p>
+    <p class="lesson-text lesson-prose">Qui modifichi un componente standalone con Angular core, common, forms e i pulsanti Angular Material. Puoi anche definire altri componenti nello stesso file TypeScript e collegarli nella vista. I progetti completi su più file arriveranno con un playground dedicato. Gli errori mostrati riguardano sintassi ed esecuzione; non c’è ancora il controllo completo dei tipi TypeScript.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>

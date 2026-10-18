@@ -1,15 +1,15 @@
 <app-lesson-shell topicId="binding" [compact]="true">
-  <p id="demo" class="playground-lesson__prompt"><strong>Prova subito:</strong> Scrivi un nome nella preview. Poi cambia <code>name</code> nel TypeScript o modifica <code>[(ngModel)]</code> nell’HTML. Osserva quali collegamenti vanno in una direzione e quali in entrambe.</p>
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand"><strong>Prova subito:</strong> Scrivi un nome nella preview. Poi cambia <code>name</code> nel TypeScript o modifica <code>[(ngModel)]</code> nell’HTML. Osserva quali <strong class="lesson-emphasis">collegamenti</strong> vanno in una direzione e quali in entrambe.</p>
   <app-angular-playground [initial]="example" />
 
-  <section class="lesson-grid" aria-label="Collega un valore alla vista">
+  <section class="lesson-grid lesson-prose" aria-label="Collega un valore alla vista">
     <p class="lesson-panel"><strong>Testo</strong><br />L’interpolazione mostra lo stato come testo, senza eseguire l’HTML digitato.</p>
     <p class="lesson-panel"><strong>Proprietà ed eventi</strong><br /><code>[disabled]</code> aggiorna il DOM; <code>(input)</code> chiama il metodo che cambia lo stato.</p>
     <p class="lesson-panel"><strong>Andata e ritorno</strong><br /><code>[(ngModel)]</code> sincronizza campo e stato. Richiede <code>FormsModule</code>.</p>
   </section>
 
   <app-lesson-disclosure anchor="deepen" title="Perché non basta [value]?">
-    <p class="lesson-text"><code>[value]</code> porta il dato verso il campo: scrivere nel campo non assegna da solo un nuovo valore alla classe. Il gestore di <code>(input)</code> fa questa assegnazione esplicita. <code>ngModel</code> riunisce le due direzioni.</p>
-    <p class="lesson-text"><code>disabled="false"</code> disabilita comunque un controllo HTML: l’attributo booleano è presente. Usa <code>[disabled]="isLocked"</code>. <code>aria-pressed</code> descrive invece lo stato di un pulsante e non lo disabilita.</p>
+    <p class="lesson-text lesson-prose"><code>[value]</code> porta il dato verso il campo: scrivere nel campo non assegna da solo un nuovo valore alla classe. Il gestore di <code>(input)</code> fa questa <strong class="lesson-emphasis">assegnazione esplicita</strong>. <code>ngModel</code> riunisce le due direzioni.</p>
+    <p class="lesson-text lesson-prose"><code>disabled="false"</code> disabilita comunque un controllo HTML: l’<strong class="lesson-emphasis">attributo booleano</strong> è presente. Usa <code>[disabled]="isLocked"</code>. <code>aria-pressed</code> descrive invece lo stato di un pulsante e non lo disabilita.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>
