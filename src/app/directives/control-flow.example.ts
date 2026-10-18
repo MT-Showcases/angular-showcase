@@ -2,9 +2,11 @@ import type { PlaygroundSources } from '../components/angular-playground/playgro
 
 export const IF_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-example',
+  imports: [MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -15,6 +17,7 @@ export default class ConditionDemo {
 }`,
   html: `<!-- Il clic cambia soltanto lo stato: Angular aggiorna il template. -->
 <button
+  matButton="filled"
   type="button"
   [attr.aria-pressed]="visible"
   (click)="visible = !visible"
@@ -31,16 +34,19 @@ export default class ConditionDemo {
   css: `/* Cambia l'aspetto dei messaggi senza cambiare la condizione. */
 .result {
   padding: 1rem;
-  border-radius: 0.5rem;
-  background: #eee7ff;
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
 }`,
 };
 
 export const FOR_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-example',
+  imports: [MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -66,9 +72,24 @@ export default class ListDemo {
   }
 }`,
   html: `<div class="actions">
-  <button id="reverse" type="button" (click)="reverse()">Inverti ordine</button>
-  <button id="clear" type="button" (click)="items = []">Svuota</button>
-  <button id="reset" type="button" (click)="reset()">Ripristina lista</button>
+  <button
+    matButton="filled"
+    id="reverse"
+    type="button"
+    (click)="reverse()"
+  >Inverti ordine</button>
+  <button
+    matButton="outlined"
+    id="clear"
+    type="button"
+    (click)="items = []"
+  >Svuota</button>
+  <button
+    matButton="outlined"
+    id="reset"
+    type="button"
+    (click)="reset()"
+  >Ripristina lista</button>
 </div>
 
 <ul aria-label="Frutta" aria-live="polite">
@@ -131,12 +152,15 @@ export default class StatusDemo {
 
 .result {
   padding: 1rem;
-  background: #eee7ff;
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
 }`,
 };
 
 export const DIRECTIVE_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, Directive, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 // Il selettore riconosce l'attributo appHighlight nel template.
 // La direttiva aggiunge un comportamento al pulsante, senza creare una nuova vista.
@@ -161,7 +185,7 @@ class Highlight {
   selector: 'app-directive-demo',
 
   // L'import rende la direttiva disponibile in questo template.
-  imports: [Highlight],
+  imports: [Highlight, MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -169,23 +193,16 @@ class Highlight {
 export default class DirectiveDemo {}`,
   html: `<!-- appHighlight attiva la direttiva sul pulsante esistente. -->
 <!-- Anche Invio e Spazio producono il clic, grazie al pulsante nativo. -->
-<button appHighlight type="button">
+<button
+  matButton="filled"
+  appHighlight
+  type="button"
+>
   Clicca per evidenziarmi
 </button>`,
   css: `/* La direttiva sceglie QUANDO aggiungere la classe; il CSS decide l'aspetto. */
-button {
-  min-height: 2.75rem;
-  padding: 1rem;
-  border: 2px solid #6746c3;
-  border-radius: 0.5rem;
-  font: inherit;
-  color: #4c318e;
-  background: white;
-}
-
 .highlighted {
-  color: #2f1466;
-  background: #eee7ff;
-  border-style: dashed;
+  outline: 3px dashed var(--mat-sys-primary);
+  outline-offset: 4px;
 }`,
 };

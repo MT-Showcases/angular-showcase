@@ -275,3 +275,36 @@ test('unsupported imports fail visibly; wrong channels and older revisions canno
     assert.equal(dom.window.document.querySelector('h2').textContent, 'Ciao, Angular!');
   } finally { dom.window.close(); }
 });
+
+
+test('preview shares the host theme and instantiates real Material button directives', async () => {
+  assert.match(source, /class="site-html"/);
+  assert.match(source, /--mat-sys-primary:/);
+  assert.match(source, /--mat-button-filled-container-shape:/);
+  const dom = await environment();
+  try {
+    await render(dom, {
+      typescript: `import { Component, ViewChild } from '@angular/core';
+import { MatButton, MatButtonModule } from '@angular/material/button';
+@Component({
+  selector: 'app-material-contract',
+  imports: [MatButtonModule],
+  templateUrl: './component.html',
+})
+export default class MaterialContract {
+  @ViewChild(MatButton) button!: MatButton;
+  disable() { this.button.disabled = true; }
+}`,
+      html: '<button matButton="filled" (click)="disable()">Material action</button>',
+      css: '',
+    }, 1);
+    await click(dom, 'button');
+    assert.equal(dom.window.document.querySelector('button').disabled, true);
+    // Verify child and parent templates both import the real directive.
+    await render(dom, COMMUNICATION_EXAMPLE, 2);
+    await click(dom, 'app-counter-button button');
+    assert.match(dom.window.document.querySelector('#count').textContent, /1/);
+    await click(dom, '#reset');
+    assert.match(dom.window.document.querySelector('#count').textContent, /0/);
+  } finally { dom.window.close(); }
+});

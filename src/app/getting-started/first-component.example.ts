@@ -3,10 +3,12 @@ import type { PlaygroundSources } from '../components/angular-playground/playgro
 /** The editable source is also the source executed by the preview. */
 export const FIRST_COMPONENT: PlaygroundSources = {
   typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 // Collega questa classe al template e al foglio di stile.
 @Component({
   selector: 'app-welcome-card',
+  imports: [MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
 
@@ -35,12 +37,15 @@ export default class WelcomeCard {
 
   <!-- I clic cambiano lo stato; Angular aggiorna la vista. -->
   <div class="actions">
-    <button class="control" (click)="count = count + 1">
+    <button
+      matButton="filled"
+      (click)="count = count + 1"
+    >
       Aggiungi 1
     </button>
 
     <button
-      class="control"
+      matButton="outlined"
       (click)="highlighted = !highlighted"
       [attr.aria-pressed]="highlighted"
     >
@@ -58,7 +63,8 @@ export default class WelcomeCard {
 
 /* Angular aggiunge questa classe quando highlighted è true. */
 .card--highlighted {
-  background: #eee7ff;
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
   border-color: #6746c3;
 }
 
@@ -84,12 +90,5 @@ export default class WelcomeCard {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-
-.control {
-  padding: 0.5rem 0.75rem;
-  border: 0.0625rem solid #6746c3;
-  border-radius: 0.5rem;
-  color: #4c318e;
-  background: white;
-}`,
+`,
 };

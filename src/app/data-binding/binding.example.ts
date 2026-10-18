@@ -4,11 +4,12 @@ import { PLAYGROUND_STYLES } from '../learning/playground-styles';
 /** One state value connects interpolation, properties, DOM events and ngModel. */
 export const BINDING_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-binding-demo',
-  imports: [FormsModule],
+  imports: [FormsModule, MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -48,6 +49,7 @@ export default class BindingDemo {
   </label>
 
   <button
+  matButton="filled"
     id="lock"
     type="button"
     [attr.aria-pressed]="isLocked"
@@ -71,8 +73,18 @@ export default class BindingDemo {
   </label>
 
   <div class="actions">
-    <button id="preset" type="button" (click)="name = 'Grace'">Usa Grace</button>
-    <button id="reset" type="button" (click)="reset()">Ripristina demo</button>
+    <button
+      matButton="filled"
+      id="preset"
+      type="button"
+      (click)="name = 'Grace'"
+    >Usa Grace</button>
+    <button
+      matButton="outlined"
+      id="reset"
+      type="button"
+      (click)="reset()"
+    >Ripristina demo</button>
   </div>
 </section>`,
   css: PLAYGROUND_STYLES,

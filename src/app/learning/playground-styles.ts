@@ -26,7 +26,7 @@ label {
 }
 
 /* Il testo modificabile resta leggibile anche su telefono. */
-input, select, button {
+input, select {
   min-height: 2.75rem;
   max-width: 100%;
   padding: 0.5rem 0.75rem;
@@ -38,14 +38,6 @@ input, select, button {
   background: #fff;
 }
 
-button {
-  color: #4c318e;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
 
 .result {
   padding: 1rem;

@@ -1,0 +1,22 @@
+/** The isolated preview uses the same Material theme as the host application. */
+@use '../src/styles/theme';
+@use 'globals' as *;
+
+body {
+  margin: 0;
+  padding: space(6);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface);
+  font: 400 #{rem(16)}/1.5 $font-family;
+  overflow-wrap: anywhere;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:where(input, textarea, select) {
+  max-width: 100%;
+  min-width: 0;
+  font: inherit;
+}

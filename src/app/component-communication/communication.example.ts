@@ -48,18 +48,26 @@ input {
 
 .result {
   padding: 1rem;
-  background: #eee7ff;
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
 }`,
 };
 
 export const OUTPUT_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, output, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 // FIGLIO: emette un messaggio senza cambiare lo stato del padre.
 @Component({
   selector: 'app-message-button',
+  imports: [MatButtonModule],
   template: \`
-    <button type="button" (click)="sent.emit('Ciao dal figlio!')">
+    <button
+      matButton="filled"
+      type="button"
+      (click)="sent.emit('Ciao dal figlio!')"
+    >
       Invia un messaggio
     </button>
   \`,
@@ -103,17 +111,25 @@ input {
 
 .result {
   padding: 1rem;
-  background: #eee7ff;
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
 }`,
 };
 
 export const COMMUNICATION_EXAMPLE: PlaygroundSources = {
   typescript: `import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-counter-button',
+  imports: [MatButtonModule],
   template: \`
-    <button type="button" (click)="incremented.emit()">{{ label() }}</button>
+    <button
+      matButton="filled"
+      type="button"
+      (click)="incremented.emit()"
+    >{{ label() }}</button>
   \`,
   changeDetection: ChangeDetectionStrategy.Eager,
 })
@@ -126,7 +142,7 @@ class CounterButton {
 // PADRE: collega il figlio e possiede lo stato della pagina.
 @Component({
   selector: 'app-combined-demo',
-  imports: [CounterButton],
+  imports: [CounterButton, MatButtonModule],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -144,7 +160,12 @@ export default class CombinedDemo {
 <p id="count" class="result" role="status">Totale: {{ count }}</p>
 
 <!-- Togli il gestore (incremented): il clic non cambierà più il totale. -->
-<button id="reset" type="button" (click)="count = 0">Ripristina</button>`,
+<button
+  matButton="outlined"
+  id="reset"
+  type="button"
+  (click)="count = 0"
+>Ripristina</button>`,
   css: `/* Questi stili appartengono al padre; il figlio ha la propria vista. */
 label {
   display: grid;
@@ -160,6 +181,8 @@ input {
 
 .result {
   padding: 1rem;
-  background: #eee7ff;
+  border-radius: var(--mat-sys-corner-medium);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
 }`,
 };
