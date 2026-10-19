@@ -1,3 +1,4 @@
+import { PLAYGROUND_FIELD_STYLES } from '../learning/playground-styles';
 import type { PlaygroundSources } from '../components/angular-playground/playground.types';
 
 export const INPUT_EXAMPLE: PlaygroundSources = {
@@ -44,12 +45,7 @@ label {
   gap: 0.5rem;
 }
 
-input {
-  max-width: 100%;
-  min-width: 0;
-  padding: 0.5rem;
-  font: inherit;
-}`,
+${PLAYGROUND_FIELD_STYLES}`,
 };
 
 export const OUTPUT_EXAMPLE: PlaygroundSources = {

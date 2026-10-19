@@ -1,3 +1,4 @@
+import { PLAYGROUND_FIELD_STYLES } from '../learning/playground-styles';
 import type { PlaygroundSources } from '../components/angular-playground/playground.types';
 
 export const IF_EXAMPLE: PlaygroundSources = {
@@ -173,6 +174,7 @@ export default class StatusDemo {
   gap: 0.5rem;
 }
 
+${PLAYGROUND_FIELD_STYLES}
 .result {
   padding: 1rem;
   border-radius: var(--mat-sys-corner-medium);
