@@ -17,6 +17,7 @@
 }
 
 .site-html {
+  scroll-behavior: smooth;
   scroll-padding-top: rem(100);
   // Keep text stable on rotation without restricting the user's pinch zoom.
   -webkit-text-size-adjust: 100%;

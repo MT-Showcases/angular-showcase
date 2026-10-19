@@ -692,7 +692,7 @@ export const selectHistory = createSelector(
     setTimeout(() => {
       const element = document.getElementById('pattern-guide');
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.scrollIntoView({ block: 'start' });
       }
     }, 100);
   }
