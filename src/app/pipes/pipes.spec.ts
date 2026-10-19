@@ -1,93 +1,57 @@
 // COMPONENT TYPE: Test Suite
-// SECTION: Angular Basics
-// ROLE: Verify parameter-driven formatting and immutable custom-pipe updates through the UI.
-// PATTERNS USED: Public Material harnesses and visible source/output assertions.
-// NOTES FOR CONTRIBUTORS: Keep expected dates independent of the machine timezone.
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatInputHarness } from '@angular/material/input/testing';
-import { MatSelectHarness } from '@angular/material/select/testing';
+// ROLE: Verify that the compact lesson wires every seed to one visible, switchable editor.
+// PATTERNS USED: Real lesson DOM, the active playground and the CodeMirror source.
+// NOTES FOR CONTRIBUTORS: Runtime behavior belongs in scripts/test-playground.mjs.
+import { EditorView } from '@codemirror/view';
+import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { PipesLesson } from './pipes';
+import { CURRENCY_EXAMPLE, DATE_EXAMPLE, TAG_LIST_EXAMPLE, UPPERCASE_EXAMPLE } from './pipes.example';
 import { TagListPipe } from './tag-list-pipe';
 
-describe('PipesLesson', () => {
-  let fixture: ComponentFixture<PipesLesson>;
-  let loader: HarnessLoader;
-  let element: HTMLElement;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [PipesLesson], providers: [provideRouter([])] }).compileComponents();
-    fixture = TestBed.createComponent(PipesLesson);
-    loader = TestbedHarnessEnvironment.loader(fixture);
-    element = fixture.nativeElement;
+describe('Pipes playground lesson', () => {
+  it('connects the actual date seed to a visible editor before optional theory', async () => {
+    TestBed.configureTestingModule({ imports: [PipesLesson], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(PipesLesson);
     await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+
+    expect(playground.initial()).toBe(DATE_EXAMPLE);
+    expect(page.querySelector('.lesson-shell__intro')).toBeNull();
+    expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
+    expect(page.querySelector('app-angular-playground')!.compareDocumentPosition(page.querySelector('app-lesson-disclosure')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    fixture.destroy();
   });
 
-  function result(id: string): string {
-    return element.querySelector(`[data-testid="${id}"]`)?.textContent?.trim() ?? '';
-  }
+  it('switches every seed and keeps its editable source in the active editor', async () => {
+    TestBed.configureTestingModule({ imports: [PipesLesson], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(PipesLesson);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const choices = page.querySelectorAll<HTMLButtonElement>('nav[aria-label="Scegli un esempio"] button');
+    const seeds = [DATE_EXAMPLE, CURRENCY_EXAMPLE, UPPERCASE_EXAMPLE, TAG_LIST_EXAMPLE];
 
-  async function select(index: number, text: string): Promise<void> {
-    const control = (await loader.getAllHarnesses(MatSelectHarness))[index];
-    await control.open();
-    await control.clickOptions({ text });
-  }
+    expect(choices).toHaveLength(seeds.length);
 
-  it('formats the same ISO value with an explicit format and timezone', async () => {
-    expect(result('date-result')).toBe('2026-10-16');
-    await select(0, 'Giorno/mese/anno');
-    expect(result('date-result')).toBe('16/10/2026');
-    await select(0, 'Ora e minuti');
-    expect(result('date-result')).toBe('10:30');
-    await select(1, 'Scarto fisso UTC+02:00');
-    expect(result('date-result')).toBe('12:30');
-    expect(result('date-raw')).toBe('2026-10-16T10:30:00Z');
-  });
+    for (const [index, seed] of seeds.entries()) {
+      choices[index].click();
+      await fixture.whenStable();
 
-  it('changes currency presentation without converting or mutating the amount', async () => {
-    expect(result('currency-result')).toBe('€1,234.50');
-    await select(2, 'Dollaro statunitense');
-    expect(result('currency-result')).toBe('$1,234.50');
-    await select(3, 'Codice');
-    expect(result('currency-result')).toContain('USD');
-    expect(result('amount-raw')).toBe('1234.5');
-    const amount = await loader.getHarness(MatInputHarness.with({ selector: '[type="number"]' }));
-    await amount.setValue('42.2');
-    expect(result('currency-result')).toContain('42.20');
-    expect(result('amount-raw')).toBe('42.2');
-    await amount.setValue('');
-    expect(result('currency-result')).toContain('Inserisci un numero');
-  });
+      const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+      const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>('.cm-editor')!)!;
 
-  it('transforms edited text while retaining its original casing', async () => {
-    const input = (await loader.getAllHarnesses(MatInputHarness))[1];
-    await input.setValue('Ciao Angular');
-    expect(result('uppercase-result')).toBe('CIAO ANGULAR');
-    expect(result('text-raw')).toBe('Ciao Angular');
-  });
+      expect(playground.initial()).toBe(seed);
+      expect(choices[index].getAttribute('aria-pressed')).toBe('true');
+      expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
+      expect(editor.state.doc.toString()).toBe(seed.typescript);
+    }
 
-  it('creates a new array for the pure pipe, changes its parameter and restores all defaults', async () => {
-    const original = fixture.componentInstance.labels();
-    const input = (await loader.getAllHarnesses(MatInputHarness))[2];
-    const add = await loader.getHarness(MatButtonHarness.with({ text: 'Aggiungi etichetta' }));
-    await input.setValue('   ');
-    expect(await add.isDisabled()).toBe(true);
-    await input.setValue('  componenti  ');
-    await add.click();
-    expect(fixture.componentInstance.labels()).not.toBe(original);
-    expect(original).toEqual(['template', 'dati']);
-    expect(result('labels-result')).toBe('template · dati · componenti');
-    await select(4, 'Barra');
-    expect(result('labels-result')).toBe('template / dati / componenti');
-    await (await loader.getHarness(MatButtonHarness.with({ text: 'Ripristina tutti i valori' }))).click();
-    expect(result('labels-result')).toBe('template · dati');
-    expect(result('currency-result')).toBe('€1,234.50');
-    expect(result('date-result')).toBe('2026-10-16');
-    expect(await input.getValue()).toBe('');
-    expect(element.querySelector('[role="status"]')?.textContent).toContain('ripristinati');
+    fixture.destroy();
   });
 });
 
@@ -95,6 +59,7 @@ describe('TagListPipe', () => {
   it('formats frozen input without mutation and supports an empty list and separator', () => {
     const pipe = new TagListPipe();
     const source = Object.freeze(['uno', 'due']);
+
     expect(pipe.transform(source)).toBe('uno · due');
     expect(pipe.transform(source, ' / ')).toBe('uno / due');
     expect(pipe.transform(source, '')).toBe('unodue');

@@ -12,6 +12,7 @@ const { FIRST_COMPONENT } = await fixture('src/app/getting-started/first-compone
 const { BINDING_EXAMPLE } = await fixture('src/app/data-binding/binding.example.ts');
 const { IF_EXAMPLE, FOR_EXAMPLE, SWITCH_EXAMPLE, DIRECTIVE_EXAMPLE } = await fixture('src/app/directives/control-flow.example.ts');
 const { INPUT_EXAMPLE, OUTPUT_EXAMPLE, COMMUNICATION_EXAMPLE } = await fixture('src/app/component-communication/communication.example.ts');
+const { DATE_EXAMPLE, CURRENCY_EXAMPLE, UPPERCASE_EXAMPLE, TAG_LIST_EXAMPLE } = await fixture('src/app/pipes/pipes.example.ts');
 
 const source = await readFile('public/playground/generated/preview.html', 'utf8');
 function listen(window, kind, revision) {
@@ -176,6 +177,96 @@ test('combined input/output keeps ownership in the parent; an unhandled event ca
     await render(dom, { ...COMMUNICATION_EXAMPLE, html: COMMUNICATION_EXAMPLE.html.replace('(incremented)="count = count + 1"', '') }, 2);
     await click(dom, 'app-counter-button button');
     assert.equal(doc.querySelector('#count').textContent, 'Totale: 0');
+  } finally { dom.window.close(); }
+});
+
+test('date seed keeps the ISO value while format and fixed offset change', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, DATE_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const result = () => doc.querySelector('#date-result').textContent.trim();
+    assert.equal(doc.querySelector('#date-raw').textContent.trim(), '2026-10-16T10:30:00Z');
+    assert.equal(result(), '2026-10-16');
+    await input(dom, '#date-format', 'dd/MM/yyyy', 'change');
+    assert.equal(result(), '16/10/2026');
+    await input(dom, '#date-format', 'HH:mm', 'change');
+    assert.equal(result(), '10:30');
+    await input(dom, '#timezone', '+0200', 'change');
+    assert.equal(result(), '12:30');
+    assert.equal(doc.querySelector('#date-raw').textContent.trim(), '2026-10-16T10:30:00Z');
+  } finally { dom.window.close(); }
+});
+
+test('currency seed changes presentation without converting or losing the number', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CURRENCY_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const result = () => doc.querySelector('#currency-result').textContent.trim();
+    assert.equal(result(), '€1,234.50');
+    await input(dom, '#currency', 'USD', 'change');
+    assert.equal(result(), '$1,234.50');
+    await input(dom, '#currency-display', 'code', 'change');
+    assert.match(result(), /USD/);
+    await input(dom, '#amount', '42.2');
+    assert.match(result(), /USD/);
+    assert.match(result(), /42\.20/);
+    assert.equal(doc.querySelector('#amount-raw').textContent.trim(), '42.2');
+    await input(dom, '#amount', '');
+    assert.match(result(), /Inserisci un numero/);
+    assert.equal(doc.querySelector('#amount-raw').textContent.trim(), 'Nessun importo');
+  } finally { dom.window.close(); }
+});
+
+test('uppercase seed transforms edited text while keeping the source casing', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, UPPERCASE_EXAMPLE, 1);
+    const doc = dom.window.document;
+    assert.equal(doc.querySelector('#uppercase-result').textContent.trim(), 'ANGULAR SI IMPARA PROVANDO');
+    await input(dom, '#uppercase-text', 'Ciao Angular');
+    assert.equal(doc.querySelector('#uppercase-result').textContent.trim(), 'CIAO ANGULAR');
+    assert.equal(doc.querySelector('#text-raw').textContent.trim(), 'Ciao Angular');
+    await input(dom, '#uppercase-text', '');
+    assert.equal(doc.querySelector('#uppercase-result').textContent.trim(), '(testo vuoto)');
+    assert.equal(doc.querySelector('#text-raw').textContent.trim(), '(testo vuoto)');
+  } finally { dom.window.close(); }
+});
+
+test('tag list seed adds an immutable label, changes separator and guards blanks', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, TAG_LIST_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const button = doc.querySelector('button');
+    const result = () => doc.querySelector('#labels-result').textContent.trim();
+    const disabled = () => button.disabled || button.getAttribute('aria-disabled') === 'true';
+    assert.equal(disabled(), true);
+    await input(dom, '#new-label', '   ');
+    assert.equal(disabled(), true);
+    await input(dom, '#new-label', '  componenti  ');
+    assert.equal(disabled(), false);
+    await click(dom, 'button');
+    assert.equal(result(), 'template · dati · componenti');
+    assert.equal(doc.querySelector('#labels-raw').textContent.trim(), 'template,dati,componenti');
+    assert.equal(doc.querySelector('#new-label').value, '');
+    assert.equal(disabled(), true);
+    await input(dom, '#separator', ' / ', 'change');
+    assert.equal(result(), 'template / dati / componenti');
+  } finally { dom.window.close(); }
+});
+
+test('edited pipe source re-renders the preview with the new initial value', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, UPPERCASE_EXAMPLE, 1);
+    assert.equal(dom.window.document.querySelector('#uppercase-result').textContent.trim(), 'ANGULAR SI IMPARA PROVANDO');
+    await render(dom, {
+      ...UPPERCASE_EXAMPLE,
+      typescript: UPPERCASE_EXAMPLE.typescript.replace("'Angular si impara provando'", "'Pipe modificate'"),
+    }, 2);
+    assert.equal(dom.window.document.querySelector('#uppercase-result').textContent.trim(), 'PIPE MODIFICATE');
   } finally { dom.window.close(); }
 });
 
