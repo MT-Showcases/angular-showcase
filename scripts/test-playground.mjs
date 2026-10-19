@@ -13,6 +13,7 @@ const { BINDING_EXAMPLE } = await fixture('src/app/data-binding/binding.example.
 const { IF_EXAMPLE, FOR_EXAMPLE, SWITCH_EXAMPLE, DIRECTIVE_EXAMPLE } = await fixture('src/app/directives/control-flow.example.ts');
 const { INPUT_EXAMPLE, OUTPUT_EXAMPLE, COMMUNICATION_EXAMPLE } = await fixture('src/app/component-communication/communication.example.ts');
 const { DATE_EXAMPLE, CURRENCY_EXAMPLE, UPPERCASE_EXAMPLE, TAG_LIST_EXAMPLE } = await fixture('src/app/pipes/pipes.example.ts');
+const { CONTROL_EXAMPLE, CONTACT_EXAMPLE } = await fixture('src/app/forms/forms.example.ts');
 
 const source = await readFile('public/playground/generated/preview.html', 'utf8');
 function listen(window, kind, revision) {
@@ -52,6 +53,12 @@ async function input(dom, selector, value, event = 'input') {
 }
 async function click(dom, selector) {
   dom.window.document.querySelector(selector).click();
+  await settle();
+}
+async function blur(dom, selector) {
+  const element = dom.window.document.querySelector(selector);
+  element.focus();
+  element.blur();
   await settle();
 }
 
@@ -267,6 +274,245 @@ test('edited pipe source re-renders the preview with the new initial value', asy
       typescript: UPPERCASE_EXAMPLE.typescript.replace("'Angular si impara provando'", "'Pipe modificate'"),
     }, 2);
     assert.equal(dom.window.document.querySelector('#uppercase-result').textContent.trim(), 'PIPE MODIFICATE');
+  } finally { dom.window.close(); }
+});
+
+test('control seed shows editing versus blur states and resets to its initial value', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTROL_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const state = id => doc.querySelector(id).textContent.trim();
+    assert.equal(doc.querySelector('#control-name').value, 'Ada');
+    assert.equal(state('#control-value'), 'Ada');
+    assert.equal(state('#control-valid'), 'true');
+    assert.equal(state('#control-dirty'), 'false');
+    assert.equal(state('#control-touched'), 'false');
+    assert.equal(doc.querySelector('mat-error'), null);
+
+    await input(dom, '#control-name', '');
+    assert.equal(state('#control-value'), '');
+    assert.equal(state('#control-valid'), 'false');
+    assert.equal(state('#control-dirty'), 'true');
+    assert.equal(state('#control-touched'), 'false');
+    assert.equal(doc.querySelector('mat-error'), null);
+
+    await blur(dom, '#control-name');
+    assert.equal(state('#control-touched'), 'true');
+    assert.match(doc.querySelector('#control-name-error').textContent, /obbligatorio/i);
+
+    await click(dom, '#control-reset');
+    assert.equal(doc.querySelector('#control-name').value, 'Ada');
+    assert.equal(state('#control-value'), 'Ada');
+    assert.equal(state('#control-valid'), 'true');
+    assert.equal(state('#control-dirty'), 'false');
+    assert.equal(state('#control-touched'), 'false');
+    assert.equal(doc.querySelector('mat-error'), null);
+  } finally { dom.window.close(); }
+});
+
+test('contact seed validates blanks, length and email after blur and recovers', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTACT_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const submit = () => doc.querySelector('#contact-submit');
+    assert.deepEqual([...doc.querySelectorAll('mat-label')].map(label => label.textContent.trim()), [
+      'Nome',
+      'Cognome',
+      'Email',
+      'Organizzazione',
+    ]);
+    assert.match(doc.querySelector('#contact-name').getAttribute('aria-describedby'), /contact-name-help/);
+    assert.equal(submit().disabled, true);
+    assert.match(doc.querySelector('#contact-reason').textContent, /Invio disabilitato/);
+    assert.equal(doc.querySelector('mat-error'), null);
+    assert.equal(doc.querySelector('#contact-dirty').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-touched').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-submitted').textContent.trim(), 'false');
+
+    await blur(dom, '#contact-name');
+    assert.match(doc.querySelector('#contact-name-error').textContent, /obbligatorio/i);
+    await input(dom, '#contact-name', '   ');
+    await blur(dom, '#contact-name');
+    assert.match(doc.querySelector('#contact-name-error').textContent, /solo spazi/i);
+    await input(dom, '#contact-name', 'a'.repeat(81));
+    await blur(dom, '#contact-name');
+    assert.match(doc.querySelector('#contact-name-error').textContent, /80 caratteri/i);
+    await input(dom, '#contact-name', 'Jean-Luc');
+    assert.equal(doc.querySelector('#contact-name-error'), null);
+
+    await input(dom, '#contact-surname', '  ');
+    await blur(dom, '#contact-surname');
+    assert.match(doc.querySelector('#contact-surname-error').textContent, /solo spazi/i);
+    await input(dom, '#contact-surname', 'Li');
+    assert.equal(doc.querySelector('#contact-surname-error'), null);
+
+    await input(dom, '#contact-email', 'invalid-email');
+    await blur(dom, '#contact-email');
+    assert.match(doc.querySelector('#contact-email-error').textContent, /Formato email/i);
+    await input(dom, '#contact-email', 'Elia@Example.technology');
+    assert.equal(doc.querySelector('#contact-email-error'), null);
+
+    await input(dom, '#contact-name', 'Èlia');
+    assert.equal(submit().disabled, false);
+    assert.match(doc.querySelector('#contact-reason').textContent, /puoi inviare/);
+  } finally { dom.window.close(); }
+});
+
+test('contact seed submits a normalized snapshot independent of later edits', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTACT_EXAMPLE, 1);
+    const doc = dom.window.document;
+    await input(dom, '#contact-name', ' Èlia Maria ');
+    await input(dom, '#contact-surname', " D'Amico-Li ");
+    await input(dom, '#contact-email', 'Elia@Example.technology');
+    await click(dom, '#contact-submit');
+
+    const payload = () => doc.querySelector('#contact-payload');
+    const snapshot = payload().textContent;
+    assert.deepEqual(JSON.parse(snapshot), {
+      name: 'Èlia Maria',
+      surname: "D'Amico-Li",
+      email: 'Elia@Example.technology',
+    });
+    assert.equal(doc.querySelector('#contact-submitted').textContent.trim(), 'true');
+    assert.match(doc.querySelector('#contact-status').textContent, /Invio locale completato/);
+
+    await input(dom, '#contact-name', 'Li');
+    assert.equal(payload().textContent, snapshot);
+    assert.equal(JSON.parse(payload().textContent).name, 'Èlia Maria');
+  } finally { dom.window.close(); }
+});
+
+test('contact seed keeps disabled organization data in raw values and out of the payload', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTACT_EXAMPLE, 1);
+    const doc = dom.window.document;
+    const organization = () => doc.querySelector('#contact-organization');
+    const value = () => JSON.parse(doc.querySelector('#contact-value').textContent);
+    const raw = () => JSON.parse(doc.querySelector('#contact-raw').textContent);
+    const payload = () => JSON.parse(doc.querySelector('#contact-payload').textContent);
+    assert.equal(organization().disabled, true);
+    assert.equal('organization' in value(), false);
+    assert.equal(raw().organization, '');
+
+    await click(dom, '#organization-toggle');
+    assert.equal(organization().disabled, false);
+    await input(dom, '#contact-organization', 'Angular Lab');
+    assert.equal(value().organization, 'Angular Lab');
+    await click(dom, '#organization-toggle');
+    assert.equal(organization().disabled, true);
+    assert.equal('organization' in value(), false);
+    assert.equal(raw().organization, 'Angular Lab');
+
+    await input(dom, '#contact-name', 'Èlia');
+    await input(dom, '#contact-surname', "D'Amico-Li");
+    await input(dom, '#contact-email', 'Elia@Example.technology');
+    await click(dom, '#contact-submit');
+    assert.deepEqual(payload(), {
+      name: 'Èlia',
+      surname: "D'Amico-Li",
+      email: 'Elia@Example.technology',
+    });
+
+    await click(dom, '#organization-toggle');
+    await click(dom, '#contact-submit');
+    assert.equal(payload().organization, 'Angular Lab');
+  } finally { dom.window.close(); }
+});
+
+test('contact seed resets values, interaction and submission states, optional data and payload', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTACT_EXAMPLE, 1);
+    const doc = dom.window.document;
+    await input(dom, '#contact-name', 'Èlia');
+    await input(dom, '#contact-surname', "D'Amico-Li");
+    await input(dom, '#contact-email', 'Elia@Example.technology');
+    await click(dom, '#organization-toggle');
+    await input(dom, '#contact-organization', 'Angular Lab');
+    await click(dom, '#contact-submit');
+    assert.equal(doc.querySelector('#contact-submitted').textContent.trim(), 'true');
+    assert.ok(doc.querySelector('#contact-payload'));
+
+    await input(dom, '#contact-name', 'Li');
+    await click(dom, '#contact-reset');
+    assert.equal(doc.querySelector('#contact-name').value, '');
+    assert.equal(doc.querySelector('#contact-surname').value, '');
+    assert.equal(doc.querySelector('#contact-email').value, '');
+    assert.equal(doc.querySelector('#contact-organization').value, '');
+    assert.equal(doc.querySelector('#contact-organization').disabled, true);
+    assert.equal(doc.querySelector('#contact-valid').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-dirty').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-touched').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-submitted').textContent.trim(), 'false');
+    assert.equal(doc.querySelector('#contact-payload'), null);
+    assert.match(doc.querySelector('#contact-status').textContent, /Nessun invio/);
+    assert.match(doc.querySelector('#contact-reason').textContent, /Invio disabilitato/);
+    assert.equal(doc.querySelector('mat-error'), null);
+  } finally { dom.window.close(); }
+});
+
+test('edited forms source re-renders the preview with the new initial value', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, CONTROL_EXAMPLE, 1);
+    assert.equal(dom.window.document.querySelector('#control-name').value, 'Ada');
+    await render(dom, {
+      ...CONTROL_EXAMPLE,
+      typescript: CONTROL_EXAMPLE.typescript.replace("new FormControl('Ada'", "new FormControl('Nina'"),
+    }, 2);
+    assert.equal(dom.window.document.querySelector('#control-name').value, 'Nina');
+    assert.equal(dom.window.document.querySelector('#control-value').textContent.trim(), 'Nina');
+  } finally { dom.window.close(); }
+});
+
+test('preview instantiates real Material input directives inside form fields', async () => {
+  const dom = await environment();
+  try {
+    await render(dom, {
+      typescript: `import { Component, ViewChild } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatFormField, MatFormFieldModule } from '@angular/material/form-field';
+import { MatInput, MatInputModule } from '@angular/material/input';
+
+@Component({
+  selector: 'app-material-field-contract',
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+  templateUrl: './component.html',
+})
+export default class MaterialFieldContract {
+  @ViewChild(MatInput) input!: MatInput;
+  @ViewChild(MatFormField) field!: MatFormField;
+  readonly control = new FormControl('Ada', { nonNullable: true });
+  result = '';
+
+  check(): void {
+    this.result = [
+      this.input instanceof MatInput,
+      this.field instanceof MatFormField,
+      this.field.appearance,
+      this.input.controlType,
+    ].join('|');
+  }
+}`,
+      html: `<mat-form-field
+  appearance="outline"
+  subscriptSizing="dynamic"
+>
+  <mat-label>Campo Material</mat-label>
+  <input matInput [formControl]="control" />
+  <mat-hint id="field-hint">Testo di supporto</mat-hint>
+</mat-form-field>
+<p id="directives">{{ result }}</p>
+<button type="button" (click)="check()">Verifica</button>`,
+      css: '',
+    }, 1);
+    await click(dom, 'button');
+    assert.equal(dom.window.document.querySelector('#directives').textContent.trim(), 'true|true|outline|mat-input');
   } finally { dom.window.close(); }
 });
 

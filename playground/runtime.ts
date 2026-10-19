@@ -4,6 +4,8 @@ import * as core from '@angular/core';
 import * as common from '@angular/common';
 import * as forms from '@angular/forms';
 import * as buttons from '@angular/material/button';
+import * as formFields from '@angular/material/form-field';
+import * as inputs from '@angular/material/input';
 import { createApplication } from '@angular/platform-browser';
 import * as ts from 'typescript';
 import { initializerTransform } from './initializer-transform';
@@ -62,10 +64,11 @@ function evaluate(sources: Sources): core.Type<unknown> {
   };
   const modules: Record<string, unknown> = {
     '@angular/core': { ...core, Component }, '@angular/common': common, '@angular/forms': forms,
-    '@angular/material/button': buttons,
+    '@angular/material/button': buttons, '@angular/material/form-field': formFields,
+    '@angular/material/input': inputs,
   };
   const require = (name: string): unknown => {
-    if (!Object.hasOwn(modules, name)) throw new Error(`Import non disponibile: ${name}. Sono disponibili Angular core, common, forms e Material button.`);
+    if (!Object.hasOwn(modules, name)) throw new Error(`Import non disponibile: ${name}. Sono disponibili Angular core, common, forms e Material button, form-field e input.`);
     return modules[name];
   };
   const exports: { default?: core.Type<unknown> } = {};

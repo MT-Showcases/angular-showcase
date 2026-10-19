@@ -1,116 +1,21 @@
-<app-lesson-shell topicId="forms">
-  <section id="demo" class="lesson-panel" aria-labelledby="form-title">
-    <h2 class="lesson-title" id="form-title">Un modello per valori e regole</h2>
-    <p class="lesson-text">Un <strong>FormControl</strong> conserva il valore e lo stato di un campo.
-      Un <strong>FormGroup</strong> raccoglie i controlli: qui nome, cognome ed email.
-      Il template li collega con <code class="lesson-code-inline">formControlName</code>.
-      La validazione verifica le regole e determina se il gruppo è valido.</p>
-    <p class="lesson-text"><strong>Prova:</strong> entra nel nome e poi esci senza scrivere: compare l'errore.
-      Inserisci un nome come «Èlia», un cognome come «D'Amico» e un'email valida.
-      Osserva gli stati e invia: vedrai una copia dei dati sotto il form.</p>
-    <p class="lesson-text">Nome e cognome sono obbligatori, non possono contenere solo spazi e hanno un limite
-      dimostrativo di 80 caratteri. Accenti, spazi, apostrofi e trattini sono ammessi; anche un nome breve come «Li».
-      Per l'email usiamo il validatore Angular, senza regex aggiuntive che escludano maiuscole o estensioni lunghe.</p>
+<app-lesson-shell topicId="forms" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">
+    Parti da un <strong class="lesson-emphasis">campo</strong>, poi passa al <strong class="lesson-emphasis">form</strong>: modifica i valori, osserva gli stati e prova validazione, invio locale e reset.
+  </p>
+  <app-lesson-examples [examples]="examples" />
 
-    <form class="form__fields" [formGroup]="reactiveForm" #formDirective="ngForm" (ngSubmit)="onSubmit()">
-      <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Nome</mat-label>
-        <input matInput type="text" formControlName="name" autocomplete="given-name" required />
-        @if (reactiveForm.controls.name.hasError('required')) {
-          <mat-error>Il nome è obbligatorio</mat-error>
-        } @else if (reactiveForm.controls.name.hasError('nonBlank')) {
-          <mat-error>Il nome non può contenere solo spazi</mat-error>
-        } @else if (reactiveForm.controls.name.hasError('maxlength')) {
-          <mat-error>Il nome può avere al massimo 80 caratteri</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Cognome</mat-label>
-        <input matInput type="text" formControlName="surname" autocomplete="family-name" required />
-        @if (reactiveForm.controls.surname.hasError('required')) {
-          <mat-error>Il cognome è obbligatorio</mat-error>
-        } @else if (reactiveForm.controls.surname.hasError('nonBlank')) {
-          <mat-error>Il cognome non può contenere solo spazi</mat-error>
-        } @else if (reactiveForm.controls.surname.hasError('maxlength')) {
-          <mat-error>Il cognome può avere al massimo 80 caratteri</mat-error>
-        }
-      </mat-form-field>
-      <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" formControlName="email" autocomplete="email" required />
-        @if (reactiveForm.controls.email.hasError('required')) {
-          <mat-error>L'email è obbligatoria</mat-error>
-        } @else if (reactiveForm.controls.email.hasError('email')) {
-          <mat-error>Formato email non valido</mat-error>
-        }
-      </mat-form-field>
-      <p id="submit-reason" class="lesson-status">{{ reactiveForm.invalid
-        ? 'Invio disabilitato: completa nome, cognome ed email rispettando le regole indicate.'
-        : 'Tutti i campi obbligatori sono validi: puoi inviare il form.' }}</p>
-      <div class="lesson-actions">
-        <button matButton="filled" type="submit" [disabled]="reactiveForm.invalid" aria-describedby="submit-reason">Invia form</button>
-        <button matButton="outlined" type="button" (click)="reset(formDirective)">Ripristina tutto</button>
-      </div>
-      <h3 class="lesson-subtitle">Osserva gli stati</h3>
-      <p class="lesson-text"><strong>dirty</strong>: hai cambiato un valore dalla UI.
-        <strong>touched</strong>: sei entrato e uscito da un campo.
-        <strong>submitted</strong>: hai inviato il form. Un campo può essere touched e ancora pristine, cioè mai modificato.</p>
-      <ul class="lesson-list" aria-label="Stati del form">
-        <li>Form: {{ reactiveForm.valid ? 'valido' : 'non valido' }}</li>
-        <li>dirty: {{ reactiveForm.dirty }} · touched: {{ reactiveForm.touched }} · submitted: {{ formDirective.submitted }}</li>
-        <li>Nome — dirty: {{ reactiveForm.controls.name.dirty }} · touched: {{ reactiveForm.controls.name.touched }}</li>
-      </ul>
-    </form>
-    <div class="lesson-result" role="status">
-      {{ submittedPayload ? 'Invio locale completato. Il payload sotto è una copia dell’ultimo invio.' : 'Nessun invio: i dati restano nella pagina, senza richieste a un server.' }}
-    </div>
-    @if (submittedPayload) {
-      <h3 class="lesson-subtitle">Payload dell'ultimo invio</h3>
-      <p class="lesson-text">Modificare il form ora non cambia questa copia. Il reset cancella anche il risultato.</p>
-      <pre class="lesson-output" aria-label="Payload dell'ultimo invio">{{ submittedPayload | json }}</pre>
-    }
-  </section>
-
-  <app-lesson-disclosure anchor="code" title="Guarda modello, collegamento e invio">
-    <h2 class="lesson-title">Dal modello al template</h2>
-    <p class="lesson-text">Frammento della classe: il builder costruisce un FormControl per ogni chiave e inferisce i tipi.
-      <code class="lesson-code-inline">nonNullable</code> mantiene valori stringa e ripristina il valore iniziale al reset, anziché null.</p>
-    <app-code-block [code]="modelExample" />
-    <p class="lesson-text">Frammento del template per il campo nome. La demo include anche gli errori nonBlank e maxlength.
-      Material mostra gli errori dopo l'interazione; non occorre segnare subito tutti i campi come touched.</p>
-    <app-code-block language="html" [code]="templateExample" />
-    <p class="lesson-text">Frammento del gestore: salva una copia tipizzata, elimina gli spazi ai bordi dei nomi
-      ed esclude l'organizzazione se disabilitata. Non invia dati in rete.</p>
-    <app-code-block [code]="submitExample" />
-  </app-lesson-disclosure>
-
-  <app-lesson-disclosure anchor="deepen" title="Approfondisci validatori e controlli disabilitati">
-    <h2 class="lesson-title">Una regola custom con uno scopo preciso</h2>
-    <p class="lesson-text">Validators.required rileva un valore vuoto, ma una stringa di soli spazi non è vuota.
-      <code class="lesson-code-inline">nonBlank</code> colma questo caso e restituisce un errore oppure null.
-      Non tenta di stabilire quali lettere possano appartenere al nome di una persona.</p>
-    <app-code-block [code]="validatorExample" />
-    <h3 class="lesson-subtitle">Prova value e getRawValue()</h3>
-    <p class="lesson-text">Questo campo facoltativo appartiene allo stesso FormGroup. Attivalo, scrivi un valore e disattivalo:
-      il suo valore rimane nel controllo ma scompare da <code class="lesson-code-inline">value</code>.
-      <code class="lesson-code-inline">getRawValue()</code> include anche i controlli disabilitati.
-      Questi non partecipano alla validazione. L'invio della demo include l'organizzazione solo quando è attiva.</p>
-    <button matButton="tonal" type="button" [attr.aria-pressed]="reactiveForm.controls.organization.enabled" (click)="toggleOrganization()">
-      {{ reactiveForm.controls.organization.disabled ? 'Attiva organizzazione' : 'Disattiva organizzazione' }}
-    </button>
-    <mat-form-field class="lesson-field" appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Organizzazione facoltativa</mat-label>
-      <input matInput [formControl]="reactiveForm.controls.organization" autocomplete="organization" />
-    </mat-form-field>
-    <div class="lesson-grid">
-      <div><h4 class="lesson-subtitle">form.value</h4><pre class="lesson-output" aria-label="Valori dei controlli attivi">{{ reactiveForm.value | json }}</pre></div>
-      <div><h4 class="lesson-subtitle">form.getRawValue()</h4><pre class="lesson-output" aria-label="Tutti i valori inclusi i controlli disabilitati">{{ reactiveForm.getRawValue() | json }}</pre></div>
-    </div>
-    <p class="lesson-text">Per questo value ha un tipo parziale: una chiave può mancare quando il controllo è disabilitato.
-      nonNullable non impedisce questa omissione. Disabilitare un campo è una scelta della UI, non un controllo di sicurezza lato server.</p>
-    <h3 class="lesson-subtitle">Cosa ripristina il reset?</h3>
-    <p class="lesson-text">«Ripristina tutto» svuota i valori e il payload, riporta i controlli a pristine e untouched,
-      disabilita di nuovo l'organizzazione e azzera submitted tramite FormGroupDirective.resetForm().
-      Chiudere un approfondimento, invece, conserva i dati che hai inserito.</p>
+  <app-lesson-disclosure anchor="deepen" title="Validatori, stati e controlli disabilitati">
+    <p class="lesson-text lesson-prose">
+      <code>Validators.required</code> rifiuta un valore vuoto, ma una stringa di soli spazi non è vuota. Il validatore <code>nonBlank</code> dell’esempio restituisce l’errore <code>nonBlank</code> oppure <code>null</code>: è una funzione pura e non prova a decidere quali lettere appartengano a un nome. Accenti, apostrofi, trattini e maiuscole restano validi; per l’email usiamo <code>Validators.email</code>, senza regex aggiuntive.
+    </p>
+    <p class="lesson-text lesson-prose">
+      <strong class="lesson-emphasis">dirty</strong> significa che un valore è cambiato dalla UI; <strong class="lesson-emphasis">touched</strong> significa che sei entrato e uscito da un campo. Per questo il form può essere touched e ancora pristine. Gli esempi mostrano gli errori solo dopo il blur: nessun campo viene segnato come touched all’avvio.
+    </p>
+    <p class="lesson-text lesson-prose">
+      L’organizzazione è un controllo <strong class="lesson-emphasis">disabilitato</strong> dentro lo stesso gruppo. Disabilitarlo conserva il valore: <code>value</code> lo omette, mentre <code>getRawValue()</code> lo include. Un controllo disabilitato non partecipa alla validazione e l’invio dell’esempio lo include solo quando è attivo. Disabilitare un campo è una scelta della UI, non una protezione lato server.
+    </p>
+    <p class="lesson-text lesson-prose">
+      «Ripristina tutto» chiama <code>FormGroupDirective.resetForm()</code>: svuota i valori, riporta i controlli a <strong class="lesson-emphasis">pristine</strong> e <strong class="lesson-emphasis">untouched</strong>, disabilita di nuovo l’organizzazione e azzera anche <code>submitted</code> e il payload. <code>FormGroup.reset()</code> da solo non azzera lo stato di invio del gruppo. Chiudere un approfondimento, invece, conserva i dati inseriti.
+    </p>
   </app-lesson-disclosure>
 </app-lesson-shell>

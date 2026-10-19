@@ -1,8 +1,5 @@
-/** Feature layout only: shared lesson classes and Material own visual presentation. */
-@use 'globals' as *;
-
-.form__fields {
-  display: grid;
-  gap: space(4);
+/** Compact lesson: examples and disclosures own their layout and Material styling. */
+:host {
+  display: block;
   min-width: 0;
 }
