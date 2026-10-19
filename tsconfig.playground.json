@@ -3,8 +3,16 @@
   "compilerOptions": {
     "noEmit": true,
     "types": [],
-    "lib": ["ES2022", "DOM"]
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
   },
-  "files": ["playground/runtime.ts", "playground/initializer-transform.ts"],
+  "files": [
+    "playground/runtime.ts",
+    "playground/initializer-transform.ts",
+    "playground/type-service.ts",
+    "playground/type-worker.ts"
+  ],
   "include": []
 }

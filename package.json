@@ -12,8 +12,8 @@
     "prestart": "npm run playground:build",
     "prebuild": "npm run playground:build",
     "pretest": "npm run playground:build",
-    "playground:test": "npm run playground:build && node --test scripts/test-playground.mjs",
-    "posttest": "node --test scripts/test-playground.mjs"
+    "playground:test": "npm run playground:build && node --test scripts/test-playground.mjs scripts/test-typescript.mjs",
+    "posttest": "node --test scripts/test-playground.mjs scripts/test-typescript.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -38,11 +38,13 @@
     "@angular/material": "^22.2.3",
     "@angular/platform-browser": "^22.2.3",
     "@angular/router": "^22.2.3",
+    "@codemirror/autocomplete": "^6.20.3",
     "@codemirror/commands": "^6.11.1",
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-html": "^6.4.12",
     "@codemirror/lang-javascript": "^6.2.5",
     "@codemirror/language": "^6.13.1",
+    "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.14",
     "@lezer/highlight": "^1.2.5",

@@ -21,3 +21,23 @@
   &__actions { display: flex; flex-wrap: wrap; align-items: center; gap: space(3); padding: space(4); }
   &__keyboard { margin: 0; padding: 0 space(4) space(4); font: var(--mat-sys-body-small); color: var(--mat-sys-on-surface-variant); }
 }
+
+// Keep the loading surface opaque until the authenticated runtime finishes rendering.
+.playground__stage { position: relative; min-width: 0; }
+.playground__loader {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: space(3);
+  padding: space(4);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface-container-low);
+  text-align: center;
+}
+.playground__analysis { display: flex; flex-wrap: wrap; align-items: center; gap: space(2); padding: space(2) space(4); font: var(--mat-sys-body-small); }
+.playground__problems { margin: 0; padding: space(2) space(6); max-height: rem(240); overflow: auto; overflow-wrap: anywhere; }
+.playground__problems button { white-space: normal; text-align: start; height: auto; min-height: rem(40); }

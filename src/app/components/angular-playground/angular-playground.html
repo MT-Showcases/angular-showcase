@@ -5,7 +5,15 @@
       <span class="playground__badge">Angular 22</span>
     </div>
     @for (frame of [channel()]; track frame) {
-      <iframe #previewFrame class="playground__frame" [style.height.px]="previewHeight()" [src]="previewUrl()" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Anteprima interattiva del componente Angular"></iframe>
+      <div class="playground__stage" [attr.aria-busy]="previewBusy()">
+      <iframe #previewFrame class="playground__frame" [style.height.px]="previewHeight()" [src]="previewUrl()" sandbox="allow-scripts" referrerpolicy="no-referrer" title="Anteprima interattiva del componente Angular" [attr.inert]="previewBusy() ? '' : null" [attr.aria-hidden]="previewBusy() ? 'true' : null"></iframe>
+      @if (previewBusy()) {
+        <div class="playground__loader" role="status">
+          <mat-spinner [diameter]="32" aria-hidden="true" />
+          <span>{{ status() === 'loading' ? 'Caricamento esempio…' : 'Aggiornamento anteprima…' }}</span>
+        </div>
+      }
+      </div>
     }
     <div class="playground__feedback"><p role="status" class="playground__status">{{ statusText() }}</p>
       <button matButton="text" type="button" (click)="restart()">Riavvia anteprima</button></div>
@@ -24,11 +32,24 @@
     @for (file of files; track file.id) {
       <div [id]="id + '-editor-' + file.id" role="tabpanel" [attr.aria-labelledby]="id + '-file-' + file.id" [hidden]="activeFile() !== file.id"><div #editorHost class="playground__editor"></div></div>
     }
+    <div class="playground__analysis">
+      <span>{{ typeStatusText() }}</span>
+      @if (diagnostics().length) {
+        <button matButton="text" type="button" [attr.aria-expanded]="showProblems()" [attr.aria-controls]="id + '-problems'" (click)="showProblems.set(!showProblems())">Problemi ({{ diagnostics().length }})</button>
+      }
+    </div>
+    @if (showProblems() && diagnostics().length) {
+      <ul class="playground__problems" [id]="id + '-problems'" aria-label="Problemi TypeScript">
+        @for (problem of diagnostics(); track $index) {
+          <li><button matButton="text" type="button" (click)="goToProblem(problem)">{{ problemLocation(problem) }} — TS{{ problem.code }}: {{ problem.message }}</button></li>
+        }
+      </ul>
+    }
     <div class="playground__actions">
       <button matButton="filled" type="button" (click)="run()" [disabled]="status() === 'loading'">Esegui</button>
       <button matButton="tonal" type="button" (click)="toggleAutomatic()" [attr.aria-pressed]="automatic()">{{ automatic() ? 'Live attivo' : 'Live in pausa' }}</button>
       <button matButton="outlined" type="button" (click)="reset()">Ripristina codice</button>
     </div>
-    <p class="playground__keyboard" [id]="id + '-keyboard-help'">Tab indenta il codice. Premi Esc, poi Tab per uscire dall’editor. Ricompilare riparte dallo stato iniziale del componente.</p>
+    <p class="playground__keyboard" [id]="id + '-keyboard-help'">Ctrl+Spazio mostra i suggerimenti. Tab indenta il codice. Premi Esc, poi Tab per uscire dall’editor. Ricompilare riparte dallo stato iniziale del componente.</p>
   </section>
 </div>

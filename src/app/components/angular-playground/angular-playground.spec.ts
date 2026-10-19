@@ -3,6 +3,7 @@ import { EditorView } from '@codemirror/view';
 import { undo } from '@codemirror/commands';
 import { vi } from 'vitest';
 import { AngularPlayground } from './angular-playground';
+import { TypeClient } from './type-client';
 import { FIRST_COMPONENT } from '../../getting-started/first-component.example';
 
 describe('Angular playground host', () => {
@@ -11,6 +12,8 @@ describe('Angular playground host', () => {
   let frame: HTMLIFrameElement;
   let send: ReturnType<typeof vi.spyOn>;
   beforeEach(async () => {
+    vi.spyOn(TypeClient.prototype, 'check').mockResolvedValue([]);
+    vi.spyOn(TypeClient.prototype, 'complete').mockResolvedValue({ from: 0, options: [] });
     TestBed.configureTestingModule({ imports: [AngularPlayground] });
     fixture = TestBed.createComponent(AngularPlayground);
     fixture.componentRef.setInput('initial', FIRST_COMPONENT);
@@ -135,4 +138,58 @@ describe('Angular playground host', () => {
     expect(editor.state.selection.main.from).toBe(second);
     expect(editor.state.selection.main.to).toBe(second + 5);
   });
+  it('covers the blank frame until the authenticated render completes and recovers after error/restart', () => {
+    expect(page.querySelector('.playground__loader')).not.toBeNull();
+    expect(frame.hasAttribute('inert')).toBe(true);
+    receive('ready');
+    expect(page.querySelector('.playground__loader')).not.toBeNull();
+    receive('rendered', { revision: 0 });
+    expect(page.querySelector('.playground__loader')).not.toBeNull();
+    receive('rendered');
+    expect(page.querySelector('.playground__loader')).toBeNull();
+    expect(frame.hasAttribute('inert')).toBe(false);
+    click('Esegui');
+    expect(page.querySelector('.playground__loader')).not.toBeNull();
+    receive('error', { revision: 2, message: 'Template non valido' });
+    expect(page.querySelector('.playground__loader')).toBeNull();
+    expect(page.querySelector('[role="alert"]')?.textContent).toContain('Template non valido');
+    click('Riavvia anteprima');
+    expect(page.querySelector('.playground__loader')).not.toBeNull();
+    expect(page.querySelector('iframe')).not.toBe(frame);
+  });
+
+  it('shows semantic problems while live preview is paused and navigates to the affected range', async () => {
+    vi.mocked(TypeClient.prototype.check).mockResolvedValueOnce([
+      { from: 6, to: 11, severity: 'error', code: 2322, message: 'Type string is not assignable to number.' },
+    ]);
+    receive('ready'); click('Live attivo'); send.mockClear();
+    edit('typescript', 'const count: number = "x";');
+    await new Promise(resolve => setTimeout(resolve, 450));
+    await fixture.whenStable();
+    expect(send).not.toHaveBeenCalled();
+    expect(page.textContent).toContain('1 problema TypeScript');
+    click('Problemi (1)');
+    const problem = page.querySelector<HTMLButtonElement>('.playground__problems button')!;
+    expect(problem.textContent).toContain('component.ts:1:7');
+    problem.click(); fixture.detectChanges();
+    const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>('[id$="editor-typescript"] .cm-editor')!)!;
+    expect(editor.state.selection.main.from).toBe(6);
+    expect(editor.state.selection.main.to).toBe(11);
+    expect(document.activeElement).toBe(editor.contentDOM);
+    click('Ripristina codice'); await fixture.whenStable(); fixture.detectChanges();
+    expect(page.querySelector('.playground__problems')).toBeNull();
+    expect(page.textContent).toContain('TypeScript: nessun problema');
+  });
+
+  it('ignores stale TypeScript responses after a newer source check', async () => {
+    let oldResult!: (value: { from: number; to: number; severity: 'error'; code: number; message: string }[]) => void;
+    vi.mocked(TypeClient.prototype.check).mockReturnValueOnce(new Promise(resolve => { oldResult = resolve; }));
+    edit('typescript', 'const pending = 1;');
+    await new Promise(resolve => setTimeout(resolve, 450));
+    click('Ripristina codice'); await fixture.whenStable(); fixture.detectChanges();
+    oldResult([{ from: 0, to: 1, severity: 'error', code: 2322, message: 'Stale error' }]); await fixture.whenStable();
+    expect(page.textContent).toContain('TypeScript: nessun problema');
+    expect(fixture.componentInstance.diagnostics()).toEqual([]);
+  });
+
 });

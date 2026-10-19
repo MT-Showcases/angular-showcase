@@ -17,14 +17,14 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 
 `/basics/getting-started` now uses the shared AngularPlayground component. Its preview precedes a CodeMirror editor with three virtual files. The former long introduction and code accordion have been replaced by a compact header, one prompt, three short concept cards and optional context.
 
-Data Binding, Control Flow and Component Communication now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Other lessons retain their existing demos.
+Data Binding, Control Flow, Component Communication, Pipes and Reactive Forms now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Other lessons retain their existing demos.
 
 ## Runtime choice
 
-- **Component prototype, delivered:** TypeScript transpilation and Angular JIT execute in a separate iframe, using the installed Angular version and the shared Material theme. The example's external HTML/CSS filenames are resolved from the editor. CodeMirror and the 4.75 MB raw compiler/runtime are loaded by the lesson/preview, not the host's initial bundle.
+- **Component prototype, delivered:** TypeScript transpilation and Angular JIT execute in a separate iframe, using the installed Angular version and the shared Material theme. The example's external HTML/CSS filenames are resolved from the editor. CodeMirror and the 4.90 MB raw compiler/runtime are loaded by the lesson/preview, not the host's initial bundle.
 - **Project playground, next:** multiple linked component/service files, package dependencies and the Angular CLI build pipeline need a broader runtime. WebContainers is a candidate; evaluate browser support, startup cost and current usage/licensing terms before choosing it. The current component runner is not a full project IDE.
 
-The runner supports one default-exported root component, inline child components/directives in the same TypeScript module and the bundled Angular core/common/forms and Material button modules. Direct input(), input.required() and output() class fields are supported by a narrow TypeScript AST bridge that supplies the metadata needed by Angular 22 JIT, preserving the real signal/emitter initializers. Literal aliases, aliased imports and input transforms are covered by runtime tests. The bridge depends on Angular-internal isSignal metadata; tests and an explicit major-version build guard protect upgrades. This does not provide model(), initializer query transforms or a complete ngc pipeline. Decorator inputs/outputs remain supported. It reports TypeScript syntax and Angular runtime/template errors, without full TypeScript semantic checking or Angular's full AOT transformation pipeline. CSS is plain, self-contained CSS.
+The runner supports one default-exported root component, inline child components/directives in the same TypeScript module and the bundled Angular core/common/forms and Material button, form-field and input modules. Direct input(), input.required() and output() class fields are supported by a narrow TypeScript AST bridge that supplies the metadata needed by Angular 22 JIT, preserving the real signal/emitter initializers. Literal aliases, aliased imports and input transforms are covered by runtime tests. The bridge depends on Angular-internal isSignal metadata; tests and an explicit major-version build guard protect upgrades. This does not provide model(), initializer query transforms or a complete ngc pipeline. Decorator inputs/outputs remain supported. A lazy Web Worker runs the TypeScript Language Service with the installed Angular declarations, providing syntax/semantic diagnostics and context completions without executing learner code. Its compiler and declaration assets are separate from the initial app bundle. Decorator-injected fields use strictPropertyInitialization=false. Angular template errors still come from runtime compilation; Angular template type checking and the full AOT transformation pipeline remain outside this runner. The editor includes inline diagnostics, a navigable problem list, bracket completion and folding. An opaque Material loading state covers the preview until the current authenticated render completes, including example switches, errors and retry. CSS is plain, self-contained CSS.
 
 ## Execution boundary
 
@@ -35,7 +35,7 @@ This isolation protects the host's DOM and origin data; it is not a resource-quo
 ## Next steps
 
 1. Finish real-device iOS/Android selection, long-press and virtual keyboard acceptance.
-2. Review the first four playground lessons before converting Pipes, Forms, Services and Routing.
+2. Validate the updated editor and Forms visually before converting Services and Routing.
 3. Add a real project runtime for multi-file examples, rather than claiming the component prototype supports arbitrary projects.
 
 References: [Angular JIT/AOT](https://angular.dev/tools/cli/aot-compiler), [createApplication](https://angular.dev/api/platform-browser/createApplication), [CodeMirror](https://codemirror.net/), [WebContainers browser support](https://webcontainers.io/guides/browser-support).
