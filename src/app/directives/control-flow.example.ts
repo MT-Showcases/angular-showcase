@@ -175,11 +175,17 @@ export default class StatusDemo {
 }
 
 ${PLAYGROUND_FIELD_STYLES}
+/* Separiamo la scelta dal risultato, senza gonfiare il riquadro. */
 .result {
+  margin-block-start: 1rem;
   padding: 1rem;
   border-radius: var(--mat-sys-corner-medium);
   color: var(--mat-sys-on-secondary-container);
   background: var(--mat-sys-secondary-container);
+}
+
+.result p {
+  margin: 0;
 }`,
 };
 
