@@ -3,7 +3,7 @@
   <app-lesson-examples [examples]="examples" />
 
   <app-lesson-disclosure anchor="deepen" title="Come leggere i due componenti?">
-    <p class="lesson-text lesson-prose">Nel TypeScript trovi <strong class="lesson-emphasis">prima il figlio</strong>, con un template breve accanto alla classe. <strong class="lesson-emphasis">Il padre</strong> è il componente esportato: usa il file HTML e il CSS separati. I commenti indicano chi possiede lo stato e in quale direzione viaggiano dati ed eventi.</p>
+    <p class="lesson-text lesson-prose"><code>component.ts</code> contiene il <strong class="lesson-emphasis">padre</strong>: l’import collega il componente figlio, che trovi nella sua tab insieme al template HTML. Puoi anche definire più componenti nello stesso file; qui li separiamo per rendere più chiare le responsabilità. I commenti indicano chi possiede lo stato e in quale direzione viaggiano dati ed eventi.</p>
     <p class="lesson-text lesson-prose"><code>input()</code> restituisce un signal da leggere con <code>name()</code>. <code>output()</code> dichiara un evento da inviare con <code>emit()</code>: non è un signal. Per gli esempi nuovi usiamo queste API; <code>&#64;Input</code> e <code>&#64;Output</code> restano supportati per il codice esistente.</p>
   </app-lesson-disclosure>
 </app-lesson-shell>

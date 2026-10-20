@@ -3,6 +3,8 @@ import { EditorView } from '@codemirror/view';
 import { undo } from '@codemirror/commands';
 import { vi } from 'vitest';
 import { AngularPlayground } from './angular-playground';
+import { INPUT_EXAMPLE } from '../../component-communication/communication.example';
+import { sourceText } from './playground.types';
 import { TypeClient } from './type-client';
 import { FIRST_COMPONENT } from '../../getting-started/first-component.example';
 
@@ -12,6 +14,9 @@ describe('Angular playground host', () => {
   let frame: HTMLIFrameElement;
   let send: ReturnType<typeof vi.spyOn>;
   beforeEach(async () => {
+    // jsdom has no range geometry; CodeMirror measures focused selections on animation frames.
+    if (!Range.prototype.getClientRects) Object.defineProperty(Range.prototype, 'getClientRects', { configurable: true, value: () => [] });
+    if (!Range.prototype.getBoundingClientRect) Object.defineProperty(Range.prototype, 'getBoundingClientRect', { configurable: true, value: () => new DOMRect() });
     vi.spyOn(TypeClient.prototype, 'check').mockResolvedValue([]);
     vi.spyOn(TypeClient.prototype, 'complete').mockResolvedValue({ from: 0, options: [] });
     TestBed.configureTestingModule({ imports: [AngularPlayground] });
@@ -90,7 +95,7 @@ describe('Angular playground host', () => {
     expect(send).toHaveBeenLastCalledWith(expect.objectContaining({ sources: FIRST_COMPONENT, revision: 3 }), '*');
     for (const file of fixture.componentInstance.files) {
       const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>(`[id$="editor-${file.id}"] .cm-editor`)!);
-      expect(editor?.state.doc.toString()).toBe(FIRST_COMPONENT[file.id]);
+      expect(editor?.state.doc.toString()).toBe(sourceText(FIRST_COMPONENT, file.id));
     }
   });
 
@@ -176,7 +181,9 @@ describe('Angular playground host', () => {
     expect(editor.state.selection.main.from).toBe(6);
     expect(editor.state.selection.main.to).toBe(11);
     expect(document.activeElement).toBe(editor.contentDOM);
-    click('Ripristina codice'); await fixture.whenStable(); fixture.detectChanges();
+    click('Ripristina codice');
+    await vi.waitFor(() => expect(fixture.componentInstance.typeStatus()).toBe('ready'));
+    await fixture.whenStable(); fixture.detectChanges();
     expect(page.querySelector('.playground__problems')).toBeNull();
     expect(page.textContent).toContain('TypeScript: nessun problema');
   });
@@ -186,10 +193,57 @@ describe('Angular playground host', () => {
     vi.mocked(TypeClient.prototype.check).mockReturnValueOnce(new Promise(resolve => { oldResult = resolve; }));
     edit('typescript', 'const pending = 1;');
     await new Promise(resolve => setTimeout(resolve, 450));
-    click('Ripristina codice'); await fixture.whenStable(); fixture.detectChanges();
+    click('Ripristina codice');
+    await vi.waitFor(() => expect(fixture.componentInstance.typeStatus()).toBe('ready'));
+    await fixture.whenStable(); fixture.detectChanges();
     oldResult([{ from: 0, to: 1, severity: 'error', code: 2322, message: 'Stale error' }]); await fixture.whenStable();
     expect(page.textContent).toContain('TypeScript: nessun problema');
     expect(fixture.componentInstance.diagnostics()).toEqual([]);
+  });
+
+  it('edits actual child tabs, navigates all files and resets the whole example without mutating its seed', async () => {
+    fixture.destroy();
+    fixture = TestBed.createComponent(AngularPlayground);
+    fixture.componentRef.setInput('initial', INPUT_EXAMPLE);
+    await fixture.whenStable();
+    page = fixture.nativeElement;
+    const sources = vi.fn(); fixture.componentInstance.sourceChange.subscribe(sources);
+    const tabs = page.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    expect([...tabs].map(tab => tab.textContent?.trim())).toEqual([
+      'component.ts', 'component.html', 'component.css', 'greeting.component.ts', 'greeting.component.html',
+    ]);
+    tabs[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); fixture.detectChanges();
+    expect(tabs[4].getAttribute('aria-selected')).toBe('true');
+    tabs[4].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); fixture.detectChanges();
+    expect(tabs[0].getAttribute('aria-selected')).toBe('true');
+    edit('greeting.component.ts', INPUT_EXAMPLE.files!['greeting.component.ts'].replace("'visitatore'", "'amica'"));
+    expect(sources).toHaveBeenLastCalledWith(expect.objectContaining({ files: expect.objectContaining({
+      'greeting.component.ts': expect.stringContaining("'amica'"),
+    }) }));
+    expect(INPUT_EXAMPLE.files!['greeting.component.ts']).toContain("'visitatore'");
+    click('Ripristina codice'); await fixture.whenStable();
+    const view = EditorView.findFromDOM(page.querySelector<HTMLElement>('[id$="editor-greeting.component.ts"] .cm-editor')!)!;
+    expect(view.state.doc.toString()).toBe(INPUT_EXAMPLE.files!['greeting.component.ts']);
+    expect(sources.mock.lastCall?.[0]).toEqual(INPUT_EXAMPLE);
+  });
+
+  it('checks the whole virtual project and navigates diagnostics in a child file', async () => {
+    fixture.destroy();
+    vi.mocked(TypeClient.prototype.check).mockImplementation(async (_source, fileName) => fileName === 'greeting.component.ts' ? [
+      { from: 6, to: 11, severity: 'error', code: 2322, message: 'Child type error' },
+    ] : []);
+    fixture = TestBed.createComponent(AngularPlayground);
+    fixture.componentRef.setInput('initial', INPUT_EXAMPLE);
+    await fixture.whenStable(); page = fixture.nativeElement; fixture.detectChanges();
+    expect(TypeClient.prototype.check).toHaveBeenCalledWith(INPUT_EXAMPLE.files!['greeting.component.ts'], 'greeting.component.ts', expect.objectContaining({
+      'component.ts': INPUT_EXAMPLE.typescript,
+      'greeting.component.ts': INPUT_EXAMPLE.files!['greeting.component.ts'],
+    }));
+    click('Problemi (1)');
+    const problem = page.querySelector<HTMLButtonElement>('.playground__problems button')!;
+    expect(problem.textContent).toContain('greeting.component.ts:');
+    problem.click(); fixture.detectChanges();
+    expect(page.querySelector('[id$="file-greeting.component.ts"]')?.getAttribute('aria-selected')).toBe('true');
   });
 
 });

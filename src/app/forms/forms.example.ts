@@ -159,31 +159,21 @@ export const CONTACT_EXAMPLE: PlaygroundSources = {
   typescript: `import { JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
   FormGroupDirective,
   ReactiveFormsModule,
-  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { nonBlank } from './non-blank.validator';
 
 interface ContactPayload {
   name: string;
   surname: string;
   email: string;
   organization?: string;
-}
-
-// Un validatore puro: rifiuta le stringhe fatte solo di spazi.
-function nonBlank(control: AbstractControl): ValidationErrors | null {
-  const value: unknown = control.value;
-
-  return typeof value === 'string' && value.length > 0 && value.trim().length === 0
-    ? { nonBlank: true }
-    : null;
 }
 
 @Component({
@@ -248,6 +238,18 @@ export default class ContactDemo {
     this.submittedPayload = null;
   }
 }`,
+  files: {
+    'non-blank.validator.ts': `import { AbstractControl, ValidationErrors } from '@angular/forms';
+
+// Un validatore puro: rifiuta le stringhe fatte solo di spazi.
+export function nonBlank(control: AbstractControl): ValidationErrors | null {
+  const value: unknown = control.value;
+
+  return typeof value === 'string' && value.length > 0 && value.trim().length === 0
+    ? { nonBlank: true }
+    : null;
+}`,
+  },
   html: `<div class="stack">
   <form
     class="form"

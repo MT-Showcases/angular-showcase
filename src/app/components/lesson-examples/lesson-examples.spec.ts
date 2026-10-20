@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { EditorView } from '@codemirror/view';
 import { LessonExamples } from './lesson-examples';
+import { INPUT_EXAMPLE } from '../../component-communication/communication.example';
 import { IF_EXAMPLE, FOR_EXAMPLE } from '../../directives/control-flow.example';
 
 describe('Independent lesson examples', () => {
@@ -35,4 +36,30 @@ describe('Independent lesson examples', () => {
     expect(editor().state.doc.toString()).toBe(IF_EXAMPLE.typescript);
     fixture.destroy();
   });
+  it('retains child file drafts when changing example and restores their original source on reset', async () => {
+    TestBed.configureTestingModule({ imports: [LessonExamples] });
+    const fixture = TestBed.createComponent(LessonExamples);
+    fixture.componentRef.setInput('examples', [
+      { id: 'input', label: 'Input', title: 'Input', prompt: '', takeaway: '', sources: INPUT_EXAMPLE },
+      { id: 'if', label: '@if', title: 'Condizione', prompt: '', takeaway: '', sources: IF_EXAMPLE },
+    ]);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const choices = page.querySelectorAll<HTMLButtonElement>('nav button');
+    const child = () => EditorView.findFromDOM(page.querySelector<HTMLElement>('[id$="editor-greeting.component.ts"] .cm-editor')!)!;
+    const original = INPUT_EXAMPLE.files!['greeting.component.ts'];
+    const modified = original.replace("'visitatore'", "'amica'");
+    child().dispatch({ changes: { from: 0, to: child().state.doc.length, insert: modified } });
+    choices[1].click(); await fixture.whenStable();
+    choices[0].click(); await fixture.whenStable();
+    expect(child().state.doc.toString()).toBe(modified);
+    expect(INPUT_EXAMPLE.files!['greeting.component.ts']).toBe(original);
+    [...page.querySelectorAll<HTMLButtonElement>('button')].find(button => button.textContent?.trim() === 'Ripristina codice')!.click();
+    fixture.detectChanges();
+    choices[1].click(); await fixture.whenStable();
+    choices[0].click(); await fixture.whenStable();
+    expect(child().state.doc.toString()).toBe(original);
+    fixture.destroy();
+  });
+
 });

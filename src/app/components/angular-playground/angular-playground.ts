@@ -15,9 +15,9 @@ import { tags } from '@lezer/highlight';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
-import { PlaygroundFile, PlaygroundSources } from './playground.types';
+import { PlaygroundFile, PlaygroundSources, cloneSources, sourceText, updateSource, toProjectFiles } from './playground.types';
 
-/** Real Angular component playground with three editable virtual files. */
+/** Real Angular component playground with editable root and supporting virtual files. */
 @Component({
   selector: 'app-angular-playground', imports: [MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './angular-playground.html', styleUrl: './angular-playground.scss',
@@ -45,11 +45,17 @@ export class AngularPlayground implements AfterViewInit {
     '/playground/generated/preview.html#' + encodeURIComponent(this.channel()),
   ));
   readonly statusText = computed(() => ({ loading: 'Avvio di Angular…', changed: 'Modifiche da eseguire', building: 'Aggiornamento anteprima…', ready: 'Anteprima aggiornata', error: 'Anteprima non aggiornata' })[this.status()]);
-  readonly files = [
-    { id: 'typescript' as const, name: 'component.ts', label: 'TypeScript' },
-    { id: 'html' as const, name: 'component.html', label: 'HTML' },
-    { id: 'css' as const, name: 'component.css', label: 'CSS' },
-  ];
+  get files(): { id: string; name: string; label: string; language: 'typescript' | 'html' | 'css' }[] {
+    return [
+      { id: 'typescript', name: 'component.ts', label: 'TypeScript', language: 'typescript' },
+      { id: 'html', name: 'component.html', label: 'HTML', language: 'html' },
+      { id: 'css', name: 'component.css', label: 'CSS', language: 'css' },
+      ...Object.keys(this.initial().files ?? {}).map(name => ({
+        id: name, name, label: name,
+        language: name.endsWith('.ts') ? 'typescript' as const : name.endsWith('.html') ? 'html' as const : 'css' as const,
+      })),
+    ];
+  }
   private readonly editorHosts = viewChildren<ElementRef<HTMLElement>>('editorHost');
   private readonly frame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
   private readonly editors = new Map<PlaygroundFile, EditorView>();
@@ -77,27 +83,27 @@ export class AngularPlayground implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.sources = { ...(this.draft() ?? this.initial()) };
+    this.sources = cloneSources(this.draft() ?? this.initial());
     const languages = { typescript: javascript({ typescript: true }), html: html(), css: css() };
     this.files.forEach((file, index) => {
       const editor = new EditorView({
         parent: this.editorHosts()[index].nativeElement,
-        state: EditorState.create({ doc: this.sources[file.id], extensions: [
+        state: EditorState.create({ doc: sourceText(this.sources, file.id), extensions: [
           // Keep selection native and singular: occurrence marks and a second drawn
           // selection layer make dragging/replacing repeated words hard to interpret.
           lineNumbers(), highlightSpecialChars(), history(), bracketMatching(), indentOnInput(), closeBrackets(), foldGutter(),
-          ...(file.id === 'typescript' ? [lintGutter(), autocompletion({ icons: false, override: [async context => {
+          ...(file.language === 'typescript' ? [lintGutter(), autocompletion({ icons: false, override: [async context => {
             const word = context.matchBefore(/[\w$]*/);
             if (!context.explicit && (!word || word.from === word.to) && context.state.sliceDoc(context.pos - 1, context.pos) !== '.') return null;
             const source = context.state.doc.toString();
             try {
-              const result = await this.typeClient.complete(source, context.pos);
-              if (context.aborted || source !== this.editors.get('typescript')?.state.doc.toString()) return null;
+              const result = await this.typeClient.complete(source, context.pos, file.name, toProjectFiles(this.sources));
+              if (context.aborted || source !== this.editors.get(file.id)?.state.doc.toString()) return null;
               return { ...result, validFor: /^[\w$]*$/ };
             } catch { return null; }
           }] })] : [autocompletion({ icons: false })]),
           EditorState.allowMultipleSelections.of(false),
-          languages[file.id], syntaxHighlighting(HighlightStyle.define([
+          languages[file.language], syntaxHighlighting(HighlightStyle.define([
             { tag: tags.keyword, color: '#c4b5fd' }, { tag: tags.string, color: '#a5f3fc' },
             { tag: tags.comment, color: '#94a3b8' }, { tag: tags.number, color: '#fdba74' },
             { tag: tags.tagName, color: '#f9a8d4' }, { tag: tags.attributeName, color: '#c4b5fd' },
@@ -131,21 +137,26 @@ export class AngularPlayground implements AfterViewInit {
     const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     if (!step && event.key !== 'Home' && event.key !== 'End') return;
     event.preventDefault();
-    const target = event.key === 'Home' ? 0 : event.key === 'End' ? 2 : (index + step + 3) % 3;
+    const count = this.files.length;
+    const target = event.key === 'Home' ? 0 : event.key === 'End' ? count - 1 : (index + step + count) % count;
     this.selectFile(this.files[target].id);
     (event.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[target].focus();
   }
 
   edit(file: PlaygroundFile, content: string): void {
-    this.sources = { ...this.sources, [file]: content };
-    if (file === 'typescript') {
+    this.sources = updateSource(this.sources, file, content);
+    if (this.files.find(item => item.id === file)?.language === 'typescript') {
       ++this.typeRevision; clearTimeout(this.typeTimer);
       this.diagnostics.set([]); this.typeStatus.set('checking');
-      const editor = this.editors.get('typescript');
-      queueMicrotask(() => { if (!this.disposed && editor) editor.dispatch(setDiagnostics(editor.state, [])); });
+      queueMicrotask(() => {
+        if (!this.disposed) this.files.filter(item => item.language === 'typescript').forEach(item => {
+          const editor = this.editors.get(item.id);
+          if (editor) editor.dispatch(setDiagnostics(editor.state, []));
+        });
+      });
       this.typeTimer = setTimeout(() => this.checkTypes(), 400);
     }
-    this.sourceChange.emit({ ...this.sources });
+    this.sourceChange.emit(cloneSources(this.sources));
     this.status.set('changed');
     clearTimeout(this.timer);
     if (this.ready && this.automatic()) this.timer = setTimeout(() => this.run(), 500);
@@ -160,7 +171,7 @@ export class AngularPlayground implements AfterViewInit {
   run(): void {
     clearTimeout(this.timer);
     if (!this.ready) return;
-    if (Object.values(this.sources).some(value => value.length > 50000)) {
+    if (Object.values(toProjectFiles(this.sources)).some(value => value.length > 50000)) {
       this.error.set('Ogni file può contenere fino a 50.000 caratteri. Riduci il codice per eseguire l’esempio.');
       this.status.set('error'); this.previewBusy.set(false); return;
     }
@@ -175,11 +186,11 @@ export class AngularPlayground implements AfterViewInit {
 
   reset(): void {
     clearTimeout(this.timer);
-    this.sources = { ...this.initial() };
+    this.sources = cloneSources(this.initial());
     this.replacing = true;
-    this.editors.forEach((editor, file) => editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: this.sources[file] } }));
+    this.editors.forEach((editor, file) => editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: sourceText(this.sources, file) } }));
     this.replacing = false;
-    this.sourceChange.emit({ ...this.sources });
+    this.sourceChange.emit(cloneSources(this.sources));
     this.checkTypes();
     if (this.ready) this.run();
   }
@@ -193,32 +204,43 @@ export class AngularPlayground implements AfterViewInit {
   private async checkTypes(): Promise<void> {
     clearTimeout(this.typeTimer);
     const revision = ++this.typeRevision;
-    const source = this.sources.typescript;
+    const files = this.files.filter(file => file.language === 'typescript');
+    const project = toProjectFiles(this.sources);
     this.diagnostics.set([]);
-    const currentEditor = this.editors.get('typescript');
-    if (currentEditor) currentEditor.dispatch(setDiagnostics(currentEditor.state, []));
+    files.forEach(file => {
+      const editor = this.editors.get(file.id);
+      if (editor) editor.dispatch(setDiagnostics(editor.state, []));
+    });
     this.typeStatus.set('checking');
     try {
-      const diagnostics = await this.typeClient.check(source);
+      const results = await Promise.all(files.map(async file => ({
+        file,
+        diagnostics: await this.typeClient.check(sourceText(this.sources, file.id), file.name, project),
+      })));
       if (this.disposed || revision !== this.typeRevision) return;
-      this.diagnostics.set(diagnostics); this.typeStatus.set('ready');
-      const editor = this.editors.get('typescript');
-      if (editor) editor.dispatch(setDiagnostics(editor.state, diagnostics));
+      this.diagnostics.set(results.flatMap(({ file, diagnostics }) => diagnostics.map(problem => ({ ...problem, fileName: file.name }))));
+      this.typeStatus.set('ready');
+      results.forEach(({ file, diagnostics }) => {
+        const editor = this.editors.get(file.id);
+        if (editor) editor.dispatch(setDiagnostics(editor.state, diagnostics));
+      });
     } catch {
       if (!this.disposed && revision === this.typeRevision) this.typeStatus.set('unavailable');
     }
   }
 
   problemLocation(diagnostic: TypeDiagnostic): string {
-    const editor = this.editors.get('typescript');
+    const file = this.files.find(file => file.name === diagnostic.fileName) ?? this.files[0];
+    const editor = this.editors.get(file.id);
     if (!editor) return '';
     const line = editor.state.doc.lineAt(Math.min(diagnostic.from, editor.state.doc.length));
-    return `component.ts:${line.number}:${diagnostic.from - line.from + 1}`;
+    return `${file.name}:${line.number}:${diagnostic.from - line.from + 1}`;
   }
 
   goToProblem(diagnostic: TypeDiagnostic): void {
-    this.selectFile('typescript');
-    const editor = this.editors.get('typescript');
+    const file = this.files.find(file => file.name === diagnostic.fileName) ?? this.files[0];
+    this.selectFile(file.id);
+    const editor = this.editors.get(file.id);
     if (!editor) return;
     editor.dispatch({ selection: { anchor: diagnostic.from, head: diagnostic.to }, scrollIntoView: true });
     editor.focus();

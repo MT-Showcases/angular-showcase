@@ -327,25 +327,9 @@ input {
 };
 
 export const TAG_LIST_EXAMPLE: PlaygroundSources = {
-  typescript: `import {
-  ChangeDetectionStrategy,
-  Component,
-  Pipe,
-  PipeTransform,
-} from '@angular/core';
+  typescript: `import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-
-// Una pipe pura trasforma il valore senza modificare l'array originale.
-@Pipe({
-  name: 'tagList',
-  standalone: true,
-  pure: true,
-})
-class TagListPipe implements PipeTransform {
-  transform(labels: readonly string[], separator = ' · '): string {
-    return labels.join(separator);
-  }
-}
+import { TagListPipe } from './tag-list.pipe';
 
 @Component({
   selector: 'app-tag-list-demo',
@@ -371,6 +355,21 @@ export default class TagListDemo {
     input.value = '';
   }
 }`,
+  files: {
+    'tag-list.pipe.ts': `import { Pipe, PipeTransform } from '@angular/core';
+
+// Una pipe pura trasforma il valore senza modificare l'array originale.
+@Pipe({
+  name: 'tagList',
+  standalone: true,
+  pure: true,
+})
+export class TagListPipe implements PipeTransform {
+  transform(labels: readonly string[], separator = ' · '): string {
+    return labels.join(separator);
+  }
+}`,
+  },
   html: `<div class="controls">
   <label class="field">
     Nuova etichetta

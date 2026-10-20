@@ -24,7 +24,7 @@
       <h2 [id]="id + '-code-title'" class="playground__title">Modifica il codice</h2>
       <span class="playground__hint">Le modifiche aggiornano la preview</span>
     </div>
-    <div class="playground__tabs" role="tablist" aria-label="File del componente">
+    <div class="playground__tabs" role="tablist" aria-label="File dell’esempio">
       @for (file of files; track file.id; let index = $index) {
         <button class="playground__tab" type="button" role="tab" [id]="id + '-file-' + file.id" [attr.aria-selected]="activeFile() === file.id" [attr.aria-controls]="id + '-editor-' + file.id" [tabIndex]="activeFile() === file.id ? 0 : -1" (click)="selectFile(file.id)" (keydown)="fileKey($event, index)">{{ file.name }}</button>
       }

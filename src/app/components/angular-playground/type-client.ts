@@ -1,5 +1,6 @@
 /** Lazy browser-only TypeScript worker. Learner code is parsed, never executed here. */
 export interface TypeDiagnostic {
+  fileName?: string;
   from: number;
   to: number;
   severity: 'error' | 'warning';
@@ -54,18 +55,18 @@ export class TypeClient {
     this.pending.clear(); this.worker?.terminate(); this.worker = undefined;
   }
 
-  private async request<T>(kind: 'check' | 'complete', source: string, position?: number): Promise<T> {
+  private async request<T>(kind: 'check' | 'complete', source: string, position?: number, fileName?: string, files?: Record<string, string>): Promise<T> {
     await this.start();
     if (this.disposed || !this.worker) throw new Error('Analisi TypeScript non disponibile.');
     const id = ++this.sequence;
     return new Promise<T>((resolve, reject) => {
       const timer = setTimeout(() => { this.pending.delete(id); reject(new Error('L’analisi TypeScript non ha risposto.')); }, 15000);
       this.pending.set(id, { resolve: value => resolve(value as T), reject, timer });
-      this.worker!.postMessage({ id, kind, source, position });
+      this.worker!.postMessage({ id, kind, source, position, fileName, files });
     });
   }
 
-  check(source: string): Promise<TypeDiagnostic[]> { return this.request('check', source); }
-  complete(source: string, position: number): Promise<TypeCompletions> { return this.request('complete', source, position); }
+  check(source: string, fileName?: string, files?: Record<string, string>): Promise<TypeDiagnostic[]> { return this.request('check', source, undefined, fileName, files); }
+  complete(source: string, position: number, fileName?: string, files?: Record<string, string>): Promise<TypeCompletions> { return this.request('complete', source, position, fileName, files); }
   destroy(): void { this.disposed = true; this.fail(new Error('Editor chiuso.')); }
 }

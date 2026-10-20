@@ -521,9 +521,9 @@ test('JIT input bridge supports required inputs, static aliases, import aliases 
   try {
     await render(dom, {
       ...INPUT_EXAMPLE,
-      typescript: INPUT_EXAMPLE.typescript
+      files: { ...INPUT_EXAMPLE.files, 'greeting.component.ts': INPUT_EXAMPLE.files['greeting.component.ts']
         .replace('Component, input,', 'Component, input as accept,')
-        .replace("input('visitatore')", "accept.required<string>({ alias: 'displayName', transform: value => String(value).toUpperCase() })"),
+        .replace("input('visitatore')", "accept.required<string>({ alias: 'displayName', transform: value => String(value).toUpperCase() })") },
       html: INPUT_EXAMPLE.html.replace('[name]', '[displayName]'),
     }, 1);
     assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, ADA!');
@@ -531,9 +531,9 @@ test('JIT input bridge supports required inputs, static aliases, import aliases 
     assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, GRACE!');
     await render(dom, {
       ...OUTPUT_EXAMPLE,
-      typescript: OUTPUT_EXAMPLE.typescript
+      files: { ...OUTPUT_EXAMPLE.files, 'message-button.component.ts': OUTPUT_EXAMPLE.files['message-button.component.ts']
         .replace('Component, output,', 'Component, output as emitEvent,')
-        .replace('output<string>()', "emitEvent<string>({ alias: 'messageSent' })"),
+        .replace('output<string>()', "emitEvent<string>({ alias: 'messageSent' })") },
       html: OUTPUT_EXAMPLE.html.replace('(sent)', '(messageSent)'),
     }, 2);
     await click(dom, 'app-message-button button');
@@ -546,19 +546,19 @@ test('unsupported initializer options fail visibly and corrected modern code rec
   try {
     const error = await render(dom, {
       ...INPUT_EXAMPLE,
-      typescript: INPUT_EXAMPLE.typescript.replace("input('visitatore')", "input('visitatore', { alias: ['dynamic'].join('') })"),
+      files: { ...INPUT_EXAMPLE.files, 'greeting.component.ts': INPUT_EXAMPLE.files['greeting.component.ts'].replace("input('visitatore')", "input('visitatore', { alias: ['dynamic'].join('') })") },
     }, 1, 'error');
     assert.match(error.message, /alias.*stringa letterale/);
     const model = await render(dom, {
       ...INPUT_EXAMPLE,
-      typescript: INPUT_EXAMPLE.typescript.replace('Component, input,', 'Component, model,').replace("input('visitatore')", "model('visitatore')"),
+      files: { ...INPUT_EXAMPLE.files, 'greeting.component.ts': INPUT_EXAMPLE.files['greeting.component.ts'].replace('Component, input,', 'Component, model,').replace("input('visitatore')", "model('visitatore')") },
     }, 2, 'error');
     assert.match(model.message, /model\(\).*non è ancora supportato/);
     await render(dom, INPUT_EXAMPLE, 3);
     assert.equal(dom.window.document.querySelector('#greeting').textContent, 'Ciao, Ada!');
     const missing = await render(dom, {
       ...INPUT_EXAMPLE,
-      typescript: INPUT_EXAMPLE.typescript.replace("input('visitatore')", 'input.required<string>()'),
+      files: { ...INPUT_EXAMPLE.files, 'greeting.component.ts': INPUT_EXAMPLE.files['greeting.component.ts'].replace("input('visitatore')", 'input.required<string>()') },
       html: INPUT_EXAMPLE.html.replace('[name]="name"', ''),
     }, 4, 'error');
     assert.match(missing.message, /NG0950|Input is required/i);

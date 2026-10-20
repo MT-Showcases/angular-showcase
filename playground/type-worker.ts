@@ -11,6 +11,10 @@ interface TypeRequest {
   kind: 'check' | 'complete';
   source: string;
   position?: number;
+  /** Selected editable TS module, for example `greeting.component.ts`. */
+  fileName?: string;
+  /** Current editable project, including the selected file and its imports. */
+  files?: Record<string, string>;
 }
 
 interface WorkerScope {
@@ -58,6 +62,11 @@ function ready(): Promise<ReturnType<typeof createTypeService>> {
   return servicePromise;
 }
 
+function projectFiles(request: TypeRequest): Record<string, string> {
+  const files = request.files;
+  return files && typeof files === 'object' && !Array.isArray(files) ? files : {};
+}
+
 scope.onmessage = async (event: MessageEvent<TypeRequest>): Promise<void> => {
   const request = event.data;
   if (!request || request.id === undefined || request.id === null) return;
@@ -65,14 +74,17 @@ scope.onmessage = async (event: MessageEvent<TypeRequest>): Promise<void> => {
   try {
     const service = await ready();
     const source = typeof request.source === 'string' ? request.source : '';
+    const fileName = typeof request.fileName === 'string' && request.fileName
+      ? request.fileName
+      : '/component.ts';
 
     let result: unknown;
     if (request.kind === 'check') {
-      result = service.check(source);
+      result = service.check(source, fileName, projectFiles(request));
     } else if (request.kind === 'complete') {
       const position =
         typeof request.position === 'number' ? request.position : source.length;
-      result = service.complete(source, position);
+      result = service.complete(source, position, fileName, projectFiles(request));
     } else {
       throw new Error(`Richiesta TypeScript non riconosciuta: ${String(request.kind)}.`);
     }

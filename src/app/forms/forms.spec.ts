@@ -20,7 +20,7 @@ describe('Forms playground lesson', () => {
 
     expect(playground.initial()).toBe(CONTROL_EXAMPLE);
     expect(page.querySelector('.lesson-shell__intro')).toBeNull();
-    expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
+    expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
     expect(page.querySelector('app-angular-playground')!.compareDocumentPosition(page.querySelector('app-lesson-disclosure')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
@@ -46,7 +46,7 @@ describe('Forms playground lesson', () => {
 
       expect(playground.initial()).toBe(seed);
       expect(choices[index].getAttribute('aria-pressed')).toBe('true');
-      expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
+      expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
       expect(editor.state.doc.toString()).toBe(seed.typescript);
       expect(page.querySelector('app-angular-playground')!.compareDocumentPosition(page.querySelector('app-lesson-disclosure')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }

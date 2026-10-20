@@ -3,7 +3,7 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { AngularPlayground } from '../angular-playground/angular-playground';
-import { PlaygroundSources } from '../angular-playground/playground.types';
+import { PlaygroundSources, cloneSources } from '../angular-playground/playground.types';
 import { LessonInline } from '../lesson-inline/lesson-inline';
 
 /** One independent teaching example and its editable virtual files. */
@@ -31,6 +31,6 @@ export class LessonExamples {
   readonly drafts = new Map<string, PlaygroundSources>();
 
   remember(id: string, sources: PlaygroundSources): void {
-    this.drafts.set(id, { ...sources });
+    this.drafts.set(id, cloneSources(sources));
   }
 }

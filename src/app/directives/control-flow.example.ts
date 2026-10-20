@@ -190,8 +190,22 @@ ${PLAYGROUND_FIELD_STYLES}
 };
 
 export const DIRECTIVE_EXAMPLE: PlaygroundSources = {
-  typescript: `import { Component, Directive, ChangeDetectionStrategy } from '@angular/core';
+  typescript: `import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { Highlight } from './highlight.directive';
+
+@Component({
+  selector: 'app-directive-demo',
+
+  // L'import rende la direttiva disponibile in questo template.
+  imports: [Highlight, MatButtonModule],
+  templateUrl: './component.html',
+  styleUrl: './component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
+})
+export default class DirectiveDemo {}`,
+  files: {
+    'highlight.directive.ts': `import { Directive } from '@angular/core';
 
 // Il selettore riconosce l'attributo appHighlight nel template.
 // La direttiva aggiunge un comportamento al pulsante, senza creare una nuova vista.
@@ -208,20 +222,10 @@ import { MatButtonModule } from '@angular/material/button';
     '(click)': 'highlighted = !highlighted',
   },
 })
-class Highlight {
+export class Highlight {
   highlighted = false;
-}
-
-@Component({
-  selector: 'app-directive-demo',
-
-  // L'import rende la direttiva disponibile in questo template.
-  imports: [Highlight, MatButtonModule],
-  templateUrl: './component.html',
-  styleUrl: './component.css',
-  changeDetection: ChangeDetectionStrategy.Eager,
-})
-export default class DirectiveDemo {}`,
+}`,
+  },
   html: `<!-- appHighlight attiva la direttiva sul pulsante esistente. -->
 <!-- Anche Invio e Spazio producono il clic, grazie al pulsante nativo. -->
 <button

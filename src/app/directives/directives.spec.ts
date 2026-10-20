@@ -14,7 +14,7 @@ describe('Directives playground lesson', () => {
     const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
     expect(playground.initial()).toBe(IF_EXAMPLE);
     expect(page.querySelector('.lesson-shell__intro')).toBeNull();
-    expect(page.querySelectorAll('.cm-editor')).toHaveLength(3);
+    expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
     expect(page.querySelector('app-angular-playground')!.compareDocumentPosition(page.querySelector('app-lesson-disclosure')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fixture.destroy();

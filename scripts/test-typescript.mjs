@@ -99,7 +99,8 @@ test('generated declaration graph is portable and includes Angular package metad
 test('all installed lesson TypeScript seeds type-check without false semantic errors', () => {
   const service = session();
   for (const seed of SEEDS) {
-    const diagnostics = service.check(seed.typescript);
+    const files = { 'component.ts': seed.typescript, ...seed.files };
+    const diagnostics = Object.entries(files).filter(([name]) => name.endsWith('.ts')).flatMap(([name, text]) => service.check(text, name, files));
     assert.deepEqual(
       diagnostics,
       [],
