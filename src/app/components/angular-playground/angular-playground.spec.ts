@@ -210,11 +210,11 @@ describe('Angular playground host', () => {
     const sources = vi.fn(); fixture.componentInstance.sourceChange.subscribe(sources);
     const tabs = page.querySelectorAll<HTMLButtonElement>('[role="tab"]');
     expect([...tabs].map(tab => tab.textContent?.trim())).toEqual([
-      'component.ts', 'component.html', 'component.css', 'greeting.component.ts', 'greeting.component.html',
+      'component.ts', 'component.html', 'component.css', 'greeting.component.ts',
     ]);
     tabs[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); fixture.detectChanges();
-    expect(tabs[4].getAttribute('aria-selected')).toBe('true');
-    tabs[4].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); fixture.detectChanges();
+    expect(tabs[3].getAttribute('aria-selected')).toBe('true');
+    tabs[3].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); fixture.detectChanges();
     expect(tabs[0].getAttribute('aria-selected')).toBe('true');
     edit('greeting.component.ts', INPUT_EXAMPLE.files!['greeting.component.ts'].replace("'visitatore'", "'amica'"));
     expect(sources).toHaveBeenLastCalledWith(expect.objectContaining({ files: expect.objectContaining({

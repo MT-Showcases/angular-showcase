@@ -23,14 +23,15 @@ export default class InputDemo {
 // FIGLIO: input() dichiara un dato ricevuto dal padre, letto come un signal.
 @Component({
   selector: 'app-greeting',
-  templateUrl: './greeting.component.html',
+  template: \`
+    <h3 id="greeting">Ciao, {{ name() }}!</h3>
+  \`,
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class Greeting {
   // Se il padre non passa un valore, viene usato questo valore iniziale.
   readonly name = input('visitatore');
 }`,
-    'greeting.component.html': `<h3 id="greeting">Ciao, {{ name() }}!</h3>`,
   },
   html: `<label>
   Nome nello stato del padre
@@ -77,7 +78,15 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-message-button',
   imports: [MatButtonModule],
-  templateUrl: './message-button.component.html',
+  template: \`
+    <button
+      matButton="filled"
+      type="button"
+      (click)="sent.emit('Ciao dal figlio!')"
+    >
+      Invia un messaggio
+    </button>
+  \`,
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class MessageButton {
@@ -85,13 +94,6 @@ export class MessageButton {
   // Non è un signal e non conserva lo stato della pagina.
   readonly sent = output<string>();
 }`,
-    'message-button.component.html': `<button
-  matButton="filled"
-  type="button"
-  (click)="sent.emit('Ciao dal figlio!')"
->
-  Invia un messaggio
-</button>`,
   },
   html: `<!-- Le parentesi tonde ascoltano l'evento del figlio. -->
 <!-- $event contiene la stringa passata a emit(), non un evento DOM. -->
@@ -131,7 +133,15 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-counter-button',
   imports: [MatButtonModule],
-  templateUrl: './counter-button.component.html',
+  template: \`
+    <button
+      matButton="filled"
+      type="button"
+      (click)="incremented.emit()"
+    >
+      {{ label() }}
+    </button>
+  \`,
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class CounterButton {
@@ -139,13 +149,6 @@ export class CounterButton {
   readonly label = input('Aggiungi 1');
   readonly incremented = output<void>();
 }`,
-    'counter-button.component.html': `<button
-  matButton="filled"
-  type="button"
-  (click)="incremented.emit()"
->
-  {{ label() }}
-</button>`,
   },
   html: `<!-- Il figlio riceve un'etichetta, ma non ha accesso al contatore. -->
 <app-counter-button
