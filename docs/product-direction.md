@@ -17,7 +17,7 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 
 `/basics/getting-started` now uses the shared AngularPlayground component. Its preview precedes a CodeMirror editor with three virtual files. The former long introduction and code accordion have been replaced by a compact header, one prompt, three short concept cards and optional context.
 
-Data Binding, Control Flow, Component Communication, Pipes and Reactive Forms now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Other lessons retain their existing demos.
+Data Binding, Control Flow, Component Communication, Pipes, Reactive Forms and Services/DI now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Other lessons retain their existing demos.
 
 ## Runtime choice
 
@@ -35,7 +35,7 @@ This isolation protects the host's DOM and origin data; it is not a resource-quo
 ## Next steps
 
 1. Finish real-device iOS/Android selection, long-press and virtual keyboard acceptance.
-2. Validate the updated editor and Forms visually before converting Services and Routing.
+2. Validate the updated editor and Forms visually before converting Routing.
 3. Add a real project runtime for multi-file examples, rather than claiming the component prototype supports arbitrary projects.
 
 References: [Angular JIT/AOT](https://angular.dev/tools/cli/aot-compiler), [createApplication](https://angular.dev/api/platform-browser/createApplication), [CodeMirror](https://codemirror.net/), [WebContainers browser support](https://webcontainers.io/guides/browser-support).

@@ -53,7 +53,11 @@ const {
 } = await fixture('src/app/pipes/pipes.example.ts');
 const { CONTROL_EXAMPLE, CONTACT_EXAMPLE } = await fixture('src/app/forms/forms.example.ts');
 
+const { SHARED_SERVICE_EXAMPLE, SCOPED_SERVICE_EXAMPLE } = await fixture('src/app/services-lesson/services.example.ts');
+
 const SEEDS = [
+  SHARED_SERVICE_EXAMPLE,
+  SCOPED_SERVICE_EXAMPLE,
   FIRST_COMPONENT,
   BINDING_EXAMPLE,
   IF_EXAMPLE,
