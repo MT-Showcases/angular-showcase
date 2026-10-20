@@ -5,6 +5,7 @@ import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclos
 import { LessonExample, LessonExamples } from '../components/lesson-examples/lesson-examples';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { CONTACT_EXAMPLE, CONTROL_EXAMPLE } from './forms.example';
+import { CONTACT_DIAGRAM, CONTROL_DIAGRAM } from './forms-diagrams';
 
 @Component({
   selector: 'app-forms',
@@ -22,6 +23,7 @@ export class Forms {
       prompt: 'Svuota il campo e poi esci: compare l’errore **required**. Mentre scrivi il controllo è **dirty**; con il blur diventa **touched**. Il pulsante chiama `reset()` e riporta il valore iniziale.',
       takeaway: '`value` è il dato corrente; `valid`, `dirty` e `touched` descrivono il controllo. Il blur segnala che hai lasciato il campo, non salva il valore.',
       sources: CONTROL_EXAMPLE,
+      diagram: CONTROL_DIAGRAM,
     },
     {
       id: 'contact',
@@ -30,6 +32,7 @@ export class Forms {
       prompt: 'Compila nome, cognome ed email: gli errori compaiono dopo il blur, non appena apri la pagina. Attiva l’**organizzazione** facoltativa e confronta `value` con `getRawValue()`. Invia, poi modifica un campo.',
       takeaway: 'Il pulsante resta disabilitato finché il form è **non valido**. L’invio crea una copia locale normalizzata, indipendente dalle modifiche successive; nessun dato parte verso un server.',
       sources: CONTACT_EXAMPLE,
+      diagram: CONTACT_DIAGRAM,
     },
   ];
 }

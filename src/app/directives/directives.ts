@@ -5,6 +5,7 @@ import { LessonExamples, LessonExample } from '../components/lesson-examples/les
 import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { IF_EXAMPLE, FOR_EXAMPLE, SWITCH_EXAMPLE, DIRECTIVE_EXAMPLE } from './control-flow.example';
+import { DIRECTIVE_DIAGRAM, FOR_DIAGRAM, IF_DIAGRAM, SWITCH_DIAGRAM } from './directives-diagrams';
 
 @Component({
   selector: 'app-directives',
@@ -22,6 +23,7 @@ export class Directives {
       prompt: "Premi il **pulsante**. Poi cambia il testo dei due rami nell’HTML.",
       takeaway: "`@if` crea un ramo o l’altro nel DOM in base a un **booleano**.",
       sources: IF_EXAMPLE,
+      diagram: IF_DIAGRAM,
     },
     {
       id: "for",
@@ -30,6 +32,7 @@ export class Directives {
       prompt: "Inverti l’ordine e osserva gli **ID**. Svuota la lista per vedere `@empty`.",
       takeaway: "L’ID resta legato al dato: `track` permette ad Angular di conservarne il nodo anche dopo un riordino.",
       sources: FOR_EXAMPLE,
+      diagram: FOR_DIAGRAM,
     },
     {
       id: "switch",
@@ -38,6 +41,7 @@ export class Directives {
       prompt: "Scegli uno **stato**, poi modifica il messaggio del caso corrispondente.",
       takeaway: "`@switch` mostra un solo caso; `@default` copre i valori non previsti.",
       sources: SWITCH_EXAMPLE,
+      diagram: SWITCH_DIAGRAM,
     },
     {
       id: "directive",
@@ -46,6 +50,7 @@ export class Directives {
       prompt: "Clicca il pulsante o usa **Invio** e **Spazio**. Poi cambia il CSS della classe `highlighted`.",
       takeaway: "La **direttiva** aggiunge comportamento all’elemento esistente. Lo stato decide quando applicare la classe; il CSS decide l’aspetto.",
       sources: DIRECTIVE_EXAMPLE,
+      diagram: DIRECTIVE_DIAGRAM,
     },
   ];
 }

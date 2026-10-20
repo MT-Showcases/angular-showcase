@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { Forms } from './forms';
 import { CONTACT_EXAMPLE, CONTROL_EXAMPLE } from './forms.example';
+import { CONTACT_DIAGRAM, CONTROL_DIAGRAM } from './forms-diagrams';
 
 describe('Forms playground lesson', () => {
   it('connects the actual control seed to a visible editor before optional theory', async () => {
@@ -49,6 +50,39 @@ describe('Forms playground lesson', () => {
       expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
       expect(editor.state.doc.toString()).toBe(seed.typescript);
       expect(page.querySelector('app-angular-playground')!.compareDocumentPosition(page.querySelector('app-lesson-disclosure')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+
+    fixture.destroy();
+  });
+
+  it('selects the matching schema for every example and links only real files', async () => {
+    TestBed.configureTestingModule({ imports: [Forms], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(Forms);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const choices = page.querySelectorAll<HTMLButtonElement>('nav[aria-label="Scegli un esempio"] button');
+    const cases = [
+      { seed: CONTROL_EXAMPLE, schema: CONTROL_DIAGRAM },
+      { seed: CONTACT_EXAMPLE, schema: CONTACT_DIAGRAM },
+    ];
+
+    expect(choices).toHaveLength(cases.length);
+
+    for (const [index, testCase] of cases.entries()) {
+      choices[index].click();
+      await fixture.whenStable();
+
+      const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+      const diagram = page.querySelector('app-lesson-diagram')!;
+      expect(playground.initial()).toBe(testCase.seed);
+      expect(diagram.textContent).toContain(testCase.schema.title);
+      expect(diagram.querySelectorAll('.diagram__group')).toHaveLength(testCase.schema.groups.length);
+
+      const files = new Set(playground.files.map(file => file.name));
+      for (const node of diagram.querySelectorAll('.diagram__node')) {
+        const target = node.querySelector('.diagram__node-file')?.textContent?.trim();
+        expect(files.has(target!)).toBe(true);
+      }
     }
 
     fixture.destroy();

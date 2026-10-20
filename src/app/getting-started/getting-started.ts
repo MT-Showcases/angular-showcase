@@ -5,6 +5,7 @@ import { AngularPlayground } from '../components/angular-playground/angular-play
 import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { FIRST_COMPONENT } from './first-component.example';
+import { FIRST_COMPONENT_DIAGRAM } from './getting-started-diagrams';
 
 @Component({
   selector: 'app-getting-started',
@@ -15,4 +16,5 @@ import { FIRST_COMPONENT } from './first-component.example';
 })
 export class GettingStarted {
   readonly example = FIRST_COMPONENT;
+  readonly diagram = FIRST_COMPONENT_DIAGRAM;
 }

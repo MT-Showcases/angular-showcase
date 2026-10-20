@@ -5,6 +5,7 @@ import { AngularPlayground } from '../components/angular-playground/angular-play
 import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { BINDING_EXAMPLE } from './binding.example';
+import { BINDING_DIAGRAM } from './data-binding-diagrams';
 
 @Component({
   selector: 'app-data-binding',
@@ -15,4 +16,5 @@ import { BINDING_EXAMPLE } from './binding.example';
 })
 export class DataBinding {
   readonly example = BINDING_EXAMPLE;
+  readonly diagram = BINDING_DIAGRAM;
 }

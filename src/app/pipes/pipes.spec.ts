@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { PipesLesson } from './pipes';
 import { CURRENCY_EXAMPLE, DATE_EXAMPLE, TAG_LIST_EXAMPLE, UPPERCASE_EXAMPLE } from './pipes.example';
+import { CURRENCY_DIAGRAM, DATE_DIAGRAM, TAG_LIST_DIAGRAM, UPPERCASE_DIAGRAM } from './pipes-diagrams';
 import { TagListPipe } from './tag-list-pipe';
 
 describe('Pipes playground lesson', () => {
@@ -49,6 +50,41 @@ describe('Pipes playground lesson', () => {
       expect(choices[index].getAttribute('aria-pressed')).toBe('true');
       expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
       expect(editor.state.doc.toString()).toBe(seed.typescript);
+    }
+
+    fixture.destroy();
+  });
+
+  it('selects the matching schema for every example and links only real files', async () => {
+    TestBed.configureTestingModule({ imports: [PipesLesson], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(PipesLesson);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const choices = page.querySelectorAll<HTMLButtonElement>('nav[aria-label="Scegli un esempio"] button');
+    const cases = [
+      { seed: DATE_EXAMPLE, schema: DATE_DIAGRAM },
+      { seed: CURRENCY_EXAMPLE, schema: CURRENCY_DIAGRAM },
+      { seed: UPPERCASE_EXAMPLE, schema: UPPERCASE_DIAGRAM },
+      { seed: TAG_LIST_EXAMPLE, schema: TAG_LIST_DIAGRAM },
+    ];
+
+    expect(choices).toHaveLength(cases.length);
+
+    for (const [index, testCase] of cases.entries()) {
+      choices[index].click();
+      await fixture.whenStable();
+
+      const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+      const diagram = page.querySelector('app-lesson-diagram')!;
+      expect(playground.initial()).toBe(testCase.seed);
+      expect(diagram.textContent).toContain(testCase.schema.title);
+      expect(diagram.querySelectorAll('.diagram__group')).toHaveLength(testCase.schema.groups.length);
+
+      const files = new Set(playground.files.map(file => file.name));
+      for (const node of diagram.querySelectorAll('.diagram__node')) {
+        const target = node.querySelector('.diagram__node-file')?.textContent?.trim();
+        expect(files.has(target!)).toBe(true);
+      }
     }
 
     fixture.destroy();
