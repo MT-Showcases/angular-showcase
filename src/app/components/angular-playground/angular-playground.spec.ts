@@ -249,7 +249,7 @@ describe('Angular playground host', () => {
     expect(page.querySelector('[id$="file-greeting.component.ts"]')?.getAttribute('aria-selected')).toBe('true');
   });
 
-  it('keeps an optional diagram between preview and code and navigates files without rerunning', async () => {
+  it('keeps an optional diagram after preview and code and navigates files without rerunning', async () => {
     fixture.destroy();
     fixture = TestBed.createComponent(AngularPlayground);
     fixture.componentRef.setInput('initial', SHARED_SERVICE_EXAMPLE);
@@ -269,8 +269,8 @@ describe('Angular playground host', () => {
     const preview = page.querySelector('.playground__preview')!;
     const diagram = page.querySelector('app-lesson-diagram')!;
     const source = page.querySelector('#code')!;
-    expect(preview.compareDocumentPosition(diagram) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(diagram.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(preview.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(source.compareDocumentPosition(diagram) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     const buttons = [...diagram.querySelectorAll<HTMLButtonElement>('.diagram__node')];
     const target = (fileName: string) => buttons.find(button => button.getAttribute('aria-label')?.endsWith(`file ${fileName}`))!;

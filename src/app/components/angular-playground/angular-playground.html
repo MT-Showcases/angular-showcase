@@ -19,9 +19,6 @@
       <button matButton="text" type="button" (click)="restart()">Riavvia anteprima</button></div>
     @if (error()) { <pre class="playground__error" role="alert">{{ error() }}</pre> }
   </section>
-  @if (diagram(); as schema) {
-    <app-lesson-diagram [data]="schema" [activeFile]="activeFileName()" (fileSelect)="openFile($event)" />
-  }
   <section #sourceSection id="code" class="playground__source" [attr.aria-labelledby]="id + '-code-title'">
     <div class="playground__bar playground__bar--code">
       <h2 [id]="id + '-code-title'" class="playground__title">Modifica il codice</h2>
@@ -55,4 +52,7 @@
     </div>
     <p class="playground__keyboard" [id]="id + '-keyboard-help'">Ctrl+Spazio mostra i suggerimenti. Tab indenta il codice. Premi Esc, poi Tab per uscire dall’editor. Ricompilare riparte dallo stato iniziale del componente.</p>
   </section>
+  @if (diagram(); as schema) {
+    <app-lesson-diagram [data]="schema" [activeFile]="activeFileName()" (fileSelect)="openFile($event)" />
+  }
 </div>

@@ -31,7 +31,7 @@ export interface LessonDiagramGroup {
   steps: readonly LessonDiagramStep[];
 }
 
-/** Optional lesson schema shown between the live preview and the editor. */
+/** Optional lesson schema shown after the editor. */
 export interface LessonDiagramData {
   title: string;
   description: string;

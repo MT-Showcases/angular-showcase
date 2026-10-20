@@ -15,7 +15,7 @@ export interface LessonExample {
   prompt: string;
   takeaway: string;
   sources: PlaygroundSources;
-  /** Optional concept schema rendered between the preview and the editable code. */
+  /** Optional concept schema rendered after the editable code. */
   diagram?: LessonDiagramData;
 }
 
