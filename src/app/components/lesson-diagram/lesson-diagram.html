@@ -1,0 +1,60 @@
+<section class="diagram" [attr.aria-labelledby]="id + '-title'">
+  <header class="diagram__header">
+    <p class="diagram__eyebrow">Schema della configurazione iniziale</p>
+    <h2 class="diagram__title" [id]="id + '-title'">{{ data().title }}</h2>
+    <p class="diagram__description lesson-prose"><app-lesson-inline [text]="data().description" /></p>
+  </header>
+
+  <div class="diagram__groups">
+    @for (group of data().groups; track group.title) {
+      <section class="diagram__group" [attr.aria-labelledby]="id + '-group-' + $index">
+        <h3 class="diagram__group-title" [id]="id + '-group-' + $index">{{ group.title }}</h3>
+
+        <div class="diagram__flow">
+          @for (step of group.steps; track $index) {
+            <div class="diagram__nodes">
+              @for (node of step.nodes; track node.id) {
+                <button
+                  matButton="outlined"
+                  class="diagram__node"
+                  [class.diagram__node--active]="isActive(node)"
+                  type="button"
+                  [attr.aria-label]="nodeLabel(node)"
+                  [attr.aria-current]="isActive(node) ? 'true' : null"
+                  (click)="fileSelect.emit(node.file)"
+                >
+                  <span class="diagram__node-body">
+                    <span class="diagram__node-label">{{ node.label }}</span>
+                    @if (node.detail) {
+                      <span class="diagram__node-detail lesson-prose"><app-lesson-inline [text]="node.detail" /></span>
+                    }
+                    <code class="diagram__node-file">{{ node.file }}</code>
+                  </span>
+                  @if (isActive(node)) {
+                    <span class="diagram__node-flag">
+                      <mat-icon class="diagram__node-flag-icon" aria-hidden="true">check_circle</mat-icon>
+                      Aperto
+                    </span>
+                  }
+                </button>
+              }
+            </div>
+
+            @if (step.connection; as connection) {
+              <div class="diagram__connection">
+                <mat-icon class="diagram__arrow" aria-hidden="true">
+                  {{ connection.direction === 'down' ? 'south' : 'north' }}
+                </mat-icon>
+                <span class="diagram__connection-label">{{ connection.label }}</span>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (data().note) {
+    <p class="diagram__note lesson-prose"><app-lesson-inline [text]="data().note!" /></p>
+  }
+</section>

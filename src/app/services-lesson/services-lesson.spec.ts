@@ -19,6 +19,10 @@ describe('Services playground lesson', () => {
     const playground = fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
 
     expect(playground.initial()).toBe(SHARED_SERVICE_EXAMPLE);
+    const diagram = page.querySelector('app-lesson-diagram');
+    expect(diagram?.querySelectorAll('.diagram__group')).toHaveLength(1);
+    expect(diagram?.textContent).toContain('Istanza condivisa');
+    expect(diagram?.textContent).toContain('fornisce');
     expect(page.querySelector('.lesson-shell__intro')).toBeNull();
     expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
     expect(page.querySelector('#demo')?.textContent).toContain('provider');
@@ -54,7 +58,54 @@ describe('Services playground lesson', () => {
       expect(choices[index].getAttribute('aria-pressed')).toBe('true');
       expect(page.querySelectorAll('.cm-editor')).toHaveLength(3 + Object.keys(playground.initial().files ?? {}).length);
       expect(editor.state.doc.toString()).toBe(seed.typescript);
+
+      const diagram = page.querySelector('app-lesson-diagram')!;
+      expect(diagram.querySelectorAll('.diagram__group')).toHaveLength(index === 0 ? 1 : 3);
+      const instances = [...diagram.querySelectorAll('.diagram__node')]
+        .filter(node => node.textContent?.includes('Istanza'));
+      expect(instances).toHaveLength(index === 0 ? 1 : 3);
+      if (index === 0) {
+        expect(diagram.textContent).not.toContain('Istanza locale');
+      } else {
+        expect(diagram.textContent).toContain('Istanza locale A');
+        expect(diagram.textContent).toContain('Istanza locale B');
+      }
     }
+
+    choices[0].click();
+    await fixture.whenStable();
+    const sharedDiagram = page.querySelector('app-lesson-diagram')!;
+    expect(sharedDiagram.querySelectorAll('.diagram__group')).toHaveLength(1);
+    expect(sharedDiagram.textContent).not.toContain('Istanza locale');
+
+    fixture.destroy();
+  });
+
+  it('keeps a service draft and its diagram across examples, then resets to the seed', async () => {
+    TestBed.configureTestingModule({ imports: [ServicesLesson], providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(ServicesLesson);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const choices = page.querySelectorAll<HTMLButtonElement>('nav[aria-label="Scegli un esempio"] button');
+    const serviceEditor = () => EditorView.findFromDOM(
+      page.querySelector<HTMLElement>('[id$="editor-counter.service.ts"] .cm-editor')!,
+    )!;
+    const original = SHARED_SERVICE_EXAMPLE.files!['counter.service.ts'];
+    const modified = '// bozza locale\n' + original;
+
+    serviceEditor().dispatch({ changes: { from: 0, to: serviceEditor().state.doc.length, insert: modified } });
+    choices[1].click(); await fixture.whenStable();
+    choices[0].click(); await fixture.whenStable();
+
+    expect(serviceEditor().state.doc.toString()).toBe(modified);
+    expect(page.querySelector('app-lesson-diagram')?.textContent).toContain('Istanza condivisa');
+
+    [...page.querySelectorAll<HTMLButtonElement>('button')]
+      .find(button => button.textContent?.trim() === 'Ripristina codice')!.click();
+    fixture.detectChanges();
+    expect(serviceEditor().state.doc.toString()).toBe(original);
+    expect(SHARED_SERVICE_EXAMPLE.files!['counter.service.ts']).toBe(original);
+    expect(page.querySelector('app-lesson-diagram')).not.toBeNull();
 
     fixture.destroy();
   });

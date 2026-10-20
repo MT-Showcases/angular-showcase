@@ -15,11 +15,13 @@ import { tags } from '@lezer/highlight';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
+import { LessonDiagram } from '../lesson-diagram/lesson-diagram';
+import type { LessonDiagramData } from '../lesson-diagram/lesson-diagram';
 import { PlaygroundFile, PlaygroundSources, cloneSources, sourceText, updateSource, toProjectFiles } from './playground.types';
 
 /** Real Angular component playground with editable root and supporting virtual files. */
 @Component({
-  selector: 'app-angular-playground', imports: [MatButtonModule, MatProgressSpinnerModule],
+  selector: 'app-angular-playground', imports: [LessonDiagram, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './angular-playground.html', styleUrl: './angular-playground.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,8 +30,10 @@ export class AngularPlayground implements AfterViewInit {
   readonly initial = input.required<PlaygroundSources>();
   readonly draft = input<PlaygroundSources>();
   readonly title = input('Il tuo componente, dal vivo');
+  readonly diagram = input<LessonDiagramData>();
   readonly sourceChange = output<PlaygroundSources>();
   readonly activeFile = signal<PlaygroundFile>('typescript');
+  readonly activeFileName = computed(() => this.files.find(file => file.id === this.activeFile())?.name ?? '');
   readonly automatic = signal(true);
   readonly status = signal<'loading' | 'changed' | 'building' | 'ready' | 'error'>('loading');
   readonly error = signal('');
@@ -58,6 +62,7 @@ export class AngularPlayground implements AfterViewInit {
   }
   private readonly editorHosts = viewChildren<ElementRef<HTMLElement>>('editorHost');
   private readonly frame = viewChild<ElementRef<HTMLIFrameElement>>('previewFrame');
+  private readonly sourceSection = viewChild<ElementRef<HTMLElement>>('sourceSection');
   private readonly editors = new Map<PlaygroundFile, EditorView>();
   private sources!: PlaygroundSources;
   private timer?: ReturnType<typeof setTimeout>;
@@ -131,6 +136,24 @@ export class AngularPlayground implements AfterViewInit {
   selectFile(file: PlaygroundFile): void {
     this.activeFile.set(file);
     requestAnimationFrame(() => this.editors.get(file)?.requestMeasure());
+  }
+
+  /** Select and focus an existing file without rebuilding or rerunning the preview. */
+  openFile(fileName: string): boolean {
+    const target = this.files.find(file => file.name === fileName);
+    if (!target) return false;
+    this.selectFile(target.id);
+    requestAnimationFrame(() => {
+      if (this.disposed || this.activeFile() !== target.id) return;
+      const editor = this.editors.get(target.id);
+      if (!editor) return;
+      editor.contentDOM.focus({ preventScroll: true });
+      editor.requestMeasure();
+      const section = this.sourceSection()?.nativeElement;
+      // The shared global stylesheet owns smooth scrolling and reduced-motion opt-out.
+      if (section && typeof section.scrollIntoView === 'function') section.scrollIntoView({ block: 'start' });
+    });
+    return true;
   }
 
   fileKey(event: KeyboardEvent, index: number): void {

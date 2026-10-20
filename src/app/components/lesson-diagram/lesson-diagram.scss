@@ -1,0 +1,204 @@
+/**
+ * Lesson diagram styles.
+ *
+ * Compact schema surface between the live preview and the editor.
+ * Mobile-first: one readable column, then multi-column groups on wider screens.
+ */
+
+@use 'globals' as *;
+
+// ═══ MAIN CONTAINER ═══
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.diagram {
+  display: grid;
+  gap: space(4);
+  min-width: 0;
+  padding: space(4);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: radius(lg);
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface);
+
+  // ─── Header ───
+  &__header {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-primary);
+    text-transform: uppercase;
+    letter-spacing: rem(0.5);
+  }
+
+  &__title {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+  }
+
+  &__description {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Groups ───
+  &__groups {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: space(3);
+    min-width: 0;
+  }
+
+  &__group {
+    display: grid;
+    align-content: start;
+    gap: space(3);
+    min-width: 0;
+    padding: space(3);
+    border: rem(1) solid var(--mat-sys-outline-variant);
+    border-radius: radius(md);
+    background: var(--mat-sys-surface);
+  }
+
+  &__group-title {
+    margin: 0;
+    font: var(--mat-sys-title-small);
+    color: var(--mat-sys-on-surface);
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Vertical flow ───
+  &__flow {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+  }
+
+  &__nodes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: space(2);
+    min-width: 0;
+  }
+
+  &__node {
+    flex: 1 1 rem(180);
+    max-width: rem(320);
+    min-width: 0;
+    min-height: rem(48);
+    padding: space(2) space(3);
+    height: auto;
+    line-height: 1.35;
+    text-align: start;
+    white-space: normal;
+
+    &--active {
+      // The "Aperto" flag carries the state too, so meaning is not color-only.
+      outline: rem(2) solid var(--mat-sys-primary);
+      outline-offset: rem(2);
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+
+      .diagram__node-detail,
+      .diagram__node-file,
+      .diagram__node-flag {
+        color: var(--mat-sys-on-primary-container);
+      }
+    }
+  }
+
+  &__node-body {
+    display: grid;
+    flex: 1 1 auto;
+    gap: rem(2);
+    min-width: 0;
+  }
+
+  &__node-label {
+    font: var(--mat-sys-label-large);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  &__node-detail {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  &__node-file {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: rem(14);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  &__node-flag {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: rem(2);
+    margin-inline-start: space(2);
+    font: var(--mat-sys-label-small);
+    color: var(--mat-sys-primary);
+  }
+
+  &__node-flag-icon {
+    width: rem(16);
+    height: rem(16);
+    font-size: rem(16);
+  }
+
+  // ─── Connections ───
+  &__connection {
+    display: grid;
+    justify-items: center;
+    gap: rem(2);
+    padding-block: rem(2);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__arrow {
+    width: rem(24);
+    height: rem(24);
+    font-size: rem(24);
+    color: var(--mat-sys-primary);
+  }
+
+  &__connection-label {
+    font: var(--mat-sys-body-small);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Note ───
+  &__note {
+    margin: 0;
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+// ═══ RESPONSIVE DESIGN ═══
+
+// Tablet and up (min-width: 768px)
+@include media-min-breakpoint(md) {
+  .diagram {
+    padding: space(6);
+
+    &__groups {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, rem(240)), 1fr));
+    }
+  }
+}

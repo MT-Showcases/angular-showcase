@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, computed, input, signal } from '@an
 import { MatButtonModule } from '@angular/material/button';
 import { AngularPlayground } from '../angular-playground/angular-playground';
 import { PlaygroundSources, cloneSources } from '../angular-playground/playground.types';
+import type { LessonDiagramData } from '../lesson-diagram/lesson-diagram';
 import { LessonInline } from '../lesson-inline/lesson-inline';
 
 /** One independent teaching example and its editable virtual files. */
@@ -14,6 +15,8 @@ export interface LessonExample {
   prompt: string;
   takeaway: string;
   sources: PlaygroundSources;
+  /** Optional concept schema rendered between the preview and the editable code. */
+  diagram?: LessonDiagramData;
 }
 
 /** Keeps one compiler iframe mounted, instead of loading every example at once. */

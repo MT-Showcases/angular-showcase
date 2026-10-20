@@ -7,6 +7,8 @@ import { INPUT_EXAMPLE } from '../../component-communication/communication.examp
 import { sourceText } from './playground.types';
 import { TypeClient } from './type-client';
 import { FIRST_COMPONENT } from '../../getting-started/first-component.example';
+import { SHARED_SERVICE_EXAMPLE } from '../../services-lesson/services.example';
+import { SHARED_SERVICE_DIAGRAM } from '../../services-lesson/services-diagrams';
 
 describe('Angular playground host', () => {
   let fixture: ComponentFixture<AngularPlayground>;
@@ -44,6 +46,7 @@ describe('Angular playground host', () => {
   }
 
   it('requires both iframe source and channel, and sends current source only after ready', () => {
+    expect(page.querySelector('app-lesson-diagram')).toBeNull();
     expect(frame.getAttribute('sandbox')).toBe('allow-scripts');
     receive('ready', {}, window); expect(send).not.toHaveBeenCalled();
     receive('ready', { channel: 'other' }); expect(send).not.toHaveBeenCalled();
@@ -244,6 +247,69 @@ describe('Angular playground host', () => {
     expect(problem.textContent).toContain('greeting.component.ts:');
     problem.click(); fixture.detectChanges();
     expect(page.querySelector('[id$="file-greeting.component.ts"]')?.getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('keeps an optional diagram between preview and code and navigates files without rerunning', async () => {
+    fixture.destroy();
+    fixture = TestBed.createComponent(AngularPlayground);
+    fixture.componentRef.setInput('initial', SHARED_SERVICE_EXAMPLE);
+    fixture.componentRef.setInput('diagram', SHARED_SERVICE_DIAGRAM);
+    await fixture.whenStable();
+    page = fixture.nativeElement; frame = page.querySelector('iframe')!;
+    send = vi.spyOn(frame.contentWindow!, 'postMessage').mockImplementation(() => undefined);
+    const playground = fixture.componentInstance;
+    receive('ready');
+    click('Live attivo');
+    send.mockClear();
+
+    const editedService = '// servizio modificato\n' + SHARED_SERVICE_EXAMPLE.files!['counter.service.ts'];
+    edit('counter.service.ts', editedService);
+    const sendsAfterEdit = send.mock.calls.length;
+
+    const preview = page.querySelector('.playground__preview')!;
+    const diagram = page.querySelector('app-lesson-diagram')!;
+    const source = page.querySelector('#code')!;
+    expect(preview.compareDocumentPosition(diagram) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(diagram.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    const buttons = [...diagram.querySelectorAll<HTMLButtonElement>('.diagram__node')];
+    const target = (fileName: string) => buttons.find(button => button.getAttribute('aria-label')?.endsWith(`file ${fileName}`))!;
+    const scroll = vi.fn();
+    Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
+    try {
+      for (const [fileName, editorId] of [
+        ['component.ts', 'typescript'],
+        ['counter.service.ts', 'counter.service.ts'],
+        ['counter-view.component.ts', 'counter-view.component.ts'],
+      ]) {
+        target(fileName).click(); fixture.detectChanges();
+        expect(playground.activeFileName()).toBe(fileName);
+        expect(page.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')?.textContent?.trim()).toBe(fileName);
+
+        const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>(`[id$="editor-${editorId}"] .cm-editor`)!)!;
+        expect(editor.state.doc.toString()).toBe(fileName === 'counter.service.ts'
+          ? editedService
+          : sourceText(SHARED_SERVICE_EXAMPLE, fileName === 'component.ts' ? 'typescript' : fileName));
+        await vi.waitFor(() => expect(document.activeElement).toBe(editor.contentDOM));
+      }
+
+      expect(scroll).toHaveBeenCalled();
+      expect(scroll.mock.calls[0][0]).toEqual({ block: 'start' });
+      expect(page.querySelector('iframe')).toBe(frame);
+      expect(send).toHaveBeenCalledTimes(sendsAfterEdit);
+      expect(SHARED_SERVICE_EXAMPLE.files!['counter.service.ts']).not.toContain('servizio modificato');
+
+      page.querySelector<HTMLButtonElement>('[role="tab"][id$="file-counter-view.component.ts"]')!.click();
+      fixture.detectChanges();
+      const viewNodes = buttons.filter(button => button.getAttribute('aria-label')?.includes('counter-view.component.ts'));
+      expect(viewNodes).toHaveLength(2);
+      expect(viewNodes.every(button => button.getAttribute('aria-current') === 'true' && button.textContent?.includes('Aperto'))).toBe(true);
+
+      expect(playground.openFile('missing-file.ts')).toBe(false);
+      expect(playground.activeFileName()).toBe('counter-view.component.ts');
+    } finally {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
   });
 
 });

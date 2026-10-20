@@ -19,7 +19,10 @@
       <button matButton="text" type="button" (click)="restart()">Riavvia anteprima</button></div>
     @if (error()) { <pre class="playground__error" role="alert">{{ error() }}</pre> }
   </section>
-  <section id="code" class="playground__source" [attr.aria-labelledby]="id + '-code-title'">
+  @if (diagram(); as schema) {
+    <app-lesson-diagram [data]="schema" [activeFile]="activeFileName()" (fileSelect)="openFile($event)" />
+  }
+  <section #sourceSection id="code" class="playground__source" [attr.aria-labelledby]="id + '-code-title'">
     <div class="playground__bar playground__bar--code">
       <h2 [id]="id + '-code-title'" class="playground__title">Modifica il codice</h2>
       <span class="playground__hint">Le modifiche aggiornano la preview</span>

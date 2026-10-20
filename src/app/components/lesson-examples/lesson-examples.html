@@ -16,6 +16,7 @@
       [title]="example.title"
       [initial]="example.sources"
       [draft]="drafts.get(example.id)"
+      [diagram]="example.diagram"
       (sourceChange)="remember(example.id, $event)"
     />
     <p class="examples__takeaway lesson-prose"><app-lesson-inline [text]="example.takeaway" /></p>

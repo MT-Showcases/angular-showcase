@@ -7,6 +7,7 @@ import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclos
 import { LessonExample, LessonExamples } from '../components/lesson-examples/lesson-examples';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { SCOPED_SERVICE_EXAMPLE, SHARED_SERVICE_EXAMPLE } from './services.example';
+import { SCOPED_SERVICE_DIAGRAM, SHARED_SERVICE_DIAGRAM } from './services-diagrams';
 
 @Component({
   selector: 'app-services-lesson',
@@ -24,6 +25,7 @@ export class ServicesLesson {
       prompt: 'Aumenta **Condivisa A**: cambia anche B. Azzera da B: entrambe tornano a zero. Le due viste usano lo stesso oggetto perché il provider `CounterService` è sul padre.',
       takeaway: '`inject(CounterService)` chiede il servizio al **provider più vicino**. Lo stesso provider restituisce lo stesso oggetto: non crea un\'istanza per ogni chiamata.',
       sources: SHARED_SERVICE_EXAMPLE,
+      diagram: SHARED_SERVICE_DIAGRAM,
     },
     {
       id: 'scoped',
@@ -32,6 +34,7 @@ export class ServicesLesson {
       prompt: 'Aumenta **Isolata A**: il contatore condiviso resta fermo. Azzera Isolata A e osserva B. Poi **rimuovi** e ricrea la coppia: il condiviso conserva il valore, gli isolati ripartono da zero.',
       takeaway: 'Lo stesso `CounterService` ha qui un provider locale su ogni `IsolatedCounter`. Il provider più vicino vince e apre uno **scope** separato: la classe è la stessa, gli oggetti no.',
       sources: SCOPED_SERVICE_EXAMPLE,
+      diagram: SCOPED_SERVICE_DIAGRAM,
     },
   ];
 }
