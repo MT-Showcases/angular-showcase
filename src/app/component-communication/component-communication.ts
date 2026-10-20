@@ -5,6 +5,7 @@ import { LessonExamples, LessonExample } from '../components/lesson-examples/les
 import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { INPUT_EXAMPLE, OUTPUT_EXAMPLE, COMMUNICATION_EXAMPLE } from './communication.example';
+import { COMBINED_DIAGRAM, INPUT_DIAGRAM, OUTPUT_DIAGRAM } from './communication-diagrams';
 
 @Component({
   selector: 'app-component-communication',
@@ -22,6 +23,7 @@ export class ComponentCommunication {
       prompt: "Scrivi un nome nel campo del padre. Il saluto del **figlio** riceve lo stesso valore.",
       takeaway: "Il padre passa il valore con `[name]`. Nel figlio `name()` legge l’input come un **signal**.",
       sources: INPUT_EXAMPLE,
+      diagram: INPUT_DIAGRAM,
     },
     {
       id: "output",
@@ -30,6 +32,7 @@ export class ComponentCommunication {
       prompt: "Premi il pulsante del figlio. Poi cambia la stringa passata a `emit()` nel TypeScript.",
       takeaway: "Il figlio **emette** un messaggio. Il padre lo riceve come `$event` e decide come aggiornare il proprio stato.",
       sources: OUTPUT_EXAMPLE,
+      diagram: OUTPUT_DIAGRAM,
     },
     {
       id: "combined",
@@ -38,6 +41,7 @@ export class ComponentCommunication {
       prompt: "Incrementa il totale. Poi togli il gestore `(incremented)` dall’HTML e riprova.",
       takeaway: "Il dato entra nel figlio; la richiesta esce. Senza un **gestore** nel padre, il contatore non cambia.",
       sources: COMMUNICATION_EXAMPLE,
+      diagram: COMBINED_DIAGRAM,
     },
   ];
 }
