@@ -55,32 +55,46 @@ export default class RoutingNavigation {
 
 const NAVIGATION_HTML = `<section class="demo">
   <p class="hint">
-    La radice resta montata: il router cambia solo la vista dentro <code>router-outlet</code>.
+    La radice resta montata: il router cambia soltanto la pagina dentro <code>router-outlet</code>.
   </p>
 
-  <!-- routerLink chiede la navigazione interna: il browser non ricarica la pagina. -->
-  <nav class="links" aria-label="Navigazione dell'esempio">
-    <!-- routerLinkActive aggiunge .active; exact evita che /overview resti attivo su un percorso figlio.
-         ariaCurrentWhenActive segnala la pagina corrente anche alle tecnologie assistive. -->
-    <a
-      matButton="outlined"
-      routerLink="/overview"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      ariaCurrentWhenActive="page"
-      data-testid="nav-overview"
-    >Panoramica</a>
+  <!-- Un unico guscio di sito: intestazione e barra restano fuori dalla pagina. -->
+  <div class="site">
+    <header class="site-header">
+      <p class="site-name">Sito demo</p>
 
-    <a
-      matButton="outlined"
-      routerLink="/about"
-      routerLinkActive="active"
-      [routerLinkActiveOptions]="{ exact: true }"
-      ariaCurrentWhenActive="page"
-      data-testid="nav-about"
-    >Chi siamo</a>
-  </nav>
+      <!-- La barra fa parte del sito persistente e resta montata a ogni cambio di pagina. -->
+      <nav class="site-nav" aria-label="Pagine dell'esempio">
+        <!-- routerLink chiede la navigazione interna: il browser non ricarica la pagina. -->
+        <!-- routerLinkActive aggiunge .active; exact evita che /overview resti attivo su un percorso figlio.
+             ariaCurrentWhenActive segnala la pagina corrente anche alle tecnologie assistive. -->
+        <a
+          matButton="text"
+          routerLink="/overview"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          data-testid="nav-overview"
+        >Panoramica</a>
 
+        <a
+          matButton="text"
+          routerLink="/about"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          data-testid="nav-about"
+        >Chi siamo</a>
+      </nav>
+    </header>
+
+    <!-- Il router mostra qui la pagina scelta; la navbar resta montata sopra l'outlet. -->
+    <div class="page">
+      <router-outlet />
+    </div>
+  </div>
+
+  <!-- Promemoria, cronologia e URL restano fuori dalla pagina, sotto il guscio del sito. -->
   <div class="state">
     <p role="status" data-testid="root-state">Promemoria della radice: {{ reminders() }}</p>
 
@@ -90,11 +104,6 @@ const NAVIGATION_HTML = `<section class="demo">
       data-testid="root-increment"
       (click)="increment()"
     >Aumenta il promemoria</button>
-  </div>
-
-  <!-- L'outlet è il punto in cui il router monta la vista figlia; la radice resta fuori. -->
-  <div class="outlet">
-    <router-outlet />
   </div>
 
   <!-- Indietro e Avanti percorrono solo la cronologia interna di questa anteprima. -->
@@ -120,7 +129,57 @@ const NAVIGATION_CSS = `.demo {
   line-height: 1.6;
 }
 
-.links,
+/* Il guscio unisce barra e pagina: il cambio di rotta non apre un riquadro separato. */
+.site {
+  min-width: 0;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  overflow: hidden;
+}
+
+/* L'intestazione è persistente: cambia solo il contenuto mostrato sotto di lei. */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+.site-name {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+}
+
+/* flex-wrap lascia andare a capo i link della barra su schermi stretti. */
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* La pagina attiva usa i colori del tema e resta leggibile anche senza distinguere i colori. */
+.site-nav .active {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+/* Il contenitore dà spazio alla pagina selezionata dal router. */
+.page {
+  min-width: 0;
+  padding: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface);
+}
+
 .state,
 .history {
   /* flex-wrap lascia andare a capo i controlli su schermi stretti. */
@@ -130,20 +189,16 @@ const NAVIGATION_CSS = `.demo {
   gap: 0.5rem;
 }
 
-/* Il riquadro separa visivamente la vista del router; non decide quale vista mostrare. */
-.outlet {
-  min-width: 0;
-  padding: 1rem;
+/* Promemoria e cronologia restano fuori dal guscio: sono stato della radice, non della pagina. */
+.state {
+  padding: 0.75rem 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: var(--mat-sys-corner-medium);
   background: var(--mat-sys-surface-container-low);
-  color: var(--mat-sys-on-surface);
 }
 
-.active {
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 0.25rem;
+.state p {
+  margin: 0;
 }
 
 .url code {
@@ -636,11 +691,11 @@ export const ROUTING_EXAMPLES: readonly LessonExample[] = [
   {
     id: 'navigation',
     label: '1. Navigazione',
-    title: 'La radice resta, il figlio cambia',
+    title: 'La navbar resta, la pagina cambia',
     prompt:
-      'Aumenta il **promemoria**, poi apri **Panoramica** e **Chi siamo**: il valore resta. Usa **Indietro** e **Avanti** per percorrere la cronologia interna. Osserva `router.url` in fondo alla preview.',
+      'Aumenta il **promemoria**, poi apri le pagine **Panoramica** e **Chi siamo**: il valore resta. Usa **Indietro** e **Avanti** per percorrere la cronologia interna. Osserva `router.url` in fondo alla preview.',
     takeaway:
-      '`RouterLink` chiede una navigazione e `RouterOutlet` mostra la vista attiva. Le rotte sono dichiarate in `app.routes.ts` e registrate da `provideRouter` in `app.config.ts`; la radice non viene ricreata a ogni cambio di figlio.',
+      '`RouterLink` chiede una navigazione e `RouterOutlet` mostra la pagina attiva. Le rotte sono dichiarate in `app.routes.ts` e registrate da `provideRouter` in `app.config.ts`; la barra del sito e la radice non vengono ricreate a ogni cambio di pagina.',
     sources: NAVIGATION_SOURCES,
     diagram: NAVIGATION_DIAGRAM,
   },
