@@ -18,6 +18,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export default class RoutingNavigation {
+  // inject recupera il router configurato da provideRouter in app.config.ts.
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
@@ -29,6 +30,7 @@ export default class RoutingNavigation {
   readonly url = signal(this.router.url);
 
   constructor() {
+    // Dopo ogni navigazione completata, aggiorniamo l’URL mostrato nel template.
     const events = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this.url.set(this.router.url);
     });
@@ -41,6 +43,7 @@ export default class RoutingNavigation {
     this.reminders.update(value => value + 1);
   }
 
+  // Location usa la cronologia interna del playground; nel progetto locale usa quella del browser.
   back(): void {
     this.location.back();
   }
@@ -55,7 +58,10 @@ const NAVIGATION_HTML = `<section class="demo">
     La radice resta montata: il router cambia solo la vista dentro <code>router-outlet</code>.
   </p>
 
+  <!-- routerLink chiede la navigazione interna: il browser non ricarica la pagina. -->
   <nav class="links" aria-label="Navigazione dell'esempio">
+    <!-- routerLinkActive aggiunge .active; exact evita che /overview resti attivo su un percorso figlio.
+         ariaCurrentWhenActive segnala la pagina corrente anche alle tecnologie assistive. -->
     <a
       matButton="outlined"
       routerLink="/overview"
@@ -86,15 +92,18 @@ const NAVIGATION_HTML = `<section class="demo">
     >Aumenta il promemoria</button>
   </div>
 
+  <!-- L'outlet è il punto in cui il router monta la vista figlia; la radice resta fuori. -->
   <div class="outlet">
     <router-outlet />
   </div>
 
+  <!-- Indietro e Avanti percorrono solo la cronologia interna di questa anteprima. -->
   <div class="history">
     <button matButton="text" type="button" data-testid="history-back" (click)="back()">Indietro</button>
     <button matButton="text" type="button" data-testid="history-forward" (click)="forward()">Avanti</button>
   </div>
 
+  <!-- router.url è l'URL interno della SPA: mostrarlo rende visibile il cambio di rotta. -->
   <p class="url" data-testid="router-url">URL interno simulato: <code>{{ url() }}</code></p>
 </section>`;
 
@@ -114,12 +123,14 @@ const NAVIGATION_CSS = `.demo {
 .links,
 .state,
 .history {
+  /* flex-wrap lascia andare a capo i controlli su schermi stretti. */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
 }
 
+/* Il riquadro separa visivamente la vista del router; non decide quale vista mostrare. */
 .outlet {
   min-width: 0;
   padding: 1rem;
@@ -136,6 +147,7 @@ const NAVIGATION_CSS = `.demo {
 }
 
 .url code {
+  /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
 }`;
 
@@ -154,6 +166,7 @@ import { RouterLink } from '@angular/router';
         Questa vista è stata creata dal router per il percorso <code>/overview</code>.
       </p>
 
+      <!-- Anche una vista figlia naviga con routerLink, senza ricaricare la pagina. -->
       <a matButton="filled" routerLink="/about" data-testid="overview-to-about">Apri Chi siamo</a>
     </article>
   \`,
@@ -241,16 +254,19 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export default class RoutingParameters {
+  // inject recupera il router configurato da provideRouter in app.config.ts.
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly url = signal(this.router.url);
 
   constructor() {
+    // NavigationEnd arriva a navigazione completata: qui l'URL è quello definitivo.
     const events = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this.url.set(this.router.url);
     });
 
+    // DestroyRef chiude la sottoscrizione quando la radice viene distrutta.
     this.destroyRef.onDestroy(() => events.unsubscribe());
   }
 }`;
@@ -260,16 +276,19 @@ const PARAMETERS_HTML = `<section class="demo">
     Il percorso <code>detail/:id</code> riusa lo stesso componente quando cambia solo l'ID.
   </p>
 
+  <!-- Ogni link cambia solo il segmento :id dell'URL. -->
   <nav class="links" aria-label="Dettagli dell'esempio">
     <a matButton="outlined" routerLink="/detail/1" data-testid="param-link-1">Dettaglio 1</a>
     <a matButton="outlined" routerLink="/detail/2" data-testid="param-link-2">Dettaglio 2</a>
     <a matButton="outlined" routerLink="/detail/999" data-testid="param-link-999">ID 999</a>
   </nav>
 
+  <!-- L'outlet resta nella radice: cambia solo il dettaglio montato al suo interno. -->
   <div class="outlet">
     <router-outlet />
   </div>
 
+  <!-- L'URL interno rende visibile il parametro che arriva al componente. -->
   <p class="url" data-testid="router-url">URL interno simulato: <code>{{ url() }}</code></p>
 </section>`;
 
@@ -287,11 +306,13 @@ const PARAMETERS_CSS = `.demo {
 }
 
 .links {
+  /* flex-wrap lascia andare a capo i link su schermi stretti. */
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+/* Lo stile del riquadro è solo presentazione: il contenuto lo sceglie il router. */
 .outlet {
   min-width: 0;
   padding: 1rem;
@@ -302,6 +323,7 @@ const PARAMETERS_CSS = `.demo {
 }
 
 .url code {
+  /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
 }`;
 
@@ -309,6 +331,7 @@ const PARAMETERS_DETAIL = `import { ChangeDetectionStrategy, Component, computed
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 
+// Dati locali delle schede: esistono solo per gli ID 1 e 2.
 const CARDS: Record<string, string> = {
   '1': 'Componenti: una classe e il suo template.',
   '2': 'Servizi: dipendenze condivise.',
@@ -353,6 +376,7 @@ const CARDS: Record<string, string> = {
     }
 
     .actions {
+      /* flex-wrap evita che i pulsanti escano dal riquadro su schermi stretti. */
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
@@ -366,12 +390,14 @@ const CARDS: Record<string, string> = {
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DetailView {
-  // Lo stesso input riceve un nuovo valore quando il parametro cambia.
+  // Il nome id coincide con :id nella rotta: il router aggiorna questo input a ogni cambio di ID.
   readonly id = input.required<string>();
 
   // Campo semplice: dimostra che Angular riusa questa istanza per ID 1 e 2.
   localClicks = 0;
 
+  // computed ricalcola il testo quando id() cambia, anche nella stessa istanza.
+  // ID 999 corrisponde alla rotta, ma manca nei dati: non è un errore di percorso.
   readonly content = computed(() => CARDS[this.id()] ??
     'Nessuna scheda per questo ID: scegli il dettaglio 1 o 2.');
 
@@ -385,6 +411,7 @@ import { DetailView } from './detail-view.component';
 
 // :id è un segmento variabile: /detail/2 corrisponde alla stessa rotta di /detail/1.
 export const routes: Routes = [
+  // Solo l'URL vuoto viene reindirizzato al primo dettaglio.
   { path: '', pathMatch: 'full', redirectTo: 'detail/1' },
   { path: 'detail/:id', component: DetailView },
 ];`;
@@ -411,16 +438,19 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
   changeDetection: ChangeDetectionStrategy.Eager,
 })
 export default class RoutingFallback {
+  // inject recupera il router configurato da provideRouter in app.config.ts.
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly url = signal(this.router.url);
 
   constructor() {
+    // NavigationEnd arriva a navigazione completata: qui l'URL è quello definitivo.
     const events = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this.url.set(this.router.url);
     });
 
+    // DestroyRef chiude la sottoscrizione quando la radice viene distrutta.
     this.destroyRef.onDestroy(() => events.unsubscribe());
   }
 }`;
@@ -430,6 +460,7 @@ const FALLBACK_HTML = `<section class="demo">
     La rotta <code>**</code> è l'ultima: intercetta solo i percorsi non riconosciuti sopra.
   </p>
 
+  <!-- I link possono portare a percorsi esistenti o sconosciuti: decide il router. -->
   <nav class="links" aria-label="Percorsi dell'esempio">
     <a matButton="outlined" routerLink="/home" data-testid="fallback-home">Home</a>
     <a matButton="outlined" routerLink="/missing-page" data-testid="fallback-missing">Percorso sconosciuto</a>
@@ -457,11 +488,13 @@ const FALLBACK_CSS = `.demo {
 }
 
 .links {
+  /* flex-wrap lascia andare a capo i link su schermi stretti. */
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+/* Lo stile del riquadro è solo presentazione: il contenuto lo sceglie il router. */
 .outlet {
   min-width: 0;
   padding: 1rem;
@@ -472,6 +505,7 @@ const FALLBACK_CSS = `.demo {
 }
 
 .url code {
+  /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
 }`;
 
@@ -547,8 +581,10 @@ import { NotFoundView } from './not-found-view.component';
 
 // L'ordine conta: il jolly deve restare per ultimo.
 export const routes: Routes = [
+  // pathMatch: 'full' limita il redirect all'URL radice.
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', component: HomeView },
+  // Il jolly resta ultimo e intercetta ogni percorso non riconosciuto sopra.
   { path: '**', component: NotFoundView },
 ];`;
 
