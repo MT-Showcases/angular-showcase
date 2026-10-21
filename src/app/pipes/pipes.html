@@ -3,11 +3,6 @@
     Una <strong class="lesson-emphasis">pipe</strong> trasforma il valore solo per la vista: <code>|</code> applica la pipe, <code>:</code> introduce i parametri. Quattro passi: {{ exampleTopics | tagList:' · ' }}. Scegli un esempio e confronta il dato originale con il risultato.
   </p>
   <app-lesson-examples [examples]="examples" />
-  <section class="lesson-panel lesson-prose" aria-label="Metti in pratica">
-    <h2 class="lesson-title">Ora costruisci il tuo catalogo</h2>
-    <p class="lesson-text">Crea il progetto sul tuo computer e metti insieme <strong class="lesson-emphasis">componenti, binding, control flow e pipe</strong>: trovi comandi, consegna e verifiche in cinque passi.</p>
-    <a routerLink="/basics/course-exercise">Apri l’esercitazione: catalogo corsi →</a>
-  </section>
 
   <app-lesson-disclosure anchor="deepen" title="Pipe pure, locale e valori nel tempo">
     <p class="lesson-text lesson-prose"><strong class="lesson-emphasis">Pipe pura</strong>: Angular la riesegue quando cambia un valore primitivo o il <strong class="lesson-emphasis">riferimento</strong> di un oggetto. Se muti lo stesso array con <code>push()</code>, il riferimento non cambia; nell’esempio TagListPipe creiamo un nuovo array con lo spread.</p>

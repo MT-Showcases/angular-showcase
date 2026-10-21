@@ -1,5 +1,5 @@
 /** Learning navigation metadata. Only published lessons are exposed as links. */
-export type LessonId = 'start' | 'binding' | 'control-flow' | 'components' | 'pipes' | 'course-exercise' | 'forms' | 'services' | 'routing' | 'signals' | 'http';
+export type LessonId = 'start' | 'binding' | 'control-flow' | 'components' | 'pipes' | 'forms' | 'services' | 'routing' | 'signals' | 'http';
 export interface LessonTopic {
   id: LessonId;
   category: 'basics' | 'advanced';
@@ -15,7 +15,6 @@ export const TOPICS: LessonTopic[] = [
   { id: 'control-flow', category: 'basics', title: 'Control flow e direttive', route: '/basics/directives', outcome: 'Mostra alternative, modifica una lista e aggiungi un comportamento con una direttiva.', prerequisites: ['binding'], published: true },
   { id: 'components', category: 'basics', title: 'Comunicazione tra componenti', route: '/basics/components', outcome: 'Passa dati a un figlio e ricevi i suoi eventi senza confondere le responsabilità.', prerequisites: ['binding', 'control-flow'], published: true },
   { id: 'pipes', category: 'basics', title: 'Pipes', route: '/basics/pipes', outcome: 'Trasforma la presentazione dei dati con parametri e pipe riutilizzabili.', prerequisites: ['binding'], published: true },
-  { id: 'course-exercise', category: 'basics', title: 'Esercitazione: catalogo corsi', route: '/basics/course-exercise', outcome: 'Crea in locale un catalogo corsi seguendo consegna, comandi e verifiche in cinque passi.', prerequisites: ['start', 'binding', 'control-flow', 'components', 'pipes'], published: true },
   { id: 'forms', category: 'basics', title: 'Reactive Forms', route: '/basics/forms', outcome: 'Osserva valori, validazione e stati di un form, invia e ripristina i dati.', prerequisites: ['binding', 'control-flow'], published: true },
   { id: 'services', category: 'basics', title: 'Servizi e dependency injection', route: '/basics/services', outcome: 'Estrai un comportamento condiviso e osserva lo scope di un servizio.', prerequisites: ['components'], published: true },
   { id: 'routing', category: 'basics', title: 'Routing', route: '/basics/routing', outcome: 'Naviga tra viste, leggi parametri e gestisci un percorso sconosciuto.', prerequisites: ['components', 'services'], published: true },

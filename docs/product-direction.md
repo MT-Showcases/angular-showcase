@@ -78,7 +78,3 @@ The first four lessons now share semantic emphasis and inline-code styles. Use `
 Dynamic example prompts/takeaways use LessonInline: only `**keyword**` and backtick-delimited code are recognized; plain strings, whitespace and HTML-looking text remain literal. Nested formatting and HTML interpretation are intentionally unsupported.
 
 Verification: 111 host tests and 14 runtime tests passed, including three renderer tests for safe text, updates and delimiter behavior. Strict playground type checking and production build passed; initial bundle 468.29 kB. Static theme contrast checks passed. Browser control remains unavailable, so visual and real-device acceptance remain pending.
-
-## Local course catalog assignment
-
-`/basics/course-exercise` is a classroom handout for work in a learner’s local Angular project, linked from Basi and Pipes. It provides setup/generation commands, fixed model/sample data, five cumulative tasks through Pipes, labelled data/event flow and observable acceptance checks. All steps are visible and printable; there is no embedded exercise runtime or completed solution. Students implement their own project and can save the handout as PDF through browser printing. The local app uses port4201 to avoid the Showcase server on4200.
