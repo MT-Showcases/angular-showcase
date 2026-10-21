@@ -1,11 +1,11 @@
 /**
- * Stable course samples shared by every exercise checkpoint.
+ * Course samples for the local classroom assignment.
  *
- * Dates are fixed UTC strings so the preview does not depend on the local
- * clock or timezone. The array is only source material: the playground never
- * sends these values over HTTP or saves them.
+ * Dates are fixed UTC strings so results do not depend on the learner's
+ * timezone. Prices are USD amounts: CurrencyPipe formats them, it does not
+ * convert currencies.
  */
-export interface CourseSample {
+export interface Course {
   readonly id: string;
   readonly title: string;
   readonly description: string;
@@ -15,7 +15,7 @@ export interface CourseSample {
   readonly available: boolean;
 }
 
-export const COURSE_SAMPLES: readonly CourseSample[] = [
+export const COURSE_SAMPLES: readonly Course[] = [
   {
     id: 'angular-fondamenti',
     title: 'Angular: fondamenti',

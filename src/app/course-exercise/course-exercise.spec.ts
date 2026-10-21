@@ -1,182 +1,77 @@
-import { EditorView } from '@codemirror/view';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { AngularPlayground } from '../components/angular-playground/angular-playground';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { Router, provideRouter } from '@angular/router';
 import { CourseExercise } from './course-exercise';
-import { COURSE_EXERCISE_STEPS } from './course-exercise.steps';
+import { COURSE_ASSIGNMENT_STEPS } from './course-exercise.steps';
 
 async function createPage(): Promise<{ fixture: ComponentFixture<CourseExercise>; page: HTMLElement }> {
   TestBed.configureTestingModule({ imports: [CourseExercise], providers: [provideRouter([])] });
   const fixture = TestBed.createComponent(CourseExercise);
   await fixture.whenStable();
 
-  return { fixture, page: fixture.nativeElement as HTMLElement };
+  return { fixture, page: fixture.nativeElement };
 }
 
-function activePlayground(fixture: ComponentFixture<CourseExercise>): AngularPlayground {
-  return fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
-}
-
-function activeEditor(page: HTMLElement): EditorView {
-  const host = page.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden]) .cm-editor');
-  return EditorView.findFromDOM(host!)!;
-}
-
-function stepButtons(page: HTMLElement): NodeListOf<HTMLButtonElement> {
-  return page.querySelectorAll<HTMLButtonElement>('nav[aria-label="Scegli un checkpoint"] button');
-}
-
-describe('CourseExercise playground lesson', () => {
-  it('starts from the first of five independent starter checkpoints', async () => {
+describe('CourseExercise local assignment handout', () => {
+  it('shows every step without a playground, editor, checklist or solution control', async () => {
     const { fixture, page } = await createPage();
-    const choices = stepButtons(page);
-    const playground = activePlayground(fixture);
+    const sections = page.querySelectorAll<HTMLElement>('[data-step]');
+    const titles = [...sections].map(section => section.querySelector('h4')?.textContent?.trim());
 
-    expect(COURSE_EXERCISE_STEPS).toHaveLength(5);
-    expect(new Set(COURSE_EXERCISE_STEPS.map(step => step.id)).size).toBe(5);
-    expect(choices).toHaveLength(5);
-    expect(choices[0].getAttribute('aria-pressed')).toBe('true');
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[0].starter);
-    expect(page.querySelector('.exercise__mode-text')?.textContent).toContain('il tuo codice');
-    expect(page.querySelector('.exercise__mode-toggle')?.textContent).toContain('Mostra soluzione');
-    expect(page.querySelector('.exercise__notice')).toBeNull();
-    expect(page.querySelectorAll('iframe')).toHaveLength(1);
+    expect(sections).toHaveLength(5);
+    expect(titles).toEqual(COURSE_ASSIGNMENT_STEPS.map(step => step.title));
+    expect(page.querySelector('app-angular-playground, iframe, .cm-editor, textarea, [contenteditable="true"]')).toBeNull();
+    expect(page.querySelectorAll('input[type="checkbox"]')).toHaveLength(0);
+    expect(page.querySelector('mat-checkbox, .exercise__check')).toBeNull();
+    expect(page.textContent).not.toContain('Mostra soluzione');
+    expect(page.querySelector('.exercise__mode-toggle')).toBeNull();
 
     fixture.destroy();
   });
 
-  it('keeps a learner draft, including a supporting file, while solution mode is shown and hidden', async () => {
+  it('lists the setup and generation commands with the real project file targets', async () => {
     const { fixture, page } = await createPage();
-    const choices = stepButtons(page);
-    choices[4].click();
-    await fixture.whenStable();
+    const setup = page.querySelector<HTMLElement>('#setup')!;
+    const setupText = setup.textContent ?? '';
+    const pageText = page.textContent ?? '';
 
-    let playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[4].starter);
-    playground.selectFile('tags.pipe.ts');
-    await fixture.whenStable();
-
-    const marker = '\n// bozza del learner nel file pipe';
-    let editor = activeEditor(page);
-    editor.dispatch({ changes: { from: editor.state.doc.length, insert: marker } });
-    await fixture.whenStable();
-
-    choices[3].click();
-    await fixture.whenStable();
-    choices[4].click();
-    await fixture.whenStable();
-
-    playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[4].starter);
-    playground.selectFile('tags.pipe.ts');
-    await fixture.whenStable();
-    expect(activeEditor(page).state.doc.toString()).toContain(marker);
-    expect(page.querySelectorAll('iframe')).toHaveLength(1);
-
-    const modeToggle = page.querySelector<HTMLButtonElement>('.exercise__mode-toggle')!;
-    modeToggle.click();
-    await fixture.whenStable();
-
-    playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[4].solution);
-    expect(playground.files.map(file => file.name)).toContain('tags.pipe.ts');
-    expect(page.querySelector('.exercise__notice')).not.toBeNull();
-    expect(page.querySelectorAll('iframe')).toHaveLength(1);
-
-    modeToggle.click();
-    await fixture.whenStable();
-
-    playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[4].starter);
-    playground.selectFile('tags.pipe.ts');
-    await fixture.whenStable();
-    expect(activeEditor(page).state.doc.toString()).toContain(marker);
-    expect(page.querySelectorAll('iframe')).toHaveLength(1);
+    expect(setupText).toContain('npx @angular/cli@22 new catalogo-corsi --standalone --routing=false --style=scss --defaults');
+    expect(setupText).toContain('npx ng add @angular/material@22');
+    expect(setupText).toContain('npm start -- --port 4201');
+    expect(setupText).toContain('src/app/models/course.ts');
+    expect(setupText).toContain('src/app/components/course-card/course-card.ts');
+    expect(setupText).toContain('src/app/pipes/tags-pipe.ts');
+    expect(pageText).toContain('npx ng generate component components/course-card --inline-template --skip-tests');
+    expect(pageText).toContain('npx ng generate pipe pipes/tags --skip-tests');
 
     fixture.destroy();
   });
 
-  it('resets only the visible solution and leaves the learner source untouched', async () => {
-    const { fixture, page } = await createPage();
-    const modeToggle = page.querySelector<HTMLButtonElement>('.exercise__mode-toggle')!;
-    const starterMarker = '\n// bozza del learner';
-
-    let editor = activeEditor(page);
-    editor.dispatch({ changes: { from: editor.state.doc.length, insert: starterMarker } });
-    await fixture.whenStable();
-
-    modeToggle.click();
-    await fixture.whenStable();
-
-    let playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[0].solution);
-    editor = activeEditor(page);
-    editor.dispatch({ changes: { from: editor.state.doc.length, insert: '\n// modifica della soluzione' } });
-    await fixture.whenStable();
-
-    playground.reset();
-    await fixture.whenStable();
-    expect(activeEditor(page).state.doc.toString()).toBe(COURSE_EXERCISE_STEPS[0].solution.typescript);
-
-    modeToggle.click();
-    await fixture.whenStable();
-
-    playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[0].starter);
-    expect(activeEditor(page).state.doc.toString()).toContain(starterMarker);
-
-    modeToggle.click();
-    await fixture.whenStable();
-    playground = activePlayground(fixture);
-    expect(playground.initial()).toBe(COURSE_EXERCISE_STEPS[0].solution);
-    expect(activeEditor(page).state.doc.toString()).toBe(COURSE_EXERCISE_STEPS[0].solution.typescript);
-    expect(page.querySelectorAll('iframe')).toHaveLength(1);
-
-    fixture.destroy();
+  it('keeps section navigation on the exercise route instead of the base URL', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideRouter([{ path: 'basics/course-exercise', component: CourseExercise }])],
+    });
+    const harness = await RouterTestingHarness.create('/basics/course-exercise');
+    const page = harness.routeNativeElement!;
+    const link = page.querySelector<HTMLAnchorElement>('.assignment__index a[href$="#step-1"]')!;
+    expect(link.getAttribute('href')).toBe('/basics/course-exercise#step-1');
+    link.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Router).url).toBe('/basics/course-exercise#step-1');
+    expect(page.querySelectorAll('[data-step]')).toHaveLength(5);
+    harness.fixture.destroy();
   });
 
-  it('reveals hints progressively and keeps the checklist manual and per step', async () => {
+  it('prints the handout from the labelled Stampa / Salva PDF button', async () => {
     const { fixture, page } = await createPage();
-    const choices = stepButtons(page);
-    const hintToggle = page.querySelector<HTMLButtonElement>('.exercise__hint-toggle')!;
+    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined);
+    const button = page.querySelector<HTMLButtonElement>('.assignment__print');
 
-    expect(page.querySelectorAll('.exercise__hint-list li')).toHaveLength(0);
-    hintToggle.click();
-    await fixture.whenStable();
-    expect(page.querySelectorAll('.exercise__hint-list li')).toHaveLength(1);
-    hintToggle.click();
-    await fixture.whenStable();
-    expect(page.querySelectorAll('.exercise__hint-list li')).toHaveLength(2);
+    expect(button?.textContent).toContain('Stampa / Salva PDF');
+    button!.click();
 
-    choices[1].click();
-    await fixture.whenStable();
-    expect(page.querySelectorAll('.exercise__hint-list li')).toHaveLength(0);
-    choices[0].click();
-    await fixture.whenStable();
-    expect(page.querySelectorAll('.exercise__hint-list li')).toHaveLength(2);
-
-    let boxes = page.querySelectorAll<HTMLInputElement>('mat-checkbox input[type="checkbox"]');
-    expect(boxes).toHaveLength(COURSE_EXERCISE_STEPS[0].checks.length);
-    expect([...boxes].every(box => !box.checked)).toBe(true);
-
-    page.querySelector<HTMLButtonElement>('.exercise__mode-toggle')!.click();
-    await fixture.whenStable();
-    boxes = page.querySelectorAll<HTMLInputElement>('mat-checkbox input[type="checkbox"]');
-    expect([...boxes].every(box => !box.checked)).toBe(true);
-
-    boxes[0].click();
-    await fixture.whenStable();
-    expect(boxes[0].checked).toBe(true);
-    expect(page.querySelector('.exercise__check-count')?.textContent).toContain('1 di');
-
-    choices[1].click();
-    await fixture.whenStable();
-    expect(page.querySelector('.exercise__check-count')?.textContent).toContain('0 di');
-    choices[0].click();
-    await fixture.whenStable();
-    boxes = page.querySelectorAll<HTMLInputElement>('mat-checkbox input[type="checkbox"]');
-    expect(boxes[0].checked).toBe(true);
+    expect(print).toHaveBeenCalledTimes(1);
+    print.mockRestore();
 
     fixture.destroy();
   });

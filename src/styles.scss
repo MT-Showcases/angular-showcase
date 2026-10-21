@@ -70,3 +70,55 @@
     background-position: 100% 50%;
   }
 }
+
+// Keep the local assignment readable as a classroom handout or browser PDF.
+@media print {
+  body:has(app-course-exercise) {
+    background: white !important;
+    color: black !important;
+
+    app-navbar,
+    app-link-modal,
+    .exploration,
+    .lesson-shell__breadcrumbs,
+    .lesson-shell__footer,
+    .code-block-header {
+      display: none !important;
+    }
+
+    .main,
+    .lesson-shell {
+      margin: 0 !important;
+      padding: 0 !important;
+      max-width: none !important;
+    }
+
+    .lesson-shell__title,
+    .lesson-shell__subtitle {
+      color: black !important;
+    }
+
+    .code-block-content {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    .code-block-container {
+      background: white !important;
+      box-shadow: none !important;
+      border: 1px solid #ccc;
+    }
+
+    .code-block-content pre,
+    .code-block-content code {
+      white-space: pre-wrap !important;
+      overflow-wrap: anywhere;
+    }
+
+    .code-block-content pre,
+    .code-block-content code,
+    .code-block-content span {
+      color: black !important;
+    }
+  }
+}
