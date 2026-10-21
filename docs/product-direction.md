@@ -17,7 +17,7 @@ Updated: 2026-10-17. This is the user's confirmed direction; the First Component
 
 `/basics/getting-started` now uses the shared AngularPlayground component. Its preview precedes a CodeMirror editor with three virtual files. The former long introduction and code accordion have been replaced by a compact header, one prompt, three short concept cards and optional context.
 
-Data Binding, Control Flow, Component Communication, Pipes, Reactive Forms and Services/DI now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Component Communication and Services/DI add per-example concept diagrams after the editable source. Communication shows input values and output events separately, with parent-owned state and clickable binding/child files. Services/DI shows named provider scopes, distinct service instances and labelled injection arrows. File nodes select the matching editor tab without restarting the preview. Diagrams explain the initial seed configuration, while edited providers can change runtime behavior. First Component, Data Binding, Control Flow, Pipes and Forms also provide concise schemas after the editor, linked to their actual source tabs. Schema descriptions follow the seed behavior, including presentation-only pipes and conditional form errors. Other lessons retain their existing demos.
+Data Binding, Control Flow, Component Communication, Pipes, Reactive Forms, Services/DI and Routing now use the same compact layout and editable runtime. Their actual seed modules are exercised by generated-runtime interaction tests. Component Communication and Services/DI add per-example concept diagrams after the editable source. Communication shows input values and output events separately, with parent-owned state and clickable binding/child files. Services/DI shows named provider scopes, distinct service instances and labelled injection arrows. File nodes select the matching editor tab without restarting the preview. Diagrams explain the initial seed configuration, while edited providers can change runtime behavior. First Component, Data Binding, Control Flow, Pipes and Forms also provide concise schemas after the editor, linked to their actual source tabs. Schema descriptions follow the seed behavior, including presentation-only pipes and conditional form errors. Other lessons retain their existing demos.
 
 ## Runtime choice
 
@@ -35,7 +35,7 @@ This isolation protects the host's DOM and origin data; it is not a resource-quo
 ## Next steps
 
 1. Finish real-device iOS/Android selection, long-press and virtual keyboard acceptance.
-2. Validate the updated editor and Forms visually before converting Routing.
+2. Validate the updated editor, Forms and Routing visually on desktop and narrow screens.
 3. Add a real project runtime for multi-file examples, rather than claiming the component prototype supports arbitrary projects.
 
 References: [Angular JIT/AOT](https://angular.dev/tools/cli/aot-compiler), [createApplication](https://angular.dev/api/platform-browser/createApplication), [CodeMirror](https://codemirror.net/), [WebContainers browser support](https://webcontainers.io/guides/browser-support).
@@ -78,3 +78,7 @@ The first four lessons now share semantic emphasis and inline-code styles. Use `
 Dynamic example prompts/takeaways use LessonInline: only `**keyword**` and backtick-delimited code are recognized; plain strings, whitespace and HTML-looking text remain literal. Nested formatting and HTML interpretation are intentionally unsupported.
 
 Verification: 111 host tests and 14 runtime tests passed, including three renderer tests for safe text, updates and delimiter behavior. Strict playground type checking and production build passed; initial bundle 468.29 kB. Static theme contrast checks passed. Browser control remains unavailable, so visual and real-device acceptance remain pending.
+
+## Routing playground
+
+Routing uses three independent editable examples: navigation, reactive route parameters and a last-position wildcard with recovery. Component modules, route configuration and application configuration are separate virtual files. The preview runs the real Angular router against a per-application in-memory location strategy. This path is displayed inside the demo; it deliberately does not change the host page URL or browser history. A local application uses its browser location instead. Recompiling/resetting creates a fresh application and resets navigation. Conventional virtual `app.config.ts` supplies `appConfig.providers`; runtime-owned location and error handling remain authoritative inside the isolated preview.

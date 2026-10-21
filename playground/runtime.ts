@@ -6,9 +6,11 @@ import * as forms from '@angular/forms';
 import * as buttons from '@angular/material/button';
 import * as formFields from '@angular/material/form-field';
 import * as inputs from '@angular/material/input';
+import * as router from '@angular/router';
 import { createApplication } from '@angular/platform-browser';
 import * as ts from 'typescript';
 import { initializerTransform } from './initializer-transform';
+import { MemoryLocationStrategy } from './memory-location';
 import type { PlaygroundSources } from '../src/app/components/angular-playground/playground.types';
 
 const MAX_FILE_LENGTH = 50000;
@@ -32,11 +34,28 @@ let revision = 0;
 let component: core.ComponentRef<unknown> | undefined;
 const reply = (kind: string, payload: object = {}) => parent.postMessage({ channel, kind, revision, ...payload }, '*');
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
+interface RenderState { revision: number; failed: boolean; }
 class PreviewErrors implements core.ErrorHandler {
-  handleError(error: unknown): void { reply('error', { message: message(error) }); }
+  constructor(private readonly state: RenderState) {}
+  handleError(error: unknown): void {
+    if (this.state.revision !== revision) return;
+    this.state.failed = true;
+    reply('error', { message: message(error) });
+  }
 }
-const applicationOptions = { providers: [{ provide: core.ErrorHandler, useClass: PreviewErrors }] };
-let app = createApplication(applicationOptions);
+// Runtime-owned services follow configuration providers and remain isolated.
+const applicationOptions = (
+  config?: core.ApplicationConfig,
+  state: RenderState = { revision: 0, failed: false },
+): core.ApplicationConfig => ({
+  providers: [
+    ...(config?.providers ?? []),
+    { provide: core.ErrorHandler, useFactory: () => new PreviewErrors(state) },
+    { provide: common.LocationStrategy, useFactory: () => new MemoryLocationStrategy() },
+  ],
+});
+let app = createApplication(applicationOptions());
+let cancelStability: (() => void) | undefined;
 let queue = Promise.resolve();
 const reportSize = () => reply('resize', {
   height: Math.ceil(document.querySelector('#preview')!.getBoundingClientRect().height + 48),
@@ -174,8 +193,37 @@ function resolveModule(specifier: string, from: string, files: Map<string, Virtu
   fail(`Modulo non trovato: "${specifier}" (importato da ${from}).`);
 }
 
-function evaluate(sources: PlaygroundSources): core.Type<unknown> {
+interface EvaluatedProject {
+  root: core.Type<unknown>;
+  config?: core.ApplicationConfig;
+}
+
+/** Validate the single configuration shape that the preview understands. */
+function applicationConfig(value: unknown, file: string): core.ApplicationConfig {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    fail(`${file}: esporta appConfig come oggetto ApplicationConfig, per esempio { providers: [...] }.`);
+  }
+
+  const candidate = value as { providers?: unknown };
+  const keys = Object.keys(candidate);
+  if (keys.some(key => key !== 'providers')) {
+    fail(`${file}: appConfig ammette solo la proprietà providers; il componente principale resta component.ts.`);
+  }
+  if (!Array.isArray(candidate.providers)) {
+    fail(`${file}: appConfig.providers deve essere un array di provider Angular.`);
+  }
+  if (!candidate.providers.every(provider =>
+    provider !== null && (typeof provider === 'object' || typeof provider === 'function'))) {
+    fail(`${file}: appConfig.providers contiene una voce che non è un provider Angular.`);
+  }
+
+  return { providers: candidate.providers as core.ApplicationConfig['providers'] };
+}
+
+function evaluate(sources: PlaygroundSources): EvaluatedProject {
   const files = createFiles(sources);
+  // One module cache per render keeps app.config.ts, app.routes.ts and the
+  // components on the same module instances.
   const cache = new Map<string, ModuleRecord>();
   let componentIndex = 0;
 
@@ -219,7 +267,7 @@ function evaluate(sources: PlaygroundSources): core.Type<unknown> {
   };
 
   const bundled: Record<string, unknown> = {
-    '@angular/common': common, '@angular/forms': forms,
+    '@angular/common': common, '@angular/forms': forms, '@angular/router': router,
     '@angular/material/button': buttons, '@angular/material/form-field': formFields,
     '@angular/material/input': inputs,
   };
@@ -245,7 +293,7 @@ function evaluate(sources: PlaygroundSources): core.Type<unknown> {
         if (!Object.hasOwn(bundled, specifier)) {
           throw new Error(
             `Import non disponibile: ${specifier} (in ${path}). Sono disponibili Angular core, ` +
-            'common, forms e Material button, form-field e input.',
+            'common, forms, router e Material button, form-field e input.',
           );
         }
         return bundled[specifier];
@@ -265,29 +313,83 @@ function evaluate(sources: PlaygroundSources): core.Type<unknown> {
   if (!root || typeof root.default !== 'function' || !core.reflectComponentType(root.default)) {
     fail('Esporta il componente principale con export default class NomeComponente (in component.ts).');
   }
-  return root.default;
+
+  // app.config.ts is optional; when present, it must export a valid
+  // ApplicationConfig. The root component remains component.ts in both modes.
+  if (!files.has('app.config.ts')) return { root: root.default };
+
+  const configModule = load('app.config.ts') as { appConfig?: unknown };
+  return { root: root.default, config: applicationConfig(configModule.appConfig, 'app.config.ts') };
 }
 
 async function render(sources: PlaygroundSources, requested: number): Promise<void> {
   if (requested !== revision) return;
   try {
-    const previous = await app;
+    // Evaluate before touching the current preview so an invalid edit leaves
+    // the last working application visible.
+    const { root, config } = evaluate(sources);
+    const previous = await app.catch(() => undefined);
     if (requested !== revision) return;
-    const type = evaluate(sources);
+
     component?.destroy();
-    if (!previous.destroyed) previous.destroy();
-    // A fresh application also resets Angular's renderer/style cache for the same selector.
-    app = createApplication(applicationOptions);
+    component = undefined;
+    if (previous && !previous.destroyed) previous.destroy();
+
+    // A fresh application also resets Angular's renderer/style cache, the
+    // router and the in-memory LocationStrategy for the same selector.
+    const state: RenderState = { revision: requested, failed: false };
+    app = createApplication(applicationOptions(config, state));
     const application = await app;
-    if (requested !== revision) return;
+    if (requested !== revision) {
+      application.destroy();
+      return;
+    }
+
     const host = document.createElement('div');
     document.querySelector('#preview')!.replaceChildren(host);
-    component = core.createComponent(type, { hostElement: host, environmentInjector: application.injector });
-    application.attachView(component.hostView);
-    component.changeDetectorRef.detectChanges();
-    reportSize();
-    reply('rendered');
-  } catch (error) { reply('error', { message: message(error) }); }
+
+    if (config) {
+      // Router initial-navigation failures are emitted as NavigationError and
+      // need not reach ErrorHandler. Keep them inside this render's boundary.
+      const configuredRouter = application.injector.get(router.Router, null);
+      if (configuredRouter) {
+        const errors = new PreviewErrors(state);
+        const subscription = configuredRouter.events.subscribe(event => {
+          if (event instanceof router.NavigationError) errors.handleError(event.error);
+        });
+        application.onDestroy(() => subscription.unsubscribe());
+      }
+      // bootstrap runs APP_BOOTSTRAP_LISTENER, starting initial navigation.
+      component = application.bootstrap(root, { hostElement: host });
+      // A newer edit must not wait forever for the previous application's tasks.
+      await Promise.race([
+        application.whenStable(),
+        new Promise<void>(resolve => { cancelStability = resolve; }),
+      ]);
+      cancelStability = undefined;
+      if (requested !== revision) {
+        component.destroy();
+        component = undefined;
+        application.destroy();
+        return;
+      }
+    } else {
+      // Keep the established component-only render path unchanged.
+      component = core.createComponent(root, {
+        hostElement: host,
+        environmentInjector: application.injector,
+      });
+      application.attachView(component.hostView);
+      component.changeDetectorRef.detectChanges();
+    }
+
+    if (!state.failed && requested === revision) {
+      reportSize();
+      reply('rendered');
+    }
+  } catch (error) {
+    if (requested === revision) reply('error', { message: message(error) });
+  }
 }
 
 addEventListener('message', event => {
@@ -295,6 +397,7 @@ addEventListener('message', event => {
   const { sources, revision: requested } = event.data;
   if (!Number.isInteger(requested) || requested < revision || !sources ||
       !['typescript', 'html', 'css'].every(key => typeof sources[key] === 'string' && sources[key].length <= MAX_FILE_LENGTH)) return;
+  if (requested > revision) cancelStability?.();
   revision = requested;
   queue = queue.then(() => render(sources, requested));
 });

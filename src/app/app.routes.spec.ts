@@ -73,20 +73,17 @@ describe('Showcase routes', () => {
     }
   });
 
-  it('keeps nested detail, query and parent state while opening a lesson section', async () => {
+  it('recovers legacy routing URLs and keeps the playground mounted at code anchors', async () => {
     const harness = await RouterTestingHarness.create('/basics/routing/detail/2?mode=compact');
+    const router = TestBed.inject(Router);
+    expect(router.url.split('?')[0]).toBe('/basics/routing');
     const page = harness.routeNativeElement!;
-    Array.from(page.querySelectorAll<HTMLButtonElement>('button'))
-      .find(button => button.textContent?.trim() === 'Incrementa promemoria')!.click();
-    await harness.fixture.whenStable();
-    const section = Array.from(page.querySelectorAll<HTMLAnchorElement>('a'))
-      .find(link => link.textContent?.trim() === '2. Guarda il codice')!;
-    section.click();
-    await harness.fixture.whenStable();
-    expect(TestBed.inject(Router).url).toBe('/basics/routing/detail/2?mode=compact#code');
-    expect(page.querySelector('[data-testid="detail-content"]')?.textContent).toContain('Scheda 2');
-    expect(page.querySelector('[data-testid="parent-state"]')?.textContent).toContain('Promemoria del padre: 1');
-    expect(page.querySelector('#code mat-expansion-panel-header')?.getAttribute('aria-expanded')).toBe('true');
+    const frame = page.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    await harness.navigateByUrl('/basics/routing#code');
+    expect(router.url).toBe('/basics/routing#code');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
   it('updates computed values after a Signals counter click', async () => {

@@ -38,6 +38,7 @@ const supportedModules = [
   '@angular/core',
   '@angular/common',
   '@angular/forms',
+  '@angular/router',
   '@angular/material/button',
   '@angular/material/form-field',
   '@angular/material/input',

@@ -17,7 +17,10 @@ export const routes: Routes = [
       {
         path: 'routing',
         loadComponent: () => import('./routing-lesson/routing-lesson').then(m => m.RoutingLesson),
-        loadChildren: () => import('./routing-lesson/demo.routes').then(m => m.DEMO_ROUTES),
+        children: [
+          { path: '', pathMatch: 'full', children: [] },
+          { path: '**', redirectTo: '' },
+        ],
       },
       {
         path: 'data-binding',

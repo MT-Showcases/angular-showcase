@@ -29,6 +29,7 @@ export const SUPPORTED_IMPORTS = [
   '@angular/core',
   '@angular/common',
   '@angular/forms',
+  '@angular/router',
   '@angular/material/button',
   '@angular/material/form-field',
   '@angular/material/input',
@@ -98,7 +99,7 @@ function unsupportedImports(source: string, fileName: string): TypeDiagnostic[] 
       severity: 'error',
       message:
         `Import non supportato: "${name}". Nel playground sono disponibili ` +
-        '@angular/core, @angular/common, @angular/forms e i moduli Material ' +
+        '@angular/core, @angular/common, @angular/forms, @angular/router e i moduli Material ' +
         'button, form-field e input.',
       code: UNSUPPORTED_IMPORT_CODE,
     });

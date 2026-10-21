@@ -1,103 +1,146 @@
 // COMPONENT TYPE: Test Suite
-// SECTION: Angular Basics
-// ROLE: Verify nested route navigation, reactive parameters, query changes and local recovery.
-// PATTERNS USED: RouterTestingHarness with a route contract isolated from application configuration.
-// NOTES FOR CONTRIBUTORS: Assert same-instance reuse, not only URLs or initial snapshots.
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { TestBed } from '@angular/core/testing';
-import { MatButtonHarness } from '@angular/material/button/testing';
+// ROLE: Verify the three routing seeds, their diagrams and draft retention in the host lesson.
+// PATTERNS USED: Real lesson DOM, AngularPlayground selection and CodeMirror source inspection.
+// NOTES FOR CONTRIBUTORS: Router behavior belongs in scripts/test-routing.mjs.
+import { EditorView } from '@codemirror/view';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideRouter, Router, Routes } from '@angular/router';
-import { RouterTestingHarness } from '@angular/router/testing';
-import { DEMO_ROUTES } from './demo.routes';
-import { DemoDetail } from './demo-views';
+import { provideRouter } from '@angular/router';
+import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { RoutingLesson } from './routing-lesson';
+import { ROUTING_EXAMPLES } from './routing.example';
 
-const testRoutes: Routes = [{
-  path: 'basics/routing',
-  component: RoutingLesson,
-  children: DEMO_ROUTES,
-}];
+const ROOT_FILES = ['component.ts', 'component.html', 'component.css'];
 
-describe('RoutingLesson', () => {
-  let harness: RouterTestingHarness;
-  let router: Router;
+async function lessonFixture(): Promise<{ fixture: ComponentFixture<RoutingLesson>; page: HTMLElement }> {
+  TestBed.configureTestingModule({ imports: [RoutingLesson], providers: [provideRouter([])] });
+  const fixture = TestBed.createComponent(RoutingLesson);
+  await fixture.whenStable();
+  return { fixture, page: fixture.nativeElement };
+}
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({ providers: [provideRouter(testRoutes)] }).compileComponents();
-    router = TestBed.inject(Router);
-    harness = await RouterTestingHarness.create();
+function activePlayground(fixture: ComponentFixture<RoutingLesson>): AngularPlayground {
+  return fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+}
+
+describe('Routing playground lesson', () => {
+  it('exports three valid independent seeds with real config, routes and diagram file targets', async () => {
+    const { fixture, page } = await lessonFixture();
+    try {
+      expect(ROUTING_EXAMPLES.map(example => example.id)).toEqual([
+        'navigation',
+        'parameters',
+        'fallback',
+      ]);
+      expect(ROUTING_EXAMPLES.map(example => example.sources)).toHaveLength(3);
+      expect(new Set(ROUTING_EXAMPLES.map(example => example.sources)).size).toBe(3);
+
+      for (const seed of ROUTING_EXAMPLES) {
+        const files = seed.sources.files ?? {};
+        expect(files['app.config.ts']).toContain('provideRouter');
+        expect(files['app.routes.ts']).toContain('Routes');
+        expect(seed.sources.typescript).not.toMatch(/href=["']#/);
+
+        const editable = new Set([...ROOT_FILES, ...Object.keys(files)]);
+        expect(seed.diagram?.groups.length).toBeGreaterThan(0);
+
+        for (const group of seed.diagram?.groups ?? []) {
+          for (const step of group.steps) {
+            for (const node of step.nodes) {
+              expect(editable.has(node.file)).toBe(true);
+            }
+          }
+        }
+      }
+
+      expect(Object.keys(ROUTING_EXAMPLES[0].sources.files ?? {})).toEqual([
+        'app.config.ts',
+        'app.routes.ts',
+        'overview-view.component.ts',
+        'about-view.component.ts',
+      ]);
+      expect(Object.keys(ROUTING_EXAMPLES[1].sources.files ?? {})).toEqual([
+        'app.config.ts',
+        'app.routes.ts',
+        'detail-view.component.ts',
+      ]);
+      expect(Object.keys(ROUTING_EXAMPLES[2].sources.files ?? {})).toEqual([
+        'app.config.ts',
+        'app.routes.ts',
+        'home-view.component.ts',
+        'not-found-view.component.ts',
+      ]);
+
+      const playground = activePlayground(fixture);
+      expect(playground.initial()).toBe(ROUTING_EXAMPLES[0].sources);
+      expect(page.querySelectorAll('.cm-editor')).toHaveLength(
+        3 + Object.keys(playground.initial().files ?? {}).length,
+      );
+      expect(page.querySelector('.lesson-shell__intro')).toBeNull();
+      expect(page.querySelector('#demo')?.textContent).toContain('router');
+      expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
+      expect(
+        page.querySelector('app-angular-playground')!.compareDocumentPosition(
+          page.querySelector('app-lesson-diagram')!,
+        ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    } finally {
+      fixture.destroy();
+    }
   });
 
-  function text(id: string): string {
-    return harness.routeNativeElement?.querySelector(`[data-testid="${id}"]`)?.textContent ?? '';
-  }
+  it('switches all three seeds and keeps each source draft until reset', async () => {
+    const { fixture, page } = await lessonFixture();
+    try {
+      const choices = page.querySelectorAll<HTMLButtonElement>(
+        'nav[aria-label="Scegli un esempio"] button',
+      );
+      expect(choices).toHaveLength(ROUTING_EXAMPLES.length);
 
-  async function click(label: string): Promise<void> {
-    const loader = TestbedHarnessEnvironment.loader(harness.fixture);
-    await (await loader.getHarness(MatButtonHarness.with({ text: label }))).click();
-    await harness.fixture.whenStable();
-    harness.detectChanges();
-  }
+      for (const [index, seed] of ROUTING_EXAMPLES.entries()) {
+        choices[index].click();
+        await fixture.whenStable();
 
-  it('redirects the empty child to overview and opens a detail through the nested outlet', async () => {
-    await harness.navigateByUrl('/basics/routing', RoutingLesson);
-    expect(router.url).toBe('/basics/routing/overview');
-    expect(harness.routeNativeElement?.textContent).toContain('Panoramica della demo');
-    await click('Apri il dettaglio 1');
-    expect(router.url).toBe('/basics/routing/detail/1');
-    expect(text('detail-id')).toContain('1');
-    expect(text('detail-content')).toContain('Componenti');
-  });
+        const playground = activePlayground(fixture);
+        const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>('.cm-editor')!)!;
 
-  it('reacts to a second ID in the same child instance and keeps parent state', async () => {
-    const parent = await harness.navigateByUrl('/basics/routing/detail/1', RoutingLesson);
-    const first = harness.routeDebugElement?.query(By.directive(DemoDetail)).componentInstance;
-    await click('Incrementa promemoria');
-    await click('Passa al dettaglio 2');
-    const second = harness.routeDebugElement?.query(By.directive(DemoDetail)).componentInstance;
-    expect(second).toBe(first);
-    expect(parent.reminders()).toBe(1);
-    expect(text('detail-id')).toContain('2');
-    expect(text('detail-content')).toContain('Servizi');
-    expect(router.url).toBe('/basics/routing/detail/2');
-  });
+        expect(playground.initial()).toBe(seed.sources);
+        expect(choices[index].getAttribute('aria-pressed')).toBe('true');
+        expect(page.querySelectorAll('.cm-editor')).toHaveLength(
+          3 + Object.keys(seed.sources.files ?? {}).length,
+        );
+        expect(editor.state.doc.toString()).toBe(seed.sources.typescript);
+        expect(page.querySelector('app-lesson-diagram')?.textContent).toContain(
+          seed.diagram!.title,
+        );
+      }
 
-  it('updates the query in place, preserves it across details and clears it on reset', async () => {
-    await harness.navigateByUrl('/basics/routing/detail/1', RoutingLesson);
-    await click('Query compatta');
-    expect(router.url).toBe('/basics/routing/detail/1?mode=compact');
-    expect(text('detail-mode')).toContain('compatta');
-    await click('Dettaglio 2');
-    expect(router.url).toBe('/basics/routing/detail/2?mode=compact');
-    expect(text('detail-mode')).toContain('compatta');
-    await click('Incrementa promemoria');
-    await click('Ripristina laboratorio');
-    expect(router.url).toBe('/basics/routing/overview');
-    expect(text('parent-state')).toContain('Promemoria del padre: 0');
-    expect(text('parent-state')).toContain('completa');
-  });
+      choices[0].click();
+      await fixture.whenStable();
+      const rootEditor = () => EditorView.findFromDOM(
+        page.querySelector<HTMLElement>('[id$="editor-typescript"] .cm-editor')!,
+      )!;
+      const original = ROUTING_EXAMPLES[0].sources.typescript;
+      const modified = '// bozza locale\n' + original;
 
-  it('handles absent data separately from a path mismatch and recovers from deep unknown paths locally', async () => {
-    await harness.navigateByUrl('/basics/routing/detail/999', RoutingLesson);
-    expect(text('detail-content')).toContain('Nessuna scheda');
-    const parent = await harness.navigateByUrl('/basics/routing/no/such/path', RoutingLesson);
-    expect(harness.routeNativeElement?.textContent).toContain('Percorso della demo non trovato');
-    expect(harness.routeNativeElement?.querySelector('app-lesson-shell')).not.toBeNull();
-    expect(parent).toBeInstanceOf(RoutingLesson);
-    await click('Torna alla panoramica');
-    expect(router.url).toBe('/basics/routing/overview');
-    await click('Percorso sconosciuto');
-    expect(router.url).toBe('/basics/routing/missing-demo');
-    expect(harness.routeNativeElement?.textContent).toContain('rotta jolly **');
-  });
+      rootEditor().dispatch({
+        changes: { from: 0, to: rootEditor().state.doc.length, insert: modified },
+      });
+      choices[1].click();
+      await fixture.whenStable();
+      choices[0].click();
+      await fixture.whenStable();
+      expect(rootEditor().state.doc.toString()).toBe(modified);
 
-  it('supports direct links with query parameters and ignores unsupported query values', async () => {
-    await harness.navigateByUrl('/basics/routing/detail/2?mode=compact', RoutingLesson);
-    expect(text('detail-content')).toContain('Scheda 2');
-    expect(text('detail-mode')).toContain('compatta');
-    expect(text('current-url')).toContain('/basics/routing/detail/2?mode=compact');
-    await harness.navigateByUrl('/basics/routing/detail/2?mode=unknown', RoutingLesson);
-    expect(text('detail-mode')).toContain('completa');
+      [...page.querySelectorAll<HTMLButtonElement>('button')]
+        .find(button => button.textContent?.trim() === 'Ripristina codice')!
+        .click();
+      fixture.detectChanges();
+      expect(rootEditor().state.doc.toString()).toBe(original);
+      expect(ROUTING_EXAMPLES[0].sources.typescript).toBe(original);
+      expect(page.querySelector('app-lesson-diagram')).not.toBeNull();
+    } finally {
+      fixture.destroy();
+    }
   });
 });
