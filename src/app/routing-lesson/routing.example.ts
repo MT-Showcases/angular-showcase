@@ -58,43 +58,58 @@ const NAVIGATION_HTML = `<section class="demo">
     La radice resta montata: il router cambia soltanto la pagina dentro <code>router-outlet</code>.
   </p>
 
-  <!-- Un unico guscio di sito: intestazione e barra restano fuori dalla pagina. -->
-  <div class="site">
-    <header class="site-header">
-      <p class="site-name">Sito demo</p>
+  <!-- Cornice simile al browser: la striscia dell'URL sta sopra il sito e la sua pagina. -->
+  <div class="browser">
+    <!-- Striscia di sola lettura: non è un campo editabile, mostra solo il percorso interno. -->
+    <div class="address-bar">
+      <!-- Indietro e Avanti percorrono solo la cronologia interna di questa anteprima. -->
+      <div class="history">
+        <button matButton="text" type="button" data-testid="history-back" (click)="back()">Indietro</button>
+        <button matButton="text" type="button" data-testid="history-forward" (click)="forward()">Avanti</button>
+      </div>
 
-      <!-- La barra fa parte del sito persistente e resta montata a ogni cambio di pagina. -->
-      <nav class="site-nav" aria-label="Pagine dell'esempio">
-        <!-- routerLink chiede la navigazione interna: il browser non ricarica la pagina. -->
-        <!-- routerLinkActive aggiunge .active; exact evita che /overview resti attivo su un percorso figlio.
-             ariaCurrentWhenActive segnala la pagina corrente anche alle tecnologie assistive. -->
-        <a
-          matButton="text"
-          routerLink="/overview"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          ariaCurrentWhenActive="page"
-          data-testid="nav-overview"
-        >Panoramica</a>
+      <!-- router.url è l'URL interno della SPA: mostrarlo rende visibile il cambio di rotta. -->
+      <p class="url" data-testid="router-url">URL simulato: <code>{{ url() }}</code></p>
+    </div>
 
-        <a
-          matButton="text"
-          routerLink="/about"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          ariaCurrentWhenActive="page"
-          data-testid="nav-about"
-        >Chi siamo</a>
-      </nav>
-    </header>
+    <!-- Un unico guscio di sito: intestazione e barra restano fuori dalla pagina. -->
+    <div class="site">
+      <header class="site-header">
+        <p class="site-name">Sito demo</p>
 
-    <!-- Il router mostra qui la pagina scelta; la navbar resta montata sopra l'outlet. -->
-    <div class="page">
-      <router-outlet />
+        <!-- La barra fa parte del sito persistente e resta montata a ogni cambio di pagina. -->
+        <nav class="site-nav" aria-label="Pagine dell'esempio">
+          <!-- routerLink chiede la navigazione interna: il browser non ricarica la pagina. -->
+          <!-- routerLinkActive aggiunge .active; exact evita che /overview resti attivo su un percorso figlio.
+               ariaCurrentWhenActive segnala la pagina corrente anche alle tecnologie assistive. -->
+          <a
+            matButton="text"
+            routerLink="/overview"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="nav-overview"
+          >Panoramica</a>
+
+          <a
+            matButton="text"
+            routerLink="/about"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="nav-about"
+          >Chi siamo</a>
+        </nav>
+      </header>
+
+      <!-- Il router mostra qui la pagina scelta; la navbar resta montata sopra l'outlet. -->
+      <div class="page">
+        <router-outlet />
+      </div>
     </div>
   </div>
 
-  <!-- Promemoria, cronologia e URL restano fuori dalla pagina, sotto il guscio del sito. -->
+  <!-- Il promemoria è stato della radice: resta fuori dalla cornice e dalla pagina. -->
   <div class="state">
     <p role="status" data-testid="root-state">Promemoria della radice: {{ reminders() }}</p>
 
@@ -105,15 +120,6 @@ const NAVIGATION_HTML = `<section class="demo">
       (click)="increment()"
     >Aumenta il promemoria</button>
   </div>
-
-  <!-- Indietro e Avanti percorrono solo la cronologia interna di questa anteprima. -->
-  <div class="history">
-    <button matButton="text" type="button" data-testid="history-back" (click)="back()">Indietro</button>
-    <button matButton="text" type="button" data-testid="history-forward" (click)="forward()">Avanti</button>
-  </div>
-
-  <!-- router.url è l'URL interno della SPA: mostrarlo rende visibile il cambio di rotta. -->
-  <p class="url" data-testid="router-url">URL interno simulato: <code>{{ url() }}</code></p>
 </section>`;
 
 const NAVIGATION_CSS = `.demo {
@@ -122,19 +128,57 @@ const NAVIGATION_CSS = `.demo {
   min-width: 0;
 }
 
-.hint,
-.url {
+.hint {
   margin: 0;
   color: var(--mat-sys-on-surface-variant);
   line-height: 1.6;
 }
 
-/* Il guscio unisce barra e pagina: il cambio di rotta non apre un riquadro separato. */
-.site {
+/* La cornice unisce striscia dell'URL, sito e pagina come in un browser. */
+.browser {
   min-width: 0;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: var(--mat-sys-corner-medium);
   overflow: hidden;
+}
+
+/* La striscia è di sola lettura: un URL lungo va a capo invece di allargare la cornice. */
+.address-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-high);
+}
+
+/* flex-wrap lascia andare a capo i controlli di cronologia su schermi stretti. */
+.history {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.url {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
+  /* Un URL lungo va a capo nel punto necessario, anche dentro un segmento. */
+  overflow-wrap: anywhere;
+}
+
+/* Il guscio del sito resta montato: cambia solo la pagina dentro l'outlet. */
+.site {
+  min-width: 0;
 }
 
 /* L'intestazione è persistente: cambia solo il contenuto mostrato sotto di lei. */
@@ -157,10 +201,21 @@ const NAVIGATION_CSS = `.demo {
 
 /* flex-wrap lascia andare a capo i link della barra su schermi stretti. */
 .site-nav {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.25rem;
+}
+
+/* Le etichette lunghe vanno a capo mantenendo i controlli Material. */
+.site-nav a {
+  max-width: 100%;
+  height: auto;
+  min-height: 2.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 /* La pagina attiva usa i colori del tema e resta leggibile anche senza distinguere i colori. */
@@ -180,17 +235,12 @@ const NAVIGATION_CSS = `.demo {
   color: var(--mat-sys-on-surface);
 }
 
-.state,
-.history {
-  /* flex-wrap lascia andare a capo i controlli su schermi stretti. */
+/* Il promemoria resta fuori dalla cornice: è stato della radice, non della pagina. */
+.state {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
-
-/* Promemoria e cronologia restano fuori dal guscio: sono stato della radice, non della pagina. */
-.state {
   padding: 0.75rem 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: var(--mat-sys-corner-medium);
@@ -202,8 +252,17 @@ const NAVIGATION_CSS = `.demo {
 }
 
 .url code {
+  /* Il percorso sembra una barra indirizzi, ma resta testo di sola lettura. */
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface);
   /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
+  /* Anche il nodo code rispetta l'a capo dell'URL. */
+  overflow-wrap: anywhere;
 }`;
 
 const NAVIGATION_OVERVIEW = `import { ChangeDetectionStrategy, Component } from '@angular/core';
@@ -298,12 +357,12 @@ export const appConfig: ApplicationConfig = {
 
 const PARAMETERS_ROOT = `import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-// RADICE: contiene i link e l'outlet, mentre il dettaglio riceve l'ID dall'URL.
+// RADICE: contiene barra, striscia dell'URL e outlet; il dettaglio riceve l'ID dall'URL.
 @Component({
   selector: 'app-routing-parameters',
-  imports: [MatButtonModule, RouterLink, RouterOutlet],
+  imports: [MatButtonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -313,6 +372,7 @@ export default class RoutingParameters {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  // Il signal espone l'URL alla striscia simulata in cima alla cornice.
   readonly url = signal(this.router.url);
 
   constructor() {
@@ -331,20 +391,56 @@ const PARAMETERS_HTML = `<section class="demo">
     Il percorso <code>detail/:id</code> riusa lo stesso componente quando cambia solo l'ID.
   </p>
 
-  <!-- Ogni link cambia solo il segmento :id dell'URL. -->
-  <nav class="links" aria-label="Dettagli dell'esempio">
-    <a matButton="outlined" routerLink="/detail/1" data-testid="param-link-1">Dettaglio 1</a>
-    <a matButton="outlined" routerLink="/detail/2" data-testid="param-link-2">Dettaglio 2</a>
-    <a matButton="outlined" routerLink="/detail/999" data-testid="param-link-999">ID 999</a>
-  </nav>
+  <!-- Cornice simile al browser: la striscia dell'URL sta sopra il sito e la sua pagina. -->
+  <div class="browser">
+    <!-- Striscia di sola lettura: mostra il percorso scelto senza campi modificabili. -->
+    <div class="address-bar">
+      <p class="url" data-testid="router-url">URL simulato: <code>{{ url() }}</code></p>
+    </div>
 
-  <!-- L'outlet resta nella radice: cambia solo il dettaglio montato al suo interno. -->
-  <div class="outlet">
-    <router-outlet />
+    <!-- Il guscio del sito resta montato: cambia solo il dettaglio dentro l'outlet. -->
+    <div class="site">
+      <header class="site-header">
+        <p class="site-name">Sito demo</p>
+
+        <!-- Ogni link cambia solo il segmento :id dell'URL. -->
+        <nav class="site-nav" aria-label="Dettagli dell'esempio">
+          <!-- routerLinkActive aggiunge .active; exact limita il match al percorso esatto. -->
+          <a
+            matButton="text"
+            routerLink="/detail/1"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="param-link-1"
+          >Dettaglio 1</a>
+
+          <a
+            matButton="text"
+            routerLink="/detail/2"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="param-link-2"
+          >Dettaglio 2</a>
+
+          <a
+            matButton="text"
+            routerLink="/detail/999"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="param-link-999"
+          >ID 999</a>
+        </nav>
+      </header>
+
+      <!-- L'outlet resta nella radice: cambia solo il dettaglio montato al suo interno. -->
+      <div class="page">
+        <router-outlet />
+      </div>
+    </div>
   </div>
-
-  <!-- L'URL interno rende visibile il parametro che arriva al componente. -->
-  <p class="url" data-testid="router-url">URL interno simulato: <code>{{ url() }}</code></p>
 </section>`;
 
 const PARAMETERS_CSS = `.demo {
@@ -353,33 +449,116 @@ const PARAMETERS_CSS = `.demo {
   min-width: 0;
 }
 
-.hint,
-.url {
+.hint {
   margin: 0;
   color: var(--mat-sys-on-surface-variant);
   line-height: 1.6;
 }
 
-.links {
-  /* flex-wrap lascia andare a capo i link su schermi stretti. */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-/* Lo stile del riquadro è solo presentazione: il contenuto lo sceglie il router. */
-.outlet {
+/* La cornice unisce striscia dell'URL, sito e pagina come in un browser. */
+.browser {
   min-width: 0;
-  padding: 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: var(--mat-sys-corner-medium);
+  overflow: hidden;
+}
+
+/* La striscia è di sola lettura: un URL lungo va a capo invece di allargare la cornice. */
+.address-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-high);
+}
+
+.url {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
+  /* Un URL lungo va a capo nel punto necessario, anche dentro un segmento. */
+  overflow-wrap: anywhere;
+}
+
+/* Il guscio del sito resta montato: cambia solo la pagina dentro l'outlet. */
+.site {
+  min-width: 0;
+}
+
+/* L'intestazione è persistente: cambia solo il contenuto mostrato sotto di lei. */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+.site-name {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+}
+
+/* flex-wrap lascia andare a capo i link della barra su schermi stretti. */
+.site-nav {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Le etichette lunghe vanno a capo mantenendo i controlli Material. */
+.site-nav a {
+  max-width: 100%;
+  height: auto;
+  min-height: 2.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* La pagina attiva usa i colori del tema e resta leggibile anche senza distinguere i colori. */
+.site-nav .active {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+/* Il contenitore dà spazio alla pagina selezionata dal router. */
+.page {
+  min-width: 0;
+  padding: 1rem;
   background: var(--mat-sys-surface-container-low);
   color: var(--mat-sys-on-surface);
 }
 
 .url code {
+  /* Il percorso sembra una barra indirizzi, ma resta testo di sola lettura. */
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface);
   /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
+  /* Anche il nodo code rispetta l'a capo dell'URL. */
+  overflow-wrap: anywhere;
 }`;
 
 const PARAMETERS_DETAIL = `import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
@@ -482,12 +661,12 @@ export const appConfig: ApplicationConfig = {
 
 const FALLBACK_ROOT = `import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-// RADICE: i link restano disponibili anche quando la vista è quella di fallback.
+// RADICE: barra e striscia dell'URL restano disponibili anche con la vista di fallback.
 @Component({
   selector: 'app-routing-fallback',
-  imports: [MatButtonModule, RouterLink, RouterOutlet],
+  imports: [MatButtonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './component.html',
   styleUrl: './component.css',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -497,6 +676,7 @@ export default class RoutingFallback {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  // Il signal espone l'URL alla striscia simulata in cima alla cornice.
   readonly url = signal(this.router.url);
 
   constructor() {
@@ -515,18 +695,55 @@ const FALLBACK_HTML = `<section class="demo">
     La rotta <code>**</code> è l'ultima: intercetta solo i percorsi non riconosciuti sopra.
   </p>
 
-  <!-- I link possono portare a percorsi esistenti o sconosciuti: decide il router. -->
-  <nav class="links" aria-label="Percorsi dell'esempio">
-    <a matButton="outlined" routerLink="/home" data-testid="fallback-home">Home</a>
-    <a matButton="outlined" routerLink="/missing-page" data-testid="fallback-missing">Percorso sconosciuto</a>
-    <a matButton="outlined" routerLink="/sezioni/inesistente" data-testid="fallback-deep">Percorso profondo</a>
-  </nav>
+  <!-- Cornice simile al browser: la striscia dell'URL sta sopra il sito e la sua pagina. -->
+  <div class="browser">
+    <!-- Striscia di sola lettura: mostra il percorso scelto senza campi modificabili. -->
+    <div class="address-bar">
+      <p class="url" data-testid="router-url">URL simulato: <code>{{ url() }}</code></p>
+    </div>
 
-  <div class="outlet">
-    <router-outlet />
+    <!-- Il guscio del sito resta montato: cambia solo la pagina dentro l'outlet. -->
+    <div class="site">
+      <header class="site-header">
+        <p class="site-name">Sito demo</p>
+
+        <!-- I link possono portare a percorsi esistenti o sconosciuti: decide il router. -->
+        <nav class="site-nav" aria-label="Percorsi dell'esempio">
+          <!-- routerLinkActive aggiunge .active anche al percorso sconosciuto, se è quello corrente. -->
+          <a
+            matButton="text"
+            routerLink="/home"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="fallback-home"
+          >Home</a>
+
+          <a
+            matButton="text"
+            routerLink="/missing-page"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="fallback-missing"
+          >Percorso sconosciuto</a>
+
+          <a
+            matButton="text"
+            routerLink="/sezioni/inesistente"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            ariaCurrentWhenActive="page"
+            data-testid="fallback-deep"
+          >Percorso profondo</a>
+        </nav>
+      </header>
+
+      <div class="page">
+        <router-outlet />
+      </div>
+    </div>
   </div>
-
-  <p class="url" data-testid="router-url">URL interno simulato: <code>{{ url() }}</code></p>
 </section>`;
 
 const FALLBACK_CSS = `.demo {
@@ -535,33 +752,116 @@ const FALLBACK_CSS = `.demo {
   min-width: 0;
 }
 
-.hint,
-.url {
+.hint {
   margin: 0;
   color: var(--mat-sys-on-surface-variant);
   line-height: 1.6;
 }
 
-.links {
-  /* flex-wrap lascia andare a capo i link su schermi stretti. */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-/* Lo stile del riquadro è solo presentazione: il contenuto lo sceglie il router. */
-.outlet {
+/* La cornice unisce striscia dell'URL, sito e pagina come in un browser. */
+.browser {
   min-width: 0;
-  padding: 1rem;
   border: 1px solid var(--mat-sys-outline-variant);
   border-radius: var(--mat-sys-corner-medium);
+  overflow: hidden;
+}
+
+/* La striscia è di sola lettura: un URL lungo va a capo invece di allargare la cornice. */
+.address-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-width: 0;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-high);
+}
+
+.url {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  line-height: 1.6;
+  /* Un URL lungo va a capo nel punto necessario, anche dentro un segmento. */
+  overflow-wrap: anywhere;
+}
+
+/* Il guscio del sito resta montato: cambia solo la pagina dentro l'outlet. */
+.site {
+  min-width: 0;
+}
+
+/* L'intestazione è persistente: cambia solo il contenuto mostrato sotto di lei. */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+}
+
+.site-name {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+}
+
+/* flex-wrap lascia andare a capo i link della barra su schermi stretti. */
+.site-nav {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Le etichette lunghe vanno a capo mantenendo i controlli Material. */
+.site-nav a {
+  max-width: 100%;
+  height: auto;
+  min-height: 2.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* La pagina attiva usa i colori del tema e resta leggibile anche senza distinguere i colori. */
+.site-nav .active {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+/* Il contenitore dà spazio alla pagina selezionata dal router. */
+.page {
+  min-width: 0;
+  padding: 1rem;
   background: var(--mat-sys-surface-container-low);
   color: var(--mat-sys-on-surface);
 }
 
 .url code {
+  /* Il percorso sembra una barra indirizzi, ma resta testo di sola lettura. */
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-surface);
   /* Colore del tema per l'URL: è enfasi visiva, non una regola di navigazione. */
   color: var(--mat-sys-primary);
+  /* Anche il nodo code rispetta l'a capo dell'URL. */
+  overflow-wrap: anywhere;
 }`;
 
 const FALLBACK_HOME = `import { ChangeDetectionStrategy, Component } from '@angular/core';
@@ -693,7 +993,7 @@ export const ROUTING_EXAMPLES: readonly LessonExample[] = [
     label: '1. Navigazione',
     title: 'La navbar resta, la pagina cambia',
     prompt:
-      'Aumenta il **promemoria**, poi apri le pagine **Panoramica** e **Chi siamo**: il valore resta. Usa **Indietro** e **Avanti** per percorrere la cronologia interna. Osserva `router.url` in fondo alla preview.',
+      'Aumenta il **promemoria**, poi apri le pagine **Panoramica** e **Chi siamo**: il valore resta. Usa **Indietro** e **Avanti** per percorrere la cronologia interna. Osserva `router.url` nella barra dell’URL in alto.',
     takeaway:
       '`RouterLink` chiede una navigazione e `RouterOutlet` mostra la pagina attiva. Le rotte sono dichiarate in `app.routes.ts` e registrate da `provideRouter` in `app.config.ts`; la barra del sito e la radice non vengono ricreate a ogni cambio di pagina.',
     sources: NAVIGATION_SOURCES,
