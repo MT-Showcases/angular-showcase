@@ -12,6 +12,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', data: { category: 'basics' }, loadComponent: () => import('./learning/category/category').then(m => m.LearningCategory) },
       { path: 'getting-started', loadComponent: () => import('./getting-started/getting-started').then(m => m.GettingStarted) },
       { path: 'components', loadComponent: () => import('./component-communication/component-communication').then(m => m.ComponentCommunication) },
+      { path: 'course-exercise', loadComponent: () => import('./course-exercise/course-exercise').then(m => m.CourseExercise) },
       { path: 'pipes', loadComponent: () => import('./pipes/pipes').then(m => m.PipesLesson) },
       { path: 'services', loadComponent: () => import('./services-lesson/services-lesson').then(m => m.ServicesLesson) },
       {

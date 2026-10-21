@@ -1,0 +1,194 @@
+/** Exercise page: one active checkpoint, progressive hints and a manual checklist. */
+@use 'globals' as *;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.exercise__intro,
+.exercise__brief,
+.exercise__workspace,
+.exercise__checks {
+  display: grid;
+  gap: space(3);
+  min-width: 0;
+}
+
+.exercise__intro {
+  max-width: rem(900);
+}
+
+.exercise__heading,
+.exercise__subheading {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  overflow-wrap: anywhere;
+}
+
+.exercise__heading {
+  font: var(--mat-sys-headline-small);
+}
+
+.exercise__subheading {
+  font: var(--mat-sys-title-small);
+}
+
+.exercise__eyebrow {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.exercise__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+}
+
+.exercise__steps button[aria-pressed='true'] {
+  outline: rem(2) solid var(--mat-sys-primary);
+  outline-offset: rem(2);
+}
+
+.exercise__brief {
+  padding: space(4);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.exercise__list,
+.exercise__hint-list {
+  display: grid;
+  gap: space(2);
+  margin: 0;
+  padding-inline-start: space(6);
+}
+
+.exercise__list li,
+.exercise__hint-list li {
+  overflow-wrap: anywhere;
+}
+
+.exercise__hints {
+  display: grid;
+  gap: space(2);
+  padding-block-start: space(3);
+  border-block-start: rem(1) solid var(--mat-sys-outline-variant);
+}
+
+.exercise__subhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: space(2);
+}
+
+.exercise__hint-toggle {
+  flex-shrink: 0;
+}
+
+.exercise__hint-empty {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.exercise__workspace {
+  gap: space(3);
+}
+
+.exercise__mode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: space(3);
+  padding: space(3);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container);
+}
+
+.exercise__mode-copy {
+  display: grid;
+  gap: space(1);
+  min-width: 0;
+}
+
+.exercise__mode-text {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+}
+
+.exercise__mode-toggle {
+  flex-shrink: 0;
+}
+
+.exercise__notice {
+  margin: 0;
+  padding: space(3);
+  border-radius: var(--mat-sys-corner-medium);
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+  overflow-wrap: anywhere;
+}
+
+.exercise__persistence {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+
+.exercise__checklist {
+  display: grid;
+  gap: space(2);
+}
+
+.exercise__check {
+  min-width: 0;
+  font-size: max(1rem, 16px);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.exercise__check-count {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@include media-min-breakpoint(md) {
+  .exercise__intro,
+  .exercise__brief,
+  .exercise__workspace,
+  .exercise__checks {
+    gap: space(4);
+  }
+
+  .exercise__brief {
+    padding: space(6);
+  }
+}
+
+// Brand text inherits the lesson shell contrast; controls sit on a theme surface.
+.exercise__title {
+  margin: 0;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+
+.exercise__intro .lesson-text,
+.exercise__persistence {
+  color: inherit;
+}
+
+.exercise__steps,
+.exercise__checks {
+  padding: space(4);
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}

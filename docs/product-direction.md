@@ -78,3 +78,7 @@ The first four lessons now share semantic emphasis and inline-code styles. Use `
 Dynamic example prompts/takeaways use LessonInline: only `**keyword**` and backtick-delimited code are recognized; plain strings, whitespace and HTML-looking text remain literal. Nested formatting and HTML interpretation are intentionally unsupported.
 
 Verification: 111 host tests and 14 runtime tests passed, including three renderer tests for safe text, updates and delimiter behavior. Strict playground type checking and production build passed; initial bundle 468.29 kB. Static theme contrast checks passed. Browser control remains unavailable, so visual and real-device acceptance remain pending.
+
+## Course catalog exercise
+
+`/basics/course-exercise` offers five independent checkpoints through Pipes: card, interactions, catalog/control flow, parent-child communication, and formatting/custom pipe. Each checkpoint has runnable starter code, observable requirements, progressive hints, manual self-assessment and a reference solution. Learner and solution drafts remain separate while moving between steps within the page. Checkpoints start from prepared code; learner edits do not automatically carry into the next step. Reloading or leaving the page clears local work. This exercise does not introduce forms, services, HTTP or routing. It is linked from the Basi index and Pipes.

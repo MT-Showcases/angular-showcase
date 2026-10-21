@@ -1,0 +1,142 @@
+<app-lesson-shell [topicId]="topicId" [compact]="true">
+  <section id="demo" class="exercise__intro" aria-labelledby="course-exercise-title">
+    <h2 id="course-exercise-title" class="exercise__title">Catalogo corsi in cinque checkpoint</h2>
+    <p class="lesson-prose lesson-prose--on-brand">
+      Costruisci una scheda corso e portala fino a un <strong class="lesson-emphasis">elenco selezionabile</strong> con componenti figli e pipe. Ogni passo parte dal proprio codice iniziale: le modifiche restano nel passo e non passano automaticamente al successivo.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Bozze, suggerimenti e caselle restano mentre cambi checkpoint. Ricaricare la pagina o uscire dalla lezione li azzera.
+    </p>
+  </section>
+
+  <nav class="exercise__steps" aria-label="Scegli un checkpoint">
+    @for (item of steps; track item.id) {
+      <button
+        matButton="outlined"
+        type="button"
+        [attr.aria-pressed]="selectedStepId() === item.id"
+        (click)="selectStep(item.id)"
+      >
+        {{ item.label }}
+      </button>
+    }
+  </nav>
+
+  <section class="exercise__brief" aria-labelledby="course-exercise-objective">
+    <p class="exercise__eyebrow">Checkpoint {{ stepIndex() }} di {{ steps.length }}</p>
+    <h3 id="course-exercise-objective" class="exercise__heading">{{ step().title }}</h3>
+    <p class="lesson-text lesson-prose"><app-lesson-inline [text]="step().objective" /></p>
+
+    <h4 class="exercise__subheading">Requisiti</h4>
+    <ul class="exercise__list">
+      @for (requirement of step().requirements; track $index) {
+        <li class="lesson-text lesson-prose"><app-lesson-inline [text]="requirement" /></li>
+      }
+    </ul>
+
+    <section class="exercise__hints" aria-labelledby="course-exercise-hints">
+      <div class="exercise__subhead">
+        <h4 id="course-exercise-hints" class="exercise__subheading">Suggerimenti</h4>
+        <button
+          matButton="text"
+          class="exercise__hint-toggle"
+          type="button"
+          [disabled]="hintCount() >= step().hints.length"
+          (click)="revealNextHint()"
+        >
+          @if (hintCount() === 0) {
+            Mostra un suggerimento
+          } @else if (hintCount() >= step().hints.length) {
+            Tutti i suggerimenti sono aperti
+          } @else {
+            Mostra un altro suggerimento
+          }
+        </button>
+      </div>
+
+      @if (hintCount() === 0) {
+        <p class="exercise__hint-empty lesson-text">Nessun suggerimento aperto: prova prima da solo, poi chiedine uno alla volta.</p>
+      } @else {
+        <ol class="exercise__hint-list">
+          @for (hint of visibleHints(); track $index) {
+            <li class="lesson-text lesson-prose"><app-lesson-inline [text]="hint" /></li>
+          }
+        </ol>
+      }
+    </section>
+  </section>
+
+  <section class="exercise__workspace" aria-labelledby="course-exercise-workspace">
+    <div class="exercise__mode">
+      <div class="exercise__mode-copy">
+        <p id="course-exercise-workspace" class="exercise__eyebrow">Codice e anteprima</p>
+        <p class="exercise__mode-text" role="status">
+          Stai lavorando su <strong class="lesson-emphasis">{{ solutionMode() ? 'la soluzione' : 'il tuo codice' }}</strong>.
+        </p>
+      </div>
+      <button
+        matButton="filled"
+        class="exercise__mode-toggle"
+        type="button"
+        [attr.aria-pressed]="solutionMode()"
+        (click)="toggleSolution()"
+      >
+        {{ solutionMode() ? 'Torna al tuo codice' : 'Mostra soluzione' }}
+      </button>
+    </div>
+
+    @if (solutionMode()) {
+      <p class="exercise__notice" role="note">
+        Stai guardando la soluzione di questo checkpoint. Il tuo codice resta salvato e torna visibile con «Torna al tuo codice»; anche «Ripristina codice» qui ripristina solo la soluzione.
+      </p>
+    }
+
+    @for (view of [activeView()]; track view.key) {
+      <app-angular-playground
+        [title]="view.title"
+        [initial]="view.sources"
+        [draft]="draftFor(view.key)"
+        (sourceChange)="rememberDraft(view.key, $event)"
+      />
+    }
+
+    <p class="exercise__persistence lesson-text">
+      Le modifiche restano legate a questo passo e a questa modalità finché resti nella pagina. Cambiare passo o mostrare la soluzione non sostituisce il codice che hai scritto.
+    </p>
+  </section>
+
+  <section class="exercise__checks" aria-labelledby="course-exercise-checks">
+    <h3 id="course-exercise-checks" class="exercise__heading">Autovalutazione</h3>
+    <p class="lesson-text lesson-prose">
+      Spunta ciò che hai verificato nella preview. Sono controlli manuali: nessuno strumento approva il codice e aprire la soluzione non spunta nulla.
+    </p>
+
+    <div class="exercise__checklist">
+      @for (check of step().checks; track $index) {
+        <mat-checkbox
+          class="exercise__check"
+          [checked]="isChecked(step().id, $index)"
+          (change)="setChecked(step().id, $index, $event.checked)"
+        >
+          <app-lesson-inline [text]="check" />
+        </mat-checkbox>
+      }
+    </div>
+
+    <p class="exercise__check-count" role="status">
+      {{ checkedCount() }} di {{ step().checks.length }} controlli spuntati in questo passo.
+    </p>
+  </section>
+
+  <app-lesson-disclosure anchor="deepen" title="Perché questi cinque passi?">
+    <p class="lesson-text lesson-prose">
+      I campioni del catalogo hanno gli stessi <code>id</code>, prezzi e date in ogni passo. Le date sono stringhe UTC fisse, così formattazione e fuso non dipendono dall’ora del computer.
+    </p>
+    <p class="lesson-text lesson-prose">
+      I dati vivono nel componente e non vengono inviati a un server: questo esercizio non usa servizi, routing, form o HTTP. <code>currency</code> cambia solo l’aspetto del prezzo e non converte la valuta.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Tenere <code>CourseCard</code> in un file separato rende visibili i ruoli; definire più componenti nello stesso file resta un’alternativa supportata. Per il codice esistente, <code>&#64;Input</code> e <code>&#64;Output</code> restano validi: gli esempi nuovi usano <code>input()</code> e <code>output()</code>.
+    </p>
+  </app-lesson-disclosure>
+</app-lesson-shell>
