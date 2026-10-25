@@ -94,3 +94,5 @@ Every dropdown has a dedicated overview: Basics, Advanced, State and Examples. T
 ## State curriculum
 
 The state path progresses from RxJS foundations to BehaviorSubject and NgRx Store. RxJS introduces independent cold subscriptions, real filter/map outputs and explicit interval completion/cancellation. Use the same preview → editable source → linked diagram structure throughout, preserving colorful role panels with paired Material tokens. BehaviorSubject and NgRx migrations follow sequentially; SignalStore and additional Users examples remain separate future work.
+
+BehaviorSubject now uses three independent editable projects: late subscribers compared with Subject, an immutable counter with a derived stream and bounded history, and a root-scoped profile service read by two consumers. AsyncPipe owns view subscriptions; `.value` is explained as a synchronous snapshot for creating the next state. Child components and service have separate editable files and source-linked schemas.

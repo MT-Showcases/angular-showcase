@@ -1,290 +1,41 @@
-<app-page-header
-  title="BehaviorSubject"
-  subtitle="Gestione dello stato reattivo in RxJS">
-</app-page-header>
+<app-lesson-shell topicId="behavior-subject" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">
+    Un <strong class="lesson-emphasis">BehaviorSubject</strong> è un Subject con un valore corrente.
+    Finché è attivo, chi si sottoscrive lo riceve subito; poi arrivano le nuove emissioni. Negli esempi puoi vedere la differenza con un Subject, costruire uno stato immutabile e condividere un servizio tra due consumatori.
+  </p>
 
-<div class="container">
-  <!-- Introduzione -->
-  <section class="intro-section">
-    <h2>Cos'è un BehaviorSubject?</h2>
-    <p>
-      Un <strong>BehaviorSubject</strong> è un tipo speciale di Subject in RxJS che:
+  <app-lesson-examples [examples]="examples" />
+
+  <app-lesson-disclosure anchor="deepen" title="Valore corrente, non solo eventi">
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">Subject</strong> è sia Observable sia osservatore: inoltra i valori a chi è
+      sottoscritto in quel momento. Non ha un valore iniziale, quindi un nuovo consumatore non riceve nulla finché non
+      arriva la prossima emissione. Un <code>BehaviorSubject</code> richiede un valore iniziale e lo consegna
+      immediatamente a ogni nuova sottoscrizione finché è attivo.
     </p>
-    <ul>
-      <li>📦 <strong>Mantiene sempre un valore corrente</strong> - richiede un valore iniziale</li>
-      <li>🔄 <strong>Emette il valore corrente immediatamente</strong> alle nuove sottoscrizioni</li>
-      <li>💾 <strong>Permette l'accesso sincono al valore</strong> tramite la proprietà <code>.value</code></li>
-      <li>🎯 <strong>Ideale per gestire lo stato</strong> dell'applicazione</li>
-    </ul>
-  </section>
+    <p class="lesson-text lesson-prose">
+      La stringa vuota è un valore come gli altri: la vista la mostra come «vuoto», mentre «Nessuna emissione» indica che
+      il Subject non ha ancora prodotto nulla. Tieni la sorgente <code>private</code> ed esponi
+      <code>asObservable()</code>: chi legge non può chiamare <code>next</code>. Rilascia la sottoscrizione con
+      l'<code>AsyncPipe</code> o con <code>takeUntilDestroyed</code> quando usi <code>subscribe</code>.
+    </p>
+    <p class="lesson-text lesson-prose">
+      In un contatore <code>.value</code> e <code>getValue()</code> leggono un'<strong class="lesson-emphasis">istantanea sincrona</strong>
+      dello stato. Sono utili per costruire il prossimo oggetto prima di <code>next</code>.
+      La vista resta reattiva quando legge <code>state$</code> e i suoi derivati con l'<code>AsyncPipe</code>.
+    </p>
+  </app-lesson-disclosure>
 
-  <!-- Esempio Base -->
-  <section class="example-section">
-    <h2>Esempio Base</h2>
-    <app-code-block [code]="basicExample" language="typescript"></app-code-block>
-
-    <div class="key-points">
-      <h3>Punti Chiave:</h3>
-      <ul>
-        <li>Deve essere inizializzato con un valore</li>
-        <li>Le sottoscrizioni ricevono subito il valore corrente</li>
-        <li>Perfetto per rappresentare "lo stato attuale" di qualcosa</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- Differenza con Subject -->
-  <section class="example-section">
-    <h2>Differenza tra Subject e BehaviorSubject</h2>
-    <app-code-block [code]="comparisonExample" language="typescript"></app-code-block>
-
-    <div class="comparison-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Caratteristica</th>
-            <th>Subject</th>
-            <th>BehaviorSubject</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Valore iniziale</td>
-            <td>❌ Non richiesto</td>
-            <td>✅ Obbligatorio</td>
-          </tr>
-          <tr>
-            <td>Emissione immediata</td>
-            <td>❌ No</td>
-            <td>✅ Sì, emette il valore corrente</td>
-          </tr>
-          <tr>
-            <td>Accesso al valore</td>
-            <td>❌ Non disponibile</td>
-            <td>✅ Tramite <code>.value</code></td>
-          </tr>
-          <tr>
-            <td>Caso d'uso</td>
-            <td>Eventi, notifiche</td>
-            <td>Stato, configurazione</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- Accesso al Valore Corrente -->
-  <section class="example-section">
-    <h2>Accesso al Valore Corrente</h2>
-    <app-code-block [code]="valueAccessExample" language="typescript"></app-code-block>
-
-    <div class="info-box">
-      <strong>⚠️ Attenzione:</strong> L'uso di <code>.value</code> va contro il paradigma reattivo.
-      Usalo solo quando necessario (es. operazioni sincrone, guard, validazioni).
-    </div>
-  </section>
-
-  <!-- Demo Interattiva: Messaggio -->
-  <section class="demo-section">
-    <h2>Demo 1: Gestione Messaggio</h2>
-    <p>Questo esempio mostra come un BehaviorSubject mantiene e aggiorna un valore.</p>
-
-    <app-message-demo />
-  </section>
-
-  <!-- Demo Interattiva: Contatore -->
-  <section class="demo-section">
-    <h2>Demo 2: Contatore Reattivo</h2>
-    <p>Un contatore gestito da BehaviorSubject - il valore è sempre accessibile e sincronizzato.</p>
-
-    <div class="demo-container">
-      <div class="counter-display">
-        <h3>Contatore:</h3>
-        <div class="value-display large">{{ currentCount }}</div>
-      </div>
-
-      <div class="controls">
-        <button (click)="decrementCounter()" class="btn btn-secondary">
-          ➖ Decrementa
-        </button>
-        <button (click)="incrementCounter()" class="btn btn-primary">
-          ➕ Incrementa
-        </button>
-        <button (click)="resetCounter()" class="btn btn-secondary">
-          🔄 Reset
-        </button>
-      </div>
-
-      <div class="info-box">
-        <strong>Nota:</strong> Usiamo <code>this.counterSubject.value</code> per ottenere il valore corrente
-        prima di incrementare/decrementare. Questo è uno dei vantaggi di BehaviorSubject!
-      </div>
-    </div>
-  </section>
-
-  <!-- Demo Interattiva: Storia Messaggi -->
-  <section class="demo-section">
-    <h2>Demo 3: Gestione Lista Messaggi</h2>
-    <p>BehaviorSubject con array di oggetti - ideale per gestire collezioni.</p>
-
-    <div class="demo-container">
-      <div class="controls">
-        <input
-          type="text"
-          placeholder="Scrivi un messaggio..."
-          #msgInput
-          class="message-input">
-        <button (click)="addMessage(msgInput.value); msgInput.value = ''" class="btn btn-primary">
-          ➕ Aggiungi
-        </button>
-        <button (click)="clearMessages()" class="btn btn-secondary">
-          🗑️ Pulisci
-        </button>
-      </div>
-
-      <div class="messages-list">
-        <h3>Messaggi ({{ messageHistory.length }}):</h3>
-        @if (messageHistory.length === 0) {
-          <p class="empty-state">Nessun messaggio ancora. Aggiungine uno!</p>
-        }
-        @for (msg of messageHistory; track msg.timestamp) {
-          <div class="message-item">
-            <span class="message-text">{{ msg.text }}</span>
-            <span class="message-time">{{ msg.timestamp | date:'HH:mm:ss' }}</span>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- Demo Interattiva: Stato Utente -->
-  <section class="demo-section">
-    <h2>Demo 4: Stato Utente</h2>
-    <p>Esempio pratico di gestione dello stato di autenticazione.</p>
-
-    <div class="demo-container">
-      <div class="user-state">
-        <h3>Stato Utente:</h3>
-        <div class="status-card" [class.online]="currentUserState.online">
-          <div class="status-indicator">
-            {{ currentUserState.online ? '🟢' : '⚫' }}
-          </div>
-          <div class="user-info">
-            <div class="user-name">{{ currentUserState.name }}</div>
-            <div class="user-status">
-              {{ currentUserState.online ? 'Online' : 'Offline' }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="controls">
-        @if (!currentUserState.online) {
-          <input
-            type="text"
-            placeholder="Il tuo nome..."
-            #nameInput
-            class="message-input">
-          <button (click)="login(nameInput.value || 'Utente'); nameInput.value = ''" class="btn btn-success">
-            🔓 Login
-          </button>
-        } @else {
-          <button (click)="logout()" class="btn btn-danger">
-            🔒 Logout
-          </button>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- Caso d'Uso Pratico: Auth Service -->
-  <section class="example-section">
-    <h2>Caso d'Uso: Authentication Service</h2>
-    <p>Un esempio reale di come usare BehaviorSubject per gestire l'autenticazione.</p>
-    <app-code-block [code]="practicalExample" language="typescript"></app-code-block>
-  </section>
-
-  <!-- Caso d'Uso Pratico: State Management -->
-  <section class="example-section">
-    <h2>Caso d'Uso: Gestione Carrello</h2>
-    <p>BehaviorSubject per gestire lo stato del carrello e-commerce.</p>
-    <app-code-block [code]="stateManagementExample" language="typescript"></app-code-block>
-  </section>
-
-  <!-- Best Practices -->
-  <section class="best-practices">
-    <h2>Best Practices</h2>
-
-    <div class="practice-grid">
-      <div class="practice-card do">
-        <h3>✅ Da Fare</h3>
-        <ul>
-          <li>Usa BehaviorSubject per lo stato dell'applicazione</li>
-          <li>Esponi solo l'Observable (<code>asObservable()</code>) ai componenti</li>
-          <li>Usa <code>.value</code> solo quando veramente necessario</li>
-          <li>Inizializza sempre con un valore sensato</li>
-          <li>Considera il tipo nullable per stati opzionali</li>
-        </ul>
-      </div>
-
-      <div class="practice-card dont">
-        <h3>❌ Da Evitare</h3>
-        <ul>
-          <li>Esporre direttamente il BehaviorSubject ai componenti</li>
-          <li>Usare <code>.value</code> quando puoi usare sottoscrizioni</li>
-          <li>Dimenticare di unsubscribe (usa <code>async</code> pipe quando possibile)</li>
-          <li>Modificare oggetti mutabili - usa sempre nuove referenze</li>
-          <li>Usare BehaviorSubject per eventi one-time</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Quando Usare -->
-  <section class="when-to-use">
-    <h2>Quando Usare BehaviorSubject?</h2>
-
-    <div class="use-cases">
-      <div class="use-case">
-        <h3>✅ Usa BehaviorSubject per:</h3>
-        <ul>
-          <li>Gestione dello stato dell'applicazione</li>
-          <li>Dati di configurazione</li>
-          <li>Stato di autenticazione</li>
-          <li>Carrello o preferenze utente</li>
-          <li>Filtri e impostazioni di ricerca</li>
-          <li>Qualsiasi dato che rappresenta "lo stato corrente"</li>
-        </ul>
-      </div>
-
-      <div class="use-case">
-        <h3>❌ Non usare BehaviorSubject per:</h3>
-        <ul>
-          <li>Eventi che accadono una sola volta</li>
-          <li>Notifiche o alert</li>
-          <li>Click o eventi UI</li>
-          <li>WebSocket messages (usa Subject)</li>
-          <li>Quando non serve il valore corrente</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Riepilogo -->
-  <section class="summary">
-    <h2>Riepilogo</h2>
-    <div class="summary-content">
-      <p><strong>BehaviorSubject</strong> è perfetto quando hai bisogno di:</p>
-      <ul>
-        <li>🎯 Mantenere e condividere uno <strong>stato corrente</strong></li>
-        <li>🔄 Garantire che nuovi subscriber ricevano <strong>subito un valore</strong></li>
-        <li>💾 Accedere al valore <strong>in modo sincrono</strong> quando necessario</li>
-        <li>📡 Implementare pattern di <strong>state management</strong></li>
-      </ul>
-
-      <p class="key-takeaway">
-        <strong>Ricorda:</strong> BehaviorSubject = "Ho sempre un valore e te lo do subito quando ti sottoscrivi!"
-      </p>
-    </div>
-  </section>
-</div>
+  <app-lesson-disclosure anchor="behavior-next" title="Da RxJS a BehaviorSubject, poi NgRx">
+    <p class="lesson-text lesson-prose">
+      Nella lezione <strong class="lesson-emphasis">RxJS</strong> hai visto sorgenti e sottoscrizioni. Qui lo stesso flusso
+      diventa uno stato condiviso: il servizio possiede la sorgente, espone letture pubbliche e offre metodi per
+      aggiornarla. Per questo la pagina riusa anche il provider e lo scope della lezione <strong>Servizi</strong>.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Un BehaviorSubject basta per uno stato piccolo e locale. Quando servono azioni esplicite, selettori e strumenti di
+      debug, il passo successivo è <strong class="lesson-emphasis">NgRx Store</strong>: conserva lo stesso flusso di stato,
+      ma organizza le modifiche in azioni e reducer. Le due scelte non sono in conflitto; dipendono dalla dimensione dello stato.
+    </p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

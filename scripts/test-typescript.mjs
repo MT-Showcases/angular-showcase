@@ -55,7 +55,13 @@ const { CONTROL_EXAMPLE, CONTACT_EXAMPLE } = await fixture('src/app/forms/forms.
 
 const { SHARED_SERVICE_EXAMPLE, SCOPED_SERVICE_EXAMPLE } = await fixture('src/app/services-lesson/services.example.ts');
 
+const { RXJS_EXAMPLES } = await fixture('src/app/rxjs-lesson/rxjs.example.ts');
+
+const { BEHAVIOR_EXAMPLES } = await fixture('src/app/behavior-subject/behavior.example.ts');
+
 const SEEDS = [
+  ...BEHAVIOR_EXAMPLES.map(example => example.sources),
+  ...RXJS_EXAMPLES.map(example => example.sources),
   SHARED_SERVICE_EXAMPLE,
   SCOPED_SERVICE_EXAMPLE,
   FIRST_COMPONENT,

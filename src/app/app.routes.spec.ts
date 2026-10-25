@@ -187,20 +187,16 @@ describe('Showcase routes', () => {
     expect(page.querySelector('.todo-list')?.textContent).not.toContain('Verify Angular upgrade');
   });
 
-  it('updates BehaviorSubject message and counter demos through their UI', async () => {
+  it('keeps the BehaviorSubject playground mounted at its visible code anchor', async () => {
     const harness = await RouterTestingHarness.create('/state/behavior-subject');
     const page = harness.routeNativeElement!;
-    const messageDemo = page.querySelector<HTMLElement>('app-message-demo')!;
-    const input = messageDemo.querySelector<HTMLInputElement>('input')!;
-    input.value = 'Reactive update after migration';
-    messageDemo.querySelector<HTMLButtonElement>('.btn-primary')!.click();
-    await harness.fixture.whenStable();
-    expect(messageDemo.querySelector('.value-display')?.textContent)
-      .toContain('Reactive update after migration');
-    Array.from(page.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.includes('Incrementa'))!.click();
-    await harness.fixture.whenStable();
-    expect(page.querySelector('.value-display.large')?.textContent?.trim()).toBe('1');
+    const frame = page.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    expect(page.querySelectorAll('iframe')).toHaveLength(1);
+    await harness.navigateByUrl('/state/behavior-subject#code');
+    expect(TestBed.inject(Router).url).toBe('/state/behavior-subject#code');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
   it('filters and deletes users after the HTTP response', async () => {
