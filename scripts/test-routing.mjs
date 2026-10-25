@@ -287,9 +287,10 @@ test('editing wildcard order exposes the route-order rule', async () => {
   const dom = await environment();
   try {
     const wildcardFirst = edited(FALLBACK, 'app.routes.ts', source =>
+      // Preserve teaching comments between the entries while swapping their order.
       source.replace(
-        "  { path: 'home', component: HomeView },\n  { path: '**', component: NotFoundView },",
-        "  { path: '**', component: NotFoundView },\n  { path: 'home', component: HomeView },",
+        /(\{ path: 'home', component: HomeView \})([\s\S]*?)(\{ path: '\*\*', component: NotFoundView \})/,
+        '$3$2$1',
       ));
     await render(dom, wildcardFirst, 1);
     const document = dom.window.document;
