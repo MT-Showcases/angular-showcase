@@ -148,6 +148,12 @@ describe('Showcase routes', () => {
     expect(frame).not.toBeNull();
     await harness.navigateByUrl('/state/ngrx#code');
     expect(TestBed.inject(Router).url).toBe('/state/ngrx#code');
+    const shortcut = page.querySelector<HTMLAnchorElement>('a[href="/state/ngrx#ngrx-flow"]');
+    expect(shortcut).not.toBeNull();
+    shortcut!.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Router).url).toBe('/state/ngrx#ngrx-flow');
+    expect(page.querySelector('#ngrx-flow')).not.toBeNull();
     expect(page.querySelector('iframe')).toBe(frame);
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
     await harness.navigateByUrl('/state');

@@ -1,0 +1,316 @@
+/**
+ * NgRx flow styles
+ *
+ * Compact mental-model surface. The six roles stay one vertical path so the
+ * arrows remain coherent; wider screens add a second column for the shared
+ * detail. Material buttons keep their own variants, so only layout and public
+ * surface tokens are styled here.
+ */
+
+@use 'globals' as *;
+
+// ═══ MAIN CONTAINER ═══
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.flow {
+  display: grid;
+  gap: space(4);
+  min-width: 0;
+  padding: space(4);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: radius(lg);
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface);
+
+  // Keep the anchor below sticky navigation.
+  scroll-margin-top: rem(120);
+
+  // ─── Header ───
+  &__header {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-primary);
+    text-transform: uppercase;
+    letter-spacing: rem(0.5);
+  }
+
+  &__title {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+    overflow-wrap: anywhere;
+  }
+
+  &__lead {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Flow and detail ───
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: space(4);
+    min-width: 0;
+  }
+
+  &__list {
+    display: grid;
+    gap: 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item {
+    display: grid;
+    min-width: 0;
+  }
+
+  &__step {
+    width: 100%;
+    height: auto;
+    min-height: rem(56);
+    padding: space(2) space(3);
+    line-height: 1.35;
+    text-align: start;
+    white-space: normal;
+    justify-content: flex-start;
+    overflow-wrap: anywhere;
+  }
+
+  &__step-body {
+    display: grid;
+    gap: rem(2);
+    min-width: 0;
+    text-align: start;
+  }
+
+  &__step-label {
+    font: var(--mat-sys-label-large);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  &__step-number {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__step-hint {
+    // Inherit the selected/unselected Material variant color.
+    color: inherit;
+    font: var(--mat-sys-body-small);
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Arrows between roles ───
+  &__connection {
+    display: grid;
+    justify-items: center;
+    gap: rem(2);
+    padding-block: rem(2);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__arrow {
+    width: rem(24);
+    height: rem(24);
+    font-size: rem(24);
+    line-height: 1;
+    color: var(--mat-sys-primary);
+  }
+
+  &__connection-label {
+    font: var(--mat-sys-body-small);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  // Only one placement is visible; the selected role stays in context on mobile.
+  &__detail-mobile {
+    min-width: 0;
+    margin-block: space(2);
+  }
+
+  &__detail-desktop {
+    display: none;
+    min-width: 0;
+  }
+
+  // ─── Selected role detail ───
+  &__detail {
+    display: grid;
+    align-content: start;
+    gap: space(2);
+    min-width: 0;
+    padding: space(3);
+    border: rem(1) solid var(--mat-sys-outline-variant);
+    border-radius: radius(md);
+    background: var(--mat-sys-surface);
+  }
+
+  &__detail-kicker {
+    margin: 0;
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-primary);
+    text-transform: uppercase;
+    letter-spacing: rem(0.5);
+  }
+
+  &__detail-title {
+    margin: 0;
+    font: var(--mat-sys-title-small);
+    overflow-wrap: anywhere;
+  }
+
+  &__detail-text {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  &__detail-note {
+    margin: 0;
+    padding-top: space(2);
+    border-top: rem(1) solid var(--mat-sys-outline-variant);
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  &__example {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+    padding: space(2);
+    border-radius: radius(sm);
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__example-label {
+    margin: 0;
+    font: var(--mat-sys-label-small);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+
+  &__code {
+    max-width: 100%;
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: rem(14);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  // ─── Closing loop ───
+  &__loop {
+    display: flex;
+    align-items: flex-start;
+    gap: space(1);
+    margin: 0;
+    padding: space(2) space(3);
+    border: rem(1) solid var(--mat-sys-outline-variant);
+    border-radius: radius(sm);
+    background: var(--mat-sys-surface);
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__loop-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__loop-icon {
+    flex: 0 0 auto;
+    width: rem(20);
+    height: rem(20);
+    font-size: rem(20);
+    color: var(--mat-sys-primary);
+  }
+
+  // ─── Non-negotiable rules ───
+  &__rules {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+    margin: 0;
+    padding: space(3);
+    padding-inline-start: space(6);
+    border: rem(1) dashed var(--mat-sys-outline-variant);
+    border-radius: radius(md);
+    background: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface);
+    list-style: disc;
+  }
+
+  &__rule {
+    font: var(--mat-sys-body-small);
+    overflow-wrap: anywhere;
+
+    &::marker {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  // ─── Optional Effects note ───
+  &__effects {
+    display: grid;
+    gap: space(1);
+    min-width: 0;
+    margin: 0;
+    padding: space(3);
+    border: rem(1) solid var(--mat-sys-outline-variant);
+    border-inline-start: rem(4) solid var(--mat-sys-tertiary);
+    border-radius: radius(sm);
+    background: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__effects-title {
+    margin: 0;
+    font: var(--mat-sys-title-small);
+  }
+
+  &__effects-text {
+    margin: 0;
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+    overflow-wrap: anywhere;
+  }
+}
+
+// ═══ RESPONSIVE DESIGN ═══
+
+// Tablet and up (min-width: 768px)
+@include media-min-breakpoint(md) {
+  .flow {
+    padding: space(6);
+
+    &__detail-mobile { display: none; }
+    &__detail-desktop { display: block; }
+
+    &__layout {
+      // The vertical path stays intact; the detail becomes a side column.
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      align-items: start;
+      gap: space(6);
+    }
+  }
+}

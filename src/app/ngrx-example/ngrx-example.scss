@@ -1,5 +1,14 @@
 /** The compact NgRx lesson delegates layout to the shared shell and example components. */
+@use 'globals' as *;
+
 :host {
   display: block;
   min-width: 0;
+}
+
+// The overview shortcut sits on the branded lesson background.
+.ngrx-flow-link {
+  color: inherit;
+  font-weight: 600;
+  text-underline-offset: rem(3);
 }

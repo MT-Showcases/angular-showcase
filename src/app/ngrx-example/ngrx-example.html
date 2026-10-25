@@ -4,9 +4,13 @@
     un’<strong>azione</strong>, un <strong>reducer</strong> puro calcola il nuovo stato e i
     <strong>selettori</strong> espongono le letture alla vista. Nei due esempi puoi seguire davvero questo flusso,
     modificare il codice e osservare i signal aggiornarsi.
+    <a class="ngrx-flow-link" routerLink="." fragment="ngrx-flow">Segui lo schema generale del ciclo NgRx</a>.
   </p>
 
   <app-lesson-examples [examples]="examples" />
+
+  <!-- The general mental model complements the source-linked schemas after the editors. -->
+  <app-ngrx-flow />
 
   <app-lesson-disclosure anchor="reducers" title="Reducer puri e journal reale">
     <p class="lesson-text lesson-prose">
@@ -21,6 +25,19 @@
       e snapshot JSON prima/dopo. Il journal vive fuori dallo Store, quindi non entra nei suoi snapshot. Non c’è time
       travel: selezionare un’azione non ripristina lo stato salvato, mentre la tab <strong>Stato</strong> mostra
       sempre quello live.
+    </p>
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="store-structure" title="Un albero di stato, più feature">
+    <p class="lesson-text lesson-prose">
+      <code>provideStore</code> configura lo Store radice; <code>provideState</code> può registrarvi
+      una <strong class="lesson-emphasis">feature</strong>, anche durante il caricamento di una rotta.
+      Contatore e utenti possono essere due rami dello <strong>stesso albero di stato</strong>:
+      suddividere lo stato in feature non richiede store indipendenti.
+    </p>
+    <p class="lesson-text lesson-prose">
+      I due playground di questa pagina sono applicazioni isolate per poterli modificare e riavviare separatamente.
+      Dentro ogni preview, componente e DevTools osservano lo stesso Store.
     </p>
   </app-lesson-disclosure>
 
@@ -46,6 +63,11 @@
       È un collegamento ai signal di Angular, non un SignalStore separato. In alternativa puoi usare
       <code>store.select(selettore)</code> con l’<code>AsyncPipe</code>, come nella lezione
       BehaviorSubject.
+    </p>
+    <p class="lesson-text lesson-prose">
+      <code>createSelector</code> permette di comporre selettori e <strong class="lesson-emphasis">memoizzare</strong>
+      il risultato: riusa l’ultimo calcolo quando i suoi valori d’ingresso non cambiano.
+      I selettori leggono e derivano dati; le modifiche allo stato passano dalle azioni e dai reducer.
     </p>
     <p class="lesson-text lesson-prose">
       Le azioni restano sincrone e senza rete. Gli <strong class="lesson-emphasis">Effects</strong> servono quando una

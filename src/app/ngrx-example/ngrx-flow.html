@@ -1,0 +1,112 @@
+<!--
+  NgRx flow template
+
+  Six ordered roles form the general cycle. Only one role is selected at a
+  time, and its short definition shares a single detail region. Arrows are
+  decorative: the ordered list and the visible numbers carry the sequence.
+-->
+<section id="ngrx-flow" class="flow" aria-labelledby="ngrx-flow-title">
+  <header class="flow__header">
+    <p class="flow__eyebrow">Modello mentale</p>
+    <h2 class="flow__title" id="ngrx-flow-title">Il ciclo NgRx</h2>
+    <p class="flow__lead lesson-prose">
+      <app-lesson-inline [text]="lead" />
+    </p>
+  </header>
+
+  <div class="flow__layout">
+    <ol class="flow__list" aria-label="Passi del ciclo NgRx">
+      @for (step of steps; track step.id; let index = $index) {
+        <li class="flow__item">
+          <button
+            type="button"
+            class="flow__step"
+            [matButton]="stepAppearance(step)"
+            [attr.aria-pressed]="isSelected(step)"
+            [attr.aria-controls]="detailId + ' ' + detailId + '-mobile'"
+            (click)="select(step.id)"
+          >
+            <span class="flow__step-body">
+              <span class="flow__step-label">
+                <span class="flow__step-number" aria-hidden="true">{{ index + 1 }}.</span>
+                {{ step.label }}
+              </span>
+              <span class="flow__step-hint">{{ step.hint }}</span>
+            </span>
+          </button>
+
+          <!-- On narrow screens the selected definition stays beside its trigger. -->
+          @if (isSelected(step)) {
+            <div class="flow__detail-mobile">
+              <ng-container
+                [ngTemplateOutlet]="roleDetail"
+                [ngTemplateOutletContext]="{ regionId: detailId + '-mobile' }"
+              />
+            </div>
+          }
+
+          @if (step.connection; as connection) {
+            <span class="flow__connection">
+              <mat-icon class="flow__arrow" aria-hidden="true">south</mat-icon>
+              <span class="flow__connection-label">{{ connection }}</span>
+            </span>
+          }
+        </li>
+      }
+    </ol>
+
+    <div class="flow__detail-desktop">
+      <ng-container
+        [ngTemplateOutlet]="roleDetail"
+        [ngTemplateOutletContext]="{ regionId: detailId }"
+      />
+    </div>
+  </div>
+
+  <p class="flow__loop lesson-prose">
+    <mat-icon class="flow__loop-icon" aria-hidden="true">autorenew</mat-icon>
+    <span class="flow__loop-text"><app-lesson-inline [text]="loopNote" /></span>
+  </p>
+
+  <ul class="flow__rules" aria-label="Regole del ciclo">
+    @for (rule of rules; track rule) {
+      <li class="flow__rule lesson-prose"><app-lesson-inline [text]="rule" /></li>
+    }
+  </ul>
+
+  <aside class="flow__effects" aria-labelledby="ngrx-flow-effects-title">
+    <h3 class="flow__effects-title" id="ngrx-flow-effects-title">Effetti (opzionali)</h3>
+    <p class="flow__effects-text lesson-prose">
+      <app-lesson-inline [text]="effectsNote" />
+    </p>
+  </aside>
+</section>
+
+
+<!-- One detail template serves the desktop panel and the inline mobile placement. -->
+<ng-template #roleDetail let-regionId="regionId">
+  <section
+    class="flow__detail"
+    [id]="regionId"
+    [attr.aria-labelledby]="regionId + '-title'"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <p class="flow__detail-kicker">Passo {{ selectedIndex() + 1 }} di {{ steps.length }}</p>
+    <h3 class="flow__detail-title" [id]="regionId + '-title'">{{ selected().label }}</h3>
+    <p class="flow__detail-text lesson-prose">
+      <app-lesson-inline [text]="selected().summary" />
+    </p>
+
+    <div class="flow__example">
+      <p class="flow__example-label">
+        Esempio illustrativo · contatore 0 → 1
+      </p>
+      <pre class="flow__code"><code>{{ selected().example }}</code></pre>
+    </div>
+
+    <p class="flow__detail-note lesson-prose">
+      <app-lesson-inline [text]="selected().note" />
+    </p>
+  </section>
+</ng-template>

@@ -23,6 +23,7 @@
 - Use one agent by default. Keep parallel work bounded and explicitly authorized; do not automatically launch another multi-agent wave.
 - Keep tasks and tool output focused. Avoid copying the entire conversation or rereading large documents when a small contract is sufficient.
 - The integrated preview uses port 4200. Check existing listeners before starting another server.
+- Before redesigning a lesson, inventory its useful interactions, conceptual diagrams and explanations; preserve or update them and record any deliberate deferral.
 - Make reviewable changes. Report actual verification and outstanding checks separately. Do not claim visual acceptance from unit tests alone.
 - Do not push or publish without user instruction. Preserve unrelated user edits.
 

@@ -48,6 +48,24 @@ describe('NgRx playground lesson', () => {
       expect(page.querySelector('#demo')?.textContent).toContain('NgRx Store');
       expect(page.querySelector('#code')).not.toBeNull();
       expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
+      const flow = page.querySelector('app-ngrx-flow')!;
+      const frame = page.querySelector('iframe');
+      const source = EditorView.findFromDOM(page.querySelector<HTMLElement>('.cm-editor')!)!;
+      const originalCode = source.state.doc.toString();
+      expect(page.querySelector('app-lesson-diagram')!.compareDocumentPosition(flow)
+        & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      const roles = flow.querySelectorAll<HTMLButtonElement>('button[aria-pressed]');
+      expect(roles).toHaveLength(6);
+      roles[2].click();
+      await fixture.whenStable();
+      expect(flow.querySelector('.flow__detail-title')?.textContent).toContain('Reducer');
+      expect(flow.querySelector('.flow__detail-text')?.textContent).toContain('funzione pura');
+      roles[4].click();
+      await fixture.whenStable();
+      expect(flow.querySelector('.flow__detail-title')?.textContent).toContain('Selector');
+      expect(flow.querySelectorAll('button[aria-pressed="true"]')).toHaveLength(1);
+      expect(page.querySelector('iframe')).toBe(frame);
+      expect(source.state.doc.toString()).toBe(originalCode);
       expect(
         page.querySelector('app-angular-playground')!.compareDocumentPosition(
           page.querySelector('app-lesson-diagram')!,

@@ -6,10 +6,12 @@ import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclos
 import { LessonExample, LessonExamples } from '../components/lesson-examples/lesson-examples';
 import { LessonShell } from '../components/lesson-shell/lesson-shell';
 import { NGRX_EXAMPLES } from './ngrx.example';
+import { NgrxFlow } from './ngrx-flow';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-ngrx-example',
-  imports: [LessonDisclosure, LessonExamples, LessonShell],
+  imports: [LessonDisclosure, LessonExamples, LessonShell, NgrxFlow, RouterLink],
   templateUrl: './ngrx-example.html',
   styleUrl: './ngrx-example.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

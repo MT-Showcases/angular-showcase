@@ -19,6 +19,7 @@
 // - Router outlet renders feature components based on route
 
 import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
@@ -35,6 +36,12 @@ import { LinkInterceptor } from '../directives/link-interceptor.directive';
   styleUrl: './app.scss',
 })
 export class App {
+  constructor() {
+    // Router anchor scrolling uses coordinates, so CSS scroll-padding alone cannot clear the sticky navbar.
+    // Match the shared 100px anchor clearance; CSS still controls smooth/reduced-motion behavior.
+    inject(ViewportScroller).setOffset([0, 100]);
+  }
+
   private readonly router = inject(Router);
   private readonly url = toSignal(this.router.events.pipe(filter(event => event instanceof NavigationEnd), map(event => event.urlAfterRedirects)), { initialValue: this.router.url });
   readonly isLesson = computed(() => /^\/(basics|advanced)\//.test(this.url()));
