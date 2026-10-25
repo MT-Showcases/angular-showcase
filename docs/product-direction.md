@@ -101,3 +101,10 @@ NgRx Store has two isolated editable projects: counter and Todo. Each owns its `
 
 
 The NgRx lesson also retains the general state cycle from its earlier concepts page: interaction → action → reducer → Store state → selector → template → next interaction. Its interactive role definitions complement the editable projects and source-linked diagrams, after the full editor. The original long setup guides are represented by the editable configuration/actions/reducer/selectors; Effects stay an optional asynchronous branch. Feature registration is described as adding slices to the root Store, replacing the old claim that feature states are inherently independent stores. Concept responsibilities follow the [NgRx Store guide](https://ngrx.io/guide/store).
+
+
+## Users project
+
+`/examples/users` now uses one isolated editable project with an explicit real HttpClient GET, an injectable service, a separate input/output child card, computed name/email search and local-only removal. Reload preserves the query and restores removed IDs only on a successful response. Loading, server-empty, no-match, all-removed and error are distinct; cancel/reset/destruction close pending requests and errors retain prior successful data. The source-linked schema follows the complete editor; optional context preserves the old lifecycle teaching point. The unused host users components/service/model were removed after reference audit. State and example pages now collapse exploration controls like the other lessons.
+
+Four generated-runtime/type tests cover the actual source seeds, transport, edits, filtering, removal, empty/error/retry and cleanup. Thirty-one focused host/route tests and production build pass. VS Code desktop verified the real ten-user API response; 360px emulation verified the Material field/actions and contained text. Real-device selection/keyboard acceptance remains open.

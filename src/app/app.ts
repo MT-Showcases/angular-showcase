@@ -44,7 +44,7 @@ export class App {
 
   private readonly router = inject(Router);
   private readonly url = toSignal(this.router.events.pipe(filter(event => event instanceof NavigationEnd), map(event => event.urlAfterRedirects)), { initialValue: this.router.url });
-  readonly isLesson = computed(() => /^\/(basics|advanced)\//.test(this.url()));
+  readonly isLesson = computed(() => /^\/(basics|advanced|state|examples)\//.test(this.url()));
   readonly explorationOpen = signal(false);
   toggleExploration(event: Event): void { this.explorationOpen.set((event.target as HTMLDetailsElement).open); }
   protected readonly title = signal('angular-showcase');

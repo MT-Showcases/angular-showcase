@@ -37,7 +37,7 @@ describe('Showcase routes', () => {
     ['/state/rxjs', 'RxJS: flussi e sottoscrizioni'],
     ['/state/ngrx', 'NgRx Store'],
     ['/state/behavior-subject', 'BehaviorSubject'],
-    ['/examples/users', 'Lista Utenti'],
+    ['/examples/users', 'Lista utenti'],
     ['/code-block-demo', 'CodeBlock Component'],
     ['/design-system', 'Design system'],
   ];
@@ -46,12 +46,6 @@ describe('Showcase routes', () => {
     it(`renders ${url}`, async () => {
       const harness = await RouterTestingHarness.create();
       await harness.navigateByUrl(url);
-      if (url === '/examples/users') {
-        TestBed.inject(HttpTestingController)
-          .expectOne('https://jsonplaceholder.typicode.com/users')
-          .flush([]);
-        await harness.fixture.whenStable();
-      }
       expect(harness.routeNativeElement?.textContent).toContain(title);
     });
   }
@@ -176,26 +170,13 @@ describe('Showcase routes', () => {
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
-  it('filters and deletes users after the HTTP response', async () => {
+  it('loads Users as an isolated editable project without host HTTP requests', async () => {
     const harness = await RouterTestingHarness.create('/examples/users');
     const page = harness.routeNativeElement!;
-    TestBed.inject(HttpTestingController)
-      .expectOne('https://jsonplaceholder.typicode.com/users')
-      .flush([
-        { id: 1, name: 'Ada Lovelace', username: 'ada', email: 'ada@example.com' },
-        { id: 2, name: 'Grace Hopper', username: 'grace', email: 'grace@example.com' },
-      ]);
-    await harness.fixture.whenStable();
-    expect(page.querySelectorAll('app-user-card').length).toBe(2);
-    const input = page.querySelector<HTMLInputElement>('.search-box__input')!;
-    input.value = 'ada@example.com';
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    await harness.fixture.whenStable();
-    expect(page.querySelectorAll('app-user-card').length).toBe(1);
-    expect(page.querySelector('.user-card__name')?.textContent).toContain('Ada Lovelace');
-    page.querySelector<HTMLButtonElement>('.user-card__delete-btn')!.click();
-    await harness.fixture.whenStable();
-    expect(page.querySelector('.user-list__empty')).toBeTruthy();
+    expect(page.querySelector('iframe')).toBeTruthy();
+    expect(page.querySelector('.cm-editor')).toBeTruthy();
+    expect(page.querySelector('app-lesson-diagram')).toBeTruthy();
+    TestBed.inject(HttpTestingController).expectNone('https://jsonplaceholder.typicode.com/users');
   });
 
   it('keeps the control-flow playground mounted while opening optional explanation', async () => {

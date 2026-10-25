@@ -1,1 +1,21 @@
+/** Match the shared lesson width without adding a curriculum topic. */
+@use 'globals' as *;
 
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.users-page {
+  max-width: rem(1200);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+/* Match compact lessons on the branded background. */
+.users-page__prompt {
+  margin-block: space(4) space(6);
+  font: var(--mat-sys-body-large);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

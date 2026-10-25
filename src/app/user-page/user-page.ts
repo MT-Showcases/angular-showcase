@@ -1,28 +1,21 @@
-// COMPONENT TYPE: Container
-// SECTION: HTTP and Async Operations
-//
-// ROLE:
-// - Provide route wrapper for user list functionality
-// - Serve as entry point for /users route
-// - Compose UserList component with page layout
-//
-// PATTERNS USED:
-// - Simple composition (wrapper component)
-// - Routing target component
-//
-// NOTES FOR CONTRIBUTORS:
-// - Keep this component minimal
-// - All user list logic lives in UserList component
-// - Add page-level concerns here (breadcrumbs, page title, etc.)
-
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { UserList } from '../user-list/user-list';
+// Feature page hosting one isolated, editable users project.
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { LessonDisclosure } from '../components/lesson-disclosure/lesson-disclosure';
+import {
+  LessonExample,
+  LessonExamples,
+} from '../components/lesson-examples/lesson-examples';
+import { PageHeader } from '../page-header/page-header';
+import { USERS_EXAMPLES } from './users.example';
 
 @Component({
   selector: 'app-user-page',
-  imports: [UserList],
+  imports: [LessonDisclosure, LessonExamples, PageHeader],
   templateUrl: './user-page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './user-page.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UserPage {}
+export class UserPage {
+  // The source files belong to the preview, not to the host application.
+  readonly examples: readonly LessonExample[] = USERS_EXAMPLES;
+}

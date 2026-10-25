@@ -162,7 +162,7 @@ const EXAMPLE_RESOURCES: CategoryResource[] = [
     navIcon: 'people',
     kind: 'Flusso HTTP',
     outcome:
-      'Carica gli utenti da JSONPlaceholder, filtra per nome o email ed elimina dalla vista locale: le scritture sono simulate.',
+      'Carica gli utenti da JSONPlaceholder, filtra per nome o email e rimuovi dalla vista locale, senza modificare il server.',
     prerequisites: [],
     bestFor: 'Un flusso HTTP completo con ricerca, eliminazione locale e stato vuoto.',
   },

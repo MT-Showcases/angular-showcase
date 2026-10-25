@@ -1,3 +1,36 @@
-<div class="user-page-container">
-  <app-user-list></app-user-list>
+<div class="users-page">
+  <app-page-header
+    title="Lista utenti"
+    subtitle="Utenti demo da JSONPlaceholder: carica, cerca e nascondi le card solo nella vista locale."
+  />
+
+  <!-- Keep the introduction next to the interaction. -->
+  <p class="users-page__prompt lesson-prose lesson-prose--on-brand">
+    Collega <strong class="lesson-emphasis">componenti, signal e HTTP</strong> in un unico esempio.
+    Carica gli utenti, cerca per nome o email e modifica i file qui sotto.
+    La <strong class="lesson-emphasis">rimozione è locale</strong>: una nuova GET ripristina i dati del server.
+  </p>
+
+  <app-lesson-examples [examples]="examples" />
+
+  <!-- Preserve the lifecycle explanation as optional context. -->
+  <app-lesson-disclosure
+    anchor="lifecycle"
+    title="Ciclo di vita delle card, rimozioni locali e reset"
+  >
+    <p class="lesson-text lesson-prose">
+      Ogni card è un <strong class="lesson-emphasis">componente figlio</strong>. Riceve l’utente con
+      un <code>input.required</code> e comunica la rimozione con un <code>output</code>: non conosce
+      il servizio HTTP. Quando il filtro o una rimozione nascondono una card, Angular la distrugge;
+      se la ricerca la riporta, la ricrea. Lo stato della lista resta nel componente padre, così il
+      ciclo di vita della card non perde dati.
+    </p>
+    <p class="lesson-text lesson-prose">
+      <strong class="lesson-emphasis">Rimuovi</strong> aggiorna un insieme di ID nascosti solo in
+      memoria. <strong class="lesson-emphasis">Ricarica utenti</strong> rilegge <code>/users</code> e
+      azzera quell’insieme; <strong class="lesson-emphasis">Ripristina demo</strong> svuota lista,
+      ricerca ed errori e annulla una richiesta in corso. JSONPlaceholder è un’API pubblica di prova:
+      qui non si creano account e non si salvano modifiche.
+    </p>
+  </app-lesson-disclosure>
 </div>
