@@ -7,6 +7,7 @@
 - Put a useful interaction at the center of each lesson. Keep the initial explanation short and adjacent to the action it explains.
 - Show the effect of a change immediately: input, state, output or relevant code. Opening an accordion alone is not a learning interaction.
 - Put each example’s editable, syntax-highlighted source directly below its interactive preview. Keep the main code visible; use accordions for optional depth or secondary examples.
+- Show tabs or selection bars only when at least two options exist; render a single option's content directly.
 - Prefer separate editable files/tabs for child components, custom pipes, directives and validators. Keep component.ts focused on the entry component; explain co-location as a supported alternative rather than making it the only readable view.
 - Prefer short inline HTML templates in each small child component’s dedicated TypeScript file/tab. Use separate HTML files for long or structurally complex templates; preserve multiline formatting and readable spacing.
 - Runnable examples must include concise comments explaining key decisions and blank lines between logical blocks. Use multiline formatting for attributes and style declarations; avoid compressed teaching code.

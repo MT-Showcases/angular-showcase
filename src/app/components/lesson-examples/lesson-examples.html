@@ -1,14 +1,17 @@
 <!-- One example has one editor and preview; switching retains source drafts. -->
-<nav class="examples__choices" aria-label="Scegli un esempio">
-  @for (example of examples(); track example.id) {
-    <button
-      matButton="outlined"
-      type="button"
-      [attr.aria-pressed]="active()?.id === example.id"
-      (click)="selectedId.set(example.id)"
-    >{{ example.label }}</button>
-  }
-</nav>
+<!-- A lone example needs no chooser. -->
+@if (examples().length > 1) {
+  <nav class="examples__choices" aria-label="Scegli un esempio">
+    @for (example of examples(); track example.id) {
+      <button
+        matButton="outlined"
+        type="button"
+        [attr.aria-pressed]="active()?.id === example.id"
+        (click)="selectedId.set(example.id)"
+      >{{ example.label }}</button>
+    }
+  </nav>
+}
 @if (active(); as selected) {
   @for (example of [selected]; track example.id) {
     <p class="examples__prompt lesson-prose lesson-prose--on-brand"><strong>Prova:</strong> <app-lesson-inline [text]="example.prompt" /></p>
@@ -22,4 +25,7 @@
     <p class="examples__takeaway lesson-prose"><app-lesson-inline [text]="example.takeaway" /></p>
   }
 }
-<p class="examples__hint">Il codice modificato resta salvato finché rimani nella pagina. Cambiando esempio, la demo riparte.</p>
+<p class="examples__hint">
+  Il codice modificato resta salvato finché rimani nella pagina.
+  @if (examples().length > 1) { Cambiando esempio, la demo riparte. }
+</p>

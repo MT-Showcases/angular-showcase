@@ -5,6 +5,33 @@ import { INPUT_EXAMPLE } from '../../component-communication/communication.examp
 import { IF_EXAMPLE, FOR_EXAMPLE } from '../../directives/control-flow.example';
 
 describe('Independent lesson examples', () => {
+  it('shows selection only with multiple examples while keeping single content editable', async () => {
+    TestBed.configureTestingModule({ imports: [LessonExamples] });
+    const fixture = TestBed.createComponent(LessonExamples);
+    const first = { id: 'if', label: '@if', title: 'Condizione', prompt: 'Cambia il ramo.', takeaway: 'Un booleano.', sources: IF_EXAMPLE };
+    const second = { id: 'for', label: '@for', title: 'Lista', prompt: '', takeaway: '', sources: FOR_EXAMPLE };
+    fixture.componentRef.setInput('examples', [first]);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const frame = page.querySelector('iframe');
+    expect(page.querySelector('nav[aria-label="Scegli un esempio"]')).toBeNull();
+    expect(frame).not.toBeNull();
+    expect(page.querySelector('.cm-editor')).not.toBeNull();
+    expect(page.querySelector('.examples__hint')?.textContent).not.toContain('Cambiando esempio');
+
+    fixture.componentRef.setInput('examples', [first, second]);
+    await fixture.whenStable();
+    expect(page.querySelectorAll('nav[aria-label="Scegli un esempio"] button')).toHaveLength(2);
+    expect(page.querySelector('.examples__hint')?.textContent).toContain('Cambiando esempio');
+    expect(page.querySelector('iframe')).toBe(frame);
+
+    fixture.componentRef.setInput('examples', [first]);
+    await fixture.whenStable();
+    expect(page.querySelector('nav[aria-label="Scegli un esempio"]')).toBeNull();
+    expect(page.querySelector('iframe')).toBe(frame);
+    fixture.destroy();
+  });
+
   it('keeps edited drafts across choices, mounts only one preview and resets to the original seed', async () => {
     TestBed.configureTestingModule({ imports: [LessonExamples] });
     const fixture = TestBed.createComponent(LessonExamples);
