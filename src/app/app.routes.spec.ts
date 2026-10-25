@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -113,24 +112,31 @@ describe('Showcase routes', () => {
     expect(page.querySelector('.log-list')?.textContent).toContain('INCREMENT');
   });
 
-  it('aborts a pending HTTP request when leaving the route', async () => {
+  it('recreates the isolated HTTP preview after leaving and returning to the lesson', async () => {
     const harness = await RouterTestingHarness.create('/advanced/http');
-    harness.routeNativeElement!.querySelector<HTMLButtonElement>('.load-posts')!.click();
-    const pending = TestBed.inject(HttpTestingController).expectOne('https://jsonplaceholder.typicode.com/posts');
+    const frame = harness.routeNativeElement!.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    TestBed.inject(HttpTestingController).expectNone('https://jsonplaceholder.typicode.com/posts');
+
     await harness.navigateByUrl('/basics');
-    expect(pending.cancelled).toBe(true);
     expect(harness.routeNativeElement?.textContent).toContain('Le basi di Angular');
+    expect(harness.routeNativeElement?.querySelector('iframe')).toBeNull();
+    await harness.navigateByUrl('/advanced/http');
+    const freshFrame = harness.routeNativeElement!.querySelector('iframe');
+    expect(freshFrame).not.toBeNull();
+    expect(freshFrame).not.toBe(frame);
   });
 
-  it('renders posts returned by the HTTP facade after loading', async () => {
+  it('keeps the HTTP editor visible and preview mounted at its code anchor', async () => {
     const harness = await RouterTestingHarness.create('/advanced/http');
     const page = harness.routeNativeElement!;
-    page.querySelector<HTMLButtonElement>('.load-posts')!.click();
-    TestBed.inject(HttpTestingController)
-      .expectOne('https://jsonplaceholder.typicode.com/posts')
-      .flush([{ userId: 1, id: 1, title: 'A test post', body: 'Loaded successfully' }]);
-    await harness.fixture.whenStable();
-    expect(page.querySelector('.post-card')?.textContent).toContain('A test post');
+    const frame = page.querySelector('iframe');
+    expect(frame).not.toBeNull();
+
+    await harness.navigateByUrl('/advanced/http#code');
+    expect(TestBed.inject(Router).url).toBe('/advanced/http#code');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
   it('keeps the NgRx todo add, complete, filter and delete flow working', async () => {
@@ -198,31 +204,6 @@ describe('Showcase routes', () => {
     page.querySelector<HTMLButtonElement>('.user-card__delete-btn')!.click();
     await harness.fixture.whenStable();
     expect(page.querySelector('.user-list__empty')).toBeTruthy();
-  });
-
-  it('renders the HTTP error state and recovers after retrying', async () => {
-    const harness = await RouterTestingHarness.create('/advanced/http');
-    const page = harness.routeNativeElement!;
-    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    try {
-      page.querySelector<HTMLButtonElement>('.load-posts')!.click();
-      TestBed.inject(HttpTestingController)
-        .expectOne('https://jsonplaceholder.typicode.com/posts')
-        .flush('Unavailable', { status: 503, statusText: 'Service Unavailable' });
-      await harness.fixture.whenStable();
-      expect(page.textContent).toContain('GET non riuscito');
-      const retry = page.querySelector<HTMLButtonElement>('.load-posts')!;
-      expect(retry.disabled).toBe(false);
-      retry.click();
-      TestBed.inject(HttpTestingController)
-        .expectOne('https://jsonplaceholder.typicode.com/posts')
-        .flush([{ id: 1, userId: 1, title: 'Recovered', body: 'Available again' }]);
-      await harness.fixture.whenStable();
-      expect(page.querySelector('.post-card')?.textContent).toContain('Recovered');
-      expect(page.textContent).not.toContain('GET non riuscito');
-    } finally {
-      errorLog.mockRestore();
-    }
   });
 
   it('keeps the control-flow playground mounted while opening optional explanation', async () => {

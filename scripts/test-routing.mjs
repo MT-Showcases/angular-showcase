@@ -352,10 +352,10 @@ test('unsupported runtime imports fail clearly and the next render recovers', as
   try {
     const unsupported = {
       ...FALLBACK.sources,
-      typescript: "import 'rxjs';\n" + FALLBACK.sources.typescript,
+      typescript: "import 'rxjs/ajax';\n" + FALLBACK.sources.typescript,
     };
     const failure = await render(dom, unsupported, 1, 'error');
-    assert.match(failure.message, /Import non disponibile: rxjs/);
+    assert.match(failure.message, /Import non disponibile: rxjs\/ajax/);
 
     await render(dom, FALLBACK.sources, 2);
     assert.match(text(dom.window.document, 'router-url'), /\/home$/);
@@ -391,7 +391,7 @@ test('routing seeds type-check with @angular/router and unsupported imports stay
   );
   assert.equal(routerImport.some(diagnostic => diagnostic.code === 90001), false);
 
-  const unsupported = service.check("import { map } from 'rxjs';", 'component.ts');
+  const unsupported = service.check("import { ajax } from 'rxjs/ajax';", 'component.ts');
   assert.ok(unsupported.some(diagnostic => diagnostic.code === 90001));
   assert.match(
     unsupported.find(diagnostic => diagnostic.code === 90001).message,

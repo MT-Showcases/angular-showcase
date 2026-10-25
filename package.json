@@ -12,8 +12,8 @@
     "prestart": "npm run playground:build",
     "prebuild": "npm run playground:build",
     "pretest": "npm run playground:build",
-    "playground:test": "npm run playground:build && node --test scripts/test-playground.mjs scripts/test-typescript.mjs scripts/test-projects.mjs scripts/test-services.mjs scripts/test-routing.mjs scripts/test-signals.mjs",
-    "posttest": "node --test scripts/test-playground.mjs scripts/test-typescript.mjs scripts/test-projects.mjs scripts/test-services.mjs scripts/test-routing.mjs scripts/test-signals.mjs"
+    "playground:test": "npm run playground:build && node --test scripts/test-playground.mjs scripts/test-typescript.mjs scripts/test-projects.mjs scripts/test-services.mjs scripts/test-routing.mjs scripts/test-signals.mjs scripts/test-http.mjs",
+    "posttest": "node --test scripts/test-playground.mjs scripts/test-typescript.mjs scripts/test-projects.mjs scripts/test-services.mjs scripts/test-routing.mjs scripts/test-signals.mjs scripts/test-http.mjs"
   },
   "prettier": {
     "printWidth": 100,

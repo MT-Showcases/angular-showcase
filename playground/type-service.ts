@@ -28,6 +28,9 @@ const UNSUPPORTED_IMPORT_CODE = 90001;
 export const SUPPORTED_IMPORTS = [
   '@angular/core',
   '@angular/common',
+  '@angular/common/http',
+  '@angular/core/rxjs-interop',
+  'rxjs',
   '@angular/forms',
   '@angular/router',
   '@angular/material/button',

@@ -18,12 +18,13 @@ const result = await build({
   external: ['fs', 'path', 'os', 'crypto', 'perf_hooks', 'inspector'],
 });
 // An inline hash permits only the bundled runtime script; learner JS runs through JIT evaluation.
+// HTTP lessons may contact JSONPlaceholder only; the opaque-origin sandbox remains unchanged.
 const script = result.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 const hash = createHash('sha256').update(script).digest('base64');
 await mkdir('public/playground/generated', { recursive: true });
 await writeFile('public/playground/generated/preview.html', `<!doctype html><html lang="it" class="site-html"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}' 'unsafe-eval'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}' 'unsafe-eval'; style-src 'unsafe-inline'; img-src data:; connect-src https://jsonplaceholder.typicode.com; form-action 'none'; base-uri 'none'">
 <title>Anteprima componente Angular</title>
 <style>${theme}</style>
 </head><body><main id="preview"></main><script>${script}</script></body></html>`);
@@ -37,6 +38,9 @@ const ts = require('typescript');
 const supportedModules = [
   '@angular/core',
   '@angular/common',
+  '@angular/common/http',
+  '@angular/core/rxjs-interop',
+  'rxjs',
   '@angular/forms',
   '@angular/router',
   '@angular/material/button',

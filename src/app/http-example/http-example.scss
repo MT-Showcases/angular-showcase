@@ -1,5 +1,5 @@
-/** HTTP teaching surfaces keep long responses locally scrollable. */
-@use 'globals' as *;
-.post-card { border-bottom: rem(1) solid var(--mat-sys-outline-variant); padding-block: space(4); min-width: 0; }
-.http-error { color: var(--mat-sys-on-error-container); background: var(--mat-sys-error-container); padding: space(4); border-radius: radius(sm); }
-.http-response { max-height: rem(400); overflow: auto; padding: space(3); border: rem(1) solid var(--mat-sys-outline-variant); }
+/** The compact HTTP lesson delegates layout to the shared shell and example components. */
+:host {
+  display: block;
+  min-width: 0;
+}
