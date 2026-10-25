@@ -14,7 +14,7 @@
 // - HostListener for click-outside-to-close functionality
 //
 // NOTES FOR CONTRIBUTORS:
-// - Add new routes to appropriate groups array
+// - Add new routes to sections.ts so hubs and navigation share one source
 // - Use Angular Material icons for every navigation glyph
 // - Keep navigation structure flat (avoid deep nesting)
 // - Update currentUrl signal when adding route tracking features
@@ -25,7 +25,7 @@ import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/ro
 import { MatIconModule } from '@angular/material/icon';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TOPICS } from '../learning/topics';
+import { CATEGORY_LIST } from '../learning/sections';
 
 // PATTERN: Navigation data structure
 // PURPOSE:
@@ -59,40 +59,22 @@ export class Navbar {
 
   mainItems: NavItem[] = [{ label: 'Home', route: '', icon: 'home', exact: true }];
 
-  groups: NavGroup[] = [
-    {
-      label: 'Basi',
-      icon: 'school',
-      items: [
-        { label: 'Percorso Basi', route: '/basics', icon: 'home' },
-        ...TOPICS.filter(topic => topic.category === 'basics' && topic.published).map(topic => ({ label: topic.title, route: topic.route, icon: 'widgets' })),
-      ],
-    },
-    {
-      label: 'Avanzato',
-      icon: 'auto_awesome',
-      items: [
-        { label: 'Percorso Avanzato', route: '/advanced', icon: 'auto_awesome' },
-        ...TOPICS.filter(topic => topic.category === 'advanced' && topic.published).map(topic => ({ label: topic.title, route: topic.route, icon: topic.id === 'http' ? 'language' : 'bolt' })),
-      ],
-    },
-    {
-      label: 'Stato',
-      icon: 'layers',
-      items: [
-        { label: 'BehaviorSubject', route: '/state/behavior-subject', icon: 'bolt' },
-        { label: 'NgRx', route: '/state/ngrx', icon: 'layers' },
-      ],
-    },
-    {
-      label: 'Esempi',
-      icon: 'people',
-      items: [
-        { label: 'Lista utenti', route: '/examples/users', icon: 'people' },
-        { label: 'Design system', route: '/design-system', icon: 'palette' },
-      ],
-    },
-  ];
+  groups: NavGroup[] = CATEGORY_LIST.map((section) => ({
+    label: section.navLabel,
+    icon: section.navIcon,
+    items: [
+      {
+        label: section.overviewLabel,
+        route: `/${section.id}`,
+        icon: section.overviewIcon,
+      },
+      ...section.resources.map((resource) => ({
+        label: resource.title,
+        route: resource.route,
+        icon: resource.navIcon,
+      })),
+    ],
+  }));
 
   constructor() {
     // Track current route

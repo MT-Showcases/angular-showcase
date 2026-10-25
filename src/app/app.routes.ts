@@ -56,6 +56,13 @@ export const routes: Routes = [
     path: 'state',
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        data: { category: 'state' },
+        loadComponent: () =>
+          import('./learning/category/category').then((module) => module.LearningCategory),
+      },
+      {
         path: 'ngrx',
         loadComponent: () =>
           import('./ngrx-example/ngrx-example').then((module) => module.NgrxExample),
@@ -72,6 +79,13 @@ export const routes: Routes = [
   {
     path: 'examples',
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        data: { category: 'examples' },
+        loadComponent: () =>
+          import('./learning/category/category').then((module) => module.LearningCategory),
+      },
       {
         path: 'users',
         loadComponent: () => import('./user-page/user-page').then((module) => module.UserPage),

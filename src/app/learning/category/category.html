@@ -1,0 +1,120 @@
+<!--
+  Learning category hub
+
+  One shared layout for /basics, /advanced, /state and /examples:
+  a concise orientation panel, a real starting CTA, and resource cards.
+  Only basics renders the phase filter.
+-->
+<div class="category">
+  <app-page-header [title]="section().title" [subtitle]="section().subtitle" />
+
+  <!-- ═══ ORIENTATION AND STARTING POINT ═══ -->
+  <section class="category__overview" aria-labelledby="category-overview-title">
+    <div class="category__overview-copy">
+      <p class="category__eyebrow">{{ section().eyebrow }}</p>
+      <h2 class="category__overview-title" id="category-overview-title">
+        {{ section().overviewTitle }}
+      </h2>
+
+      <!-- Intro prose keeps strong terms and inline code semantic. -->
+      <p class="category__intro lesson-prose">
+        <app-lesson-inline [text]="section().intro" />
+      </p>
+
+      <p class="category__summary">{{ summary() }}</p>
+
+    </div>
+
+    <!-- The first resource in the suggested sequence is the real entry point. -->
+    <aside class="category__start" aria-labelledby="category-start-title">
+      <p class="category__start-label" id="category-start-title">Da dove iniziare</p>
+      <p class="category__start-title">{{ section().entry.title }}</p>
+      <p class="category__start-outcome">{{ section().entry.outcome }}</p>
+      <a
+        matButton="filled"
+        class="category__start-action"
+        [routerLink]="section().entry.route"
+        [attr.aria-label]="'Inizia da: ' + section().entry.title"
+      >
+        Inizia da qui
+        <mat-icon iconPositionEnd aria-hidden="true">east</mat-icon>
+      </a>
+    </aside>
+  </section>
+
+  <!-- ═══ CATALOG ═══ -->
+  <section class="category__catalog" aria-labelledby="category-catalog-title">
+    <div class="category__catalog-head">
+      <h2 class="category__catalog-title" id="category-catalog-title">
+        {{ section().catalogTitle }}
+      </h2>
+      <p class="category__catalog-hint">{{ section().catalogHint }}</p>
+    </div>
+
+    <!-- Basics only: a single-select Material listbox, including all phases. -->
+    @if (section().phases.length) {
+      <div class="category__filter">
+        <mat-chip-listbox
+          class="category__filter-list"
+          aria-label="Filtra le lezioni per fase"
+          [multiple]="false"
+          [value]="selectedPhase()"
+          (change)="selectPhase($event)"
+        >
+          <mat-chip-option value="all">
+            Tutte le fasi ({{ section().resources.length }})
+          </mat-chip-option>
+          @for (phase of section().phases; track phase.id) {
+            <mat-chip-option [value]="phase.id">
+              {{ phase.label }} ({{ phaseCount(phase.id) }})
+            </mat-chip-option>
+          }
+        </mat-chip-listbox>
+        <p class="category__status" aria-live="polite">{{ filterStatus() }}</p>
+      </div>
+    }
+
+    <!-- Every card is a single anchor: no nested links or controls. -->
+    <ul class="category__grid" role="list">
+      @for (resource of visibleResources(); track resource.id) {
+        <li class="category__item">
+          <a class="category__card" [routerLink]="resource.route">
+            <span class="category__card-head">
+              <mat-icon class="category__card-icon" aria-hidden="true">{{ resource.icon }}</mat-icon>
+              <span class="category__kind">{{ phaseFor(resource) || resource.kind }}</span>
+            </span>
+
+            <h3 class="category__card-title">{{ resource.title }}</h3>
+            <p class="category__card-outcome">{{ resource.outcome }}</p>
+
+            @if (resource.bestFor) {
+              <p class="category__card-context">
+                <strong>Ideale per:</strong> {{ resource.bestFor }}
+              </p>
+            }
+
+            @if (resource.prerequisites.length) {
+              <p class="category__card-context">
+                <strong>Prerequisiti:</strong> {{ resource.prerequisites.join(', ') }}
+              </p>
+            }
+
+            <span class="category__card-action">
+              {{ section().id === 'basics' || section().id === 'advanced' ? 'Apri la lezione' : 'Esplora la risorsa' }}
+              <mat-icon aria-hidden="true">east</mat-icon>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    <!-- One adjacent path keeps the hub connected without extra clutter. -->
+    <nav class="category__related" aria-label="Altri percorsi">
+      <span class="category__related-label">Altri percorsi</span>
+      <a matButton="outlined" class="category__related-action" [routerLink]="section().related.route">
+        {{ section().related.label }}
+        <mat-icon iconPositionEnd aria-hidden="true">east</mat-icon>
+      </a>
+    </nav>
+  </section>
+</div>

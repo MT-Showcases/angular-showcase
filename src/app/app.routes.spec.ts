@@ -72,6 +72,24 @@ describe('Showcase routes', () => {
     }
   });
 
+  it('offers working overview pages for the State and Examples dropdowns', async () => {
+    const harness = await RouterTestingHarness.create('/state');
+    const sections = [
+      { url: '/state', links: ['/state/behavior-subject', '/state/ngrx'] },
+      { url: '/examples', links: ['/examples/users', '/design-system'] },
+    ];
+
+    for (const section of sections) {
+      await harness.navigateByUrl(section.url);
+      const page = harness.routeNativeElement!;
+      expect(page.querySelectorAll('h1')).toHaveLength(1);
+      expect(page.querySelector('h1')?.textContent?.trim()).toBeTruthy();
+      for (const link of section.links) {
+        expect(page.querySelector(`a[href="${link}"]`)).not.toBeNull();
+      }
+    }
+  });
+
   it('recovers legacy routing URLs and keeps the playground mounted at code anchors', async () => {
     const harness = await RouterTestingHarness.create('/basics/routing/detail/2?mode=compact');
     const router = TestBed.inject(Router);

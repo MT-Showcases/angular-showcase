@@ -1,0 +1,307 @@
+/**
+ * Learning category hub styles
+ *
+ * Shared layout for the four landing pages: a readable orientation panel,
+ * an optional Material phase filter and spacious anchor cards. Colors come
+ * only from public Material system tokens; spacing and radii use globals.
+ */
+
+@use 'globals' as *;
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+// ═══ PAGE CONTAINER ═══
+.category {
+  display: grid;
+  gap: space(6);
+  max-width: rem(1200);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+// ═══ ORIENTATION PANEL ═══
+// ─── Main panel and responsive two-column split ───
+.category__overview {
+  @include surface-panel($padding: 6);
+  display: grid;
+  gap: space(6);
+  min-width: 0;
+
+  // Keep the reading column wider than the starting card on desktop.
+  @include media-min-breakpoint(md) {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.category__overview-copy {
+  min-width: 0;
+}
+
+.category__eyebrow {
+  margin-bottom: space(2);
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  letter-spacing: rem(0.5);
+  text-transform: uppercase;
+}
+
+.category__overview-title {
+  margin-bottom: space(4);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-headline-medium);
+  overflow-wrap: anywhere;
+}
+
+// ─── Formatted intro prose ───
+.category__intro {
+  margin-bottom: space(4);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-large);
+  overflow-wrap: anywhere;
+
+}
+
+// Real count of resources and phases, never a progress estimate.
+.category__summary {
+  display: inline-block;
+  padding: space(1) space(3);
+  border-radius: radius(sm);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
+  font: var(--mat-sys-label-large);
+  overflow-wrap: anywhere;
+}
+
+
+// ─── Starting CTA ───
+.category__start {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+  min-width: 0;
+  padding: space(6);
+  border-radius: radius(lg);
+  color: var(--mat-sys-on-primary-container);
+  background: var(--mat-sys-primary-container);
+}
+
+.category__start-label {
+  font: var(--mat-sys-label-large);
+  letter-spacing: rem(0.5);
+  text-transform: uppercase;
+}
+
+.category__start-title {
+  font: var(--mat-sys-title-large);
+  overflow-wrap: anywhere;
+}
+
+.category__start-outcome {
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+.category__start-action {
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+// ═══ CATALOG ═══
+.category__catalog {
+  @include surface-panel($padding: 6);
+  display: flex;
+  flex-direction: column;
+  gap: space(6);
+  min-width: 0;
+}
+
+.category__catalog-head {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+  min-width: 0;
+}
+
+.category__catalog-title {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-headline-small);
+  overflow-wrap: anywhere;
+}
+
+.category__catalog-hint {
+  max-width: rem(760);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+// ─── Phase filter ───
+.category__filter {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+  min-width: 0;
+}
+
+// The Material listbox wraps its own chips; only the host width is ours.
+.category__filter-list {
+  width: 100%;
+  min-width: 0;
+}
+
+.category__status {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+// ─── Resource cards ───
+.category__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: space(4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  // Two readable columns from tablet up; one column avoids overflow at 360 px.
+  @include media-min-breakpoint(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.category__item {
+  display: flex;
+  min-width: 0;
+}
+
+.category__card {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+  width: 100%;
+  min-width: 0;
+  padding: space(6);
+  border: rem(1) solid var(--mat-sys-outline-variant);
+  border-radius: radius(md);
+  color: var(--mat-sys-on-surface);
+  background: var(--mat-sys-surface-container-low);
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    border-color: var(--mat-sys-primary);
+    box-shadow: shadow(card);
+    transform: translateY(rem(-2));
+  }
+
+  // Keep the global focus ring visible against the card surface.
+  &:focus-visible {
+    outline-offset: rem(2);
+  }
+
+  // Motion is decorative: remove the lift when the user asks for less motion.
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+.category__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: space(3);
+}
+
+.category__card-icon {
+  flex: none;
+  color: var(--mat-sys-primary);
+}
+
+.category__kind {
+  padding: space(1) space(3);
+  border-radius: radius(sm);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
+  font: var(--mat-sys-label-medium);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.category__card-title {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-large);
+  overflow-wrap: anywhere;
+}
+
+.category__card-outcome {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}
+
+// Prerequisite and "best for" lines stay secondary to the outcome.
+.category__card-context {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  overflow-wrap: anywhere;
+
+  strong {
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+// The action sits at the bottom so cards in the same row align.
+.category__card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: space(1);
+  margin-top: auto;
+  padding-top: space(2);
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+
+  mat-icon {
+    width: rem(20);
+    height: rem(20);
+    font-size: rem(20);
+  }
+}
+
+// ─── Adjacent path ───
+.category__related {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: space(3);
+  padding-top: space(4);
+  border-top: rem(1) solid var(--mat-sys-outline-variant);
+}
+
+.category__related-label {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+// Long translated action labels must wrap within narrow viewports.
+.category__start-action,
+.category__related-action {
+  max-width: 100%;
+  min-height: rem(40);
+  height: auto;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
