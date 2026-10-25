@@ -37,6 +37,7 @@ describe('Showcase routes', () => {
     ['/basics/routing', 'Routing'],
     ['/advanced/signals', 'Signals'],
     ['/advanced/http', 'HTTP e servizi'],
+    ['/state/rxjs', 'RxJS: flussi e sottoscrizioni'],
     ['/state/ngrx', 'NgRx - State Management'],
     ['/state/behavior-subject', 'BehaviorSubject'],
     ['/examples/users', 'Lista Utenti'],
@@ -64,7 +65,7 @@ describe('Showcase routes', () => {
     for (const topic of TOPICS.filter(topic => topic.published)) {
       expect(home.querySelector(`a[href="${topic.route}"]`)).not.toBeNull();
     }
-    for (const category of ['basics', 'advanced']) {
+    for (const category of ['basics', 'advanced', 'state']) {
       await harness.navigateByUrl('/' + category);
       for (const topic of TOPICS.filter(topic => topic.category === category && topic.published)) {
         expect(harness.routeNativeElement!.querySelector(`a[href="${topic.route}"]`)).not.toBeNull();
@@ -75,7 +76,7 @@ describe('Showcase routes', () => {
   it('offers working overview pages for the State and Examples dropdowns', async () => {
     const harness = await RouterTestingHarness.create('/state');
     const sections = [
-      { url: '/state', links: ['/state/behavior-subject', '/state/ngrx'] },
+      { url: '/state', links: ['/state/rxjs', '/state/behavior-subject', '/state/ngrx'] },
       { url: '/examples', links: ['/examples/users', '/design-system'] },
     ];
 

@@ -1,7 +1,7 @@
 <div class="lesson-shell">
   <nav class="lesson-shell__breadcrumbs" aria-label="Percorso della lezione">
     <a class="lesson-shell__link" routerLink="/">Home</a><span aria-hidden="true">/</span>
-    <a class="lesson-shell__link" [routerLink]="'/' + topic().category">{{ topic().category === 'basics' ? 'Basi' : 'Avanzato' }}</a>
+    <a class="lesson-shell__link" [routerLink]="'/' + topic().category">{{ categoryLabels[topic().category] }}</a>
     <span aria-hidden="true">/</span><span aria-current="page">{{ topic().title }}</span>
   </nav>
   @if (compact()) {

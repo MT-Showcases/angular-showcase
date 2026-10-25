@@ -1,0 +1,49 @@
+<app-lesson-shell topicId="rxjs" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">
+    Un <strong class="lesson-emphasis">Observable</strong> descrive una sequenza di valori. Negli esempi <strong>freddi</strong> di questa pagina,
+    <code>subscribe</code> avvia il produttore. L’osservatore riceve le notifiche <code>next</code>,
+    <code>error</code> e <code>complete</code>. Scegli un esempio, cambia il codice e osserva le emissioni reali.
+  </p>
+
+  <app-lesson-examples [examples]="examples" />
+
+  <app-lesson-disclosure anchor="deepen" title="next, error e complete">
+    <p class="lesson-text lesson-prose">
+      Un osservatore ascolta tre notifiche. <code>next</code> consegna un valore, <code>error</code> interrompe il
+      flusso con un errore e <code>complete</code> segnala la fine senza un valore. Dopo <code>complete</code> o
+      <code>error</code> la sottoscrizione è chiusa: non arriva altro.
+    </p>
+    <p class="lesson-text lesson-prose">
+      <code>subscribe</code> restituisce una <strong class="lesson-emphasis">Subscription</strong>.
+      <code>unsubscribe</code> annulla il lavoro della sorgente: nel terzo esempio ferma il timer senza chiamare
+      <code>complete</code>. Anche <code>take(n)</code> chiude il flusso, ma perché ha raggiunto il limite, non
+      perché hai annullato la sottoscrizione.
+    </p>
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="rxjs-streams" title="Flusso o signal?">
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">signal</strong> conserva un valore corrente: chi lo legge ottiene subito lo
+      stato attuale. Un Observable rappresenta una sequenza: i valori ricevuti dipendono dalla sorgente e dagli operatori.
+      Una sottoscrizione può completarsi, terminare con un errore oppure essere annullata. Per lo stato sincrono della vista usa i signal; per eventi, richieste
+      HTTP e sequenze nel tempo usa RxJS.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Anche un Observable può emettere valori sincroni, come nel primo esempio. Le sorgenti fredde qui usate partono a ogni sottoscrizione. Un <strong>Subject</strong>, invece,
+      può produrre anche senza osservatori: vedremo questa differenza nella prossima lezione.
+    </p>
+  </app-lesson-disclosure>
+
+  <app-lesson-disclosure anchor="rxjs-next" title="Operatori e prossimo passo">
+    <p class="lesson-text lesson-prose">
+      <code>of</code> crea un flusso da valori già disponibili; <code>filter</code> scarta i valori che non passano
+      il test e <code>map</code> trasforma quelli che restano. Gli operatori restituiscono un nuovo Observable: la
+      pipeline di questo esempio descrive il lavoro, che parte con una sottoscrizione.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">Subject</strong> è sia Observable sia osservatore e permette di condividere
+      un flusso tra più consumatori. Lo vedrai nella lezione dedicata:
+      <a routerLink="/state/behavior-subject">continua con BehaviorSubject</a>.
+    </p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

@@ -90,3 +90,7 @@ Signals follows the same editable lesson structure as Basics: independent writab
 ## Category entry pages
 
 Every dropdown has a dedicated overview: Basics, Advanced, State and Examples. These pages provide concise orientation, a recommended starting point and resource cards that explain the learning outcome. Basics exposes progressive phase filters; the shorter categories avoid unnecessary filtering. Published lesson data comes from TOPICS, while section metadata adds the State/Examples resources and navigation context. Overview routes and all existing lesson URLs remain stable; no completion tracking, time estimates or unpublished lesson links are implied.
+
+## State curriculum
+
+The state path progresses from RxJS foundations to BehaviorSubject and NgRx Store. RxJS introduces independent cold subscriptions, real filter/map outputs and explicit interval completion/cancellation. Use the same preview → editable source → linked diagram structure throughout, preserving colorful role panels with paired Material tokens. BehaviorSubject and NgRx migrations follow sequentially; SignalStore and additional Users examples remain separate future work.

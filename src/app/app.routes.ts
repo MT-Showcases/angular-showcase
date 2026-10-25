@@ -63,6 +63,10 @@ export const routes: Routes = [
           import('./learning/category/category').then((module) => module.LearningCategory),
       },
       {
+        path: 'rxjs',
+        loadComponent: () => import('./rxjs-lesson/rxjs-lesson').then(module => module.RxjsLesson),
+      },
+      {
         path: 'ngrx',
         loadComponent: () =>
           import('./ngrx-example/ngrx-example').then((module) => module.NgrxExample),

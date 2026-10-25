@@ -39,5 +39,6 @@ export class LessonShell {
     const index = published.findIndex(topic => topic.id === this.topicId());
     return { previous: published[index - 1], next: published[index + 1] };
   });
+  readonly categoryLabels = { basics: 'Basi', advanced: 'Avanzato', state: 'Stato' };
   readonly glossary = GLOSSARY;
 }

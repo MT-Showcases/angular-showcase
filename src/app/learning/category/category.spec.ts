@@ -158,12 +158,12 @@ describe('LearningCategory hubs', () => {
   it('links the state and examples resources without search or filter controls', async () => {
     await setCategory('state');
 
-    expect(cards()).toHaveLength(2);
-    expect(cardRoutes()).toEqual(['/state/behavior-subject', '/state/ngrx']);
+    expect(cards()).toHaveLength(3);
+    expect(cardRoutes()).toEqual(['/state/rxjs', '/state/behavior-subject', '/state/ngrx']);
     expect(fixture.nativeElement.querySelector('mat-chip-listbox')).toBeNull();
     expect(fixture.nativeElement.querySelector('input')).toBeNull();
     expect(fixture.nativeElement.querySelector('.category__catalog-title')?.textContent).toContain(
-      'I due approcci',
+      'Il percorso sullo stato',
     );
 
     await setCategory('examples');

@@ -1,8 +1,8 @@
 /** Learning navigation metadata. Only published lessons are exposed as links. */
-export type LessonId = 'start' | 'binding' | 'control-flow' | 'components' | 'pipes' | 'forms' | 'services' | 'routing' | 'signals' | 'http';
+export type LessonId = 'start' | 'binding' | 'control-flow' | 'components' | 'pipes' | 'forms' | 'services' | 'routing' | 'signals' | 'http' | 'rxjs' | 'behavior-subject' | 'ngrx';
 export interface LessonTopic {
   id: LessonId;
-  category: 'basics' | 'advanced';
+  category: 'basics' | 'advanced' | 'state';
   title: string;
   route: string;
   outcome: string;
@@ -20,6 +20,9 @@ export const TOPICS: LessonTopic[] = [
   { id: 'routing', category: 'basics', title: 'Routing', route: '/basics/routing', outcome: 'Naviga tra viste, leggi parametri e gestisci un percorso sconosciuto.', prerequisites: ['components', 'services'], published: true },
   { id: 'signals', category: 'advanced', title: 'Signals', route: '/advanced/signals', outcome: 'Distingui stato modificabile, valori derivati ed effetti verso API imperative.', prerequisites: ['components', 'control-flow'], published: true },
   { id: 'http', category: 'advanced', title: 'HTTP e servizi', route: '/advanced/http', outcome: 'Segui una richiesta dalla UI alla risposta e gestisci successo, attesa ed errore.', prerequisites: ['services', 'forms'], published: true },
+  { id: 'rxjs', category: 'state', title: 'RxJS: flussi e sottoscrizioni', route: '/state/rxjs', outcome: 'Osserva le emissioni di un flusso, trasformale con operatori e interrompi una sottoscrizione.', prerequisites: ['binding'], published: true },
+  { id: 'behavior-subject', category: 'state', title: 'BehaviorSubject', route: '/state/behavior-subject', outcome: 'Condividi un valore corrente e osserva cosa riceve un componente che si collega dopo.', prerequisites: ['rxjs', 'services'], published: true },
+  { id: 'ngrx', category: 'state', title: 'NgRx Store', route: '/state/ngrx', outcome: 'Segui un’azione dal componente al reducer e osserva lo stato attraverso i selettori.', prerequisites: ['rxjs', 'services', 'signals'], published: true },
 ];
 export const GLOSSARY = [
   { term: 'Componente', definition: 'Una classe Angular con un template e uno stile: gestisce una parte dell’interfaccia.' },

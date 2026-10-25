@@ -65,7 +65,7 @@ export class LearningCategory {
         : section.resourceNoun.plural;
     return section.phases.length
       ? `${section.resources.length} ${noun} in ${section.phases.length} fasi progressive`
-      : `${section.resources.length} ${noun} indipendenti`;
+      : `${section.resources.length} ${noun}`;
   });
 
   readonly visibleLabel = computed(() => {

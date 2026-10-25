@@ -3,8 +3,7 @@
  *
  * Basics and advanced resources are derived from TOPICS: their array order is
  * the suggested sequence, while `prerequisites` are concept requirements and
- * never block a route. State and examples are standalone demos that do not
- * extend LessonId, because the lesson shell only manages the two main paths.
+ * never block a route. State lessons share TOPICS as well; standalone examples remain resource entries.
  */
 import { LessonId, LessonTopic, TOPICS } from './topics';
 
@@ -80,6 +79,9 @@ const LESSON_ICONS: Record<LessonId, string> = {
   routing: 'route',
   signals: 'sensors',
   http: 'http',
+  rxjs: 'timeline',
+  'behavior-subject': 'bolt',
+  ngrx: 'hub',
 };
 
 const LESSON_KINDS: Record<LessonId, string> = {
@@ -93,6 +95,9 @@ const LESSON_KINDS: Record<LessonId, string> = {
   routing: 'Navigazione',
   signals: 'Stato reattivo',
   http: 'Dati asincroni',
+  rxjs: 'Flussi e operatori',
+  'behavior-subject': 'Valore condiviso',
+  ngrx: 'Azioni e selettori',
 };
 
 const BASICS_PHASE_BY_ID: Partial<Record<LessonId, BasicsPhase>> = {
@@ -113,7 +118,7 @@ const ADVANCED_BEST_FOR: Partial<Record<LessonId, string>> = {
 
 const TOPIC_TITLES = new Map<LessonId, string>(TOPICS.map((topic) => [topic.id, topic.title]));
 
-function publishedTopics(category: 'basics' | 'advanced'): LessonTopic[] {
+function publishedTopics(category: LessonTopic['category']): LessonTopic[] {
   return TOPICS.filter((topic) => topic.category === category && topic.published);
 }
 
@@ -144,32 +149,9 @@ const ADVANCED_RESOURCES = publishedTopics('advanced').map((topic) =>
   lessonResource(topic, topic.id === 'http' ? 'language' : 'bolt'),
 );
 
-const STATE_RESOURCES: CategoryResource[] = [
-  {
-    id: 'behavior-subject',
-    title: 'BehaviorSubject',
-    route: '/state/behavior-subject',
-    icon: 'bolt',
-    navIcon: 'bolt',
-    kind: 'Observable con valore',
-    outcome:
-      'Osserva l’ultimo valore consegnato ai nuovi iscritti e prova messaggi, contatore e stato utente.',
-    prerequisites: [],
-    bestFor: 'Uno stato corrente semplice da condividere tra più componenti.',
-  },
-  {
-    id: 'ngrx',
-    title: 'NgRx',
-    route: '/state/ngrx',
-    icon: 'hub',
-    navIcon: 'layers',
-    kind: 'Store strutturato',
-    outcome:
-      'Segui azioni, reducer e selettori in uno store condiviso, con contatore, todo e registro delle azioni.',
-    prerequisites: [],
-    bestFor: 'Uno store con azioni tracciabili quando lo stato condiviso cresce.',
-  },
-];
+const STATE_RESOURCES = publishedTopics('state').map((topic) =>
+  lessonResource(topic, LESSON_ICONS[topic.id]),
+);
 
 const EXAMPLE_RESOURCES: CategoryResource[] = [
   {
@@ -263,18 +245,18 @@ export const CATEGORY_SECTIONS: Record<CategoryId, CategorySection> = {
   state: section({
     id: 'state',
     title: 'Stato condiviso',
-    subtitle: 'Due modi per condividere dati nel tempo, dal valore osservabile allo store NgRx.',
+    subtitle: 'Dai flussi RxJS al valore condiviso, fino allo store NgRx.',
     navLabel: 'Stato',
     navIcon: 'layers',
     overviewLabel: 'Panoramica Stato',
     overviewIcon: 'dashboard',
     eyebrow: 'Stato e reattività',
-    overviewTitle: 'Scegli quanta struttura ti serve',
-    intro: 'Confronta due flussi: **BehaviorSubject** per osservare un valore condiviso; **NgRx** per seguire azioni, reducer e selettori.',
+    overviewTitle: 'Dai flussi allo stato condiviso',
+    intro: 'Parti dai flussi **RxJS**, condividi un valore con **BehaviorSubject**, poi segui azioni e selettori di **NgRx Store**.',
     
-    resourceNoun: { singular: 'approccio', plural: 'approcci' },
-    catalogTitle: 'I due approcci',
-    catalogHint: 'Confronta i due approcci e apri quello più vicino al tuo caso.',
+    resourceNoun: { singular: 'lezione', plural: 'lezioni' },
+    catalogTitle: 'Il percorso sullo stato',
+    catalogHint: 'Segui l’ordine consigliato o scegli il concetto da approfondire.',
     phases: [],
     resources: STATE_RESOURCES,
     related: { label: 'Vai ad Avanzato', route: '/advanced' },
