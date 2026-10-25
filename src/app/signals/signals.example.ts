@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export default class SignalCounter {
   // signal(0) crea uno stato modificabile con valore iniziale zero.
+  // readonly blocca la riassegnazione del campo, non il valore: set e update restano permessi.
   readonly count = signal(0);
 
   increment(): void {
@@ -37,19 +38,23 @@ export default class SignalCounter {
     Il template legge <code>count()</code>: ogni scrittura aggiorna subito il numero.
   </p>
 
+  <!-- La lettura count() registra il template come consumatore: quando il valore cambia, Angular aggiorna il template. -->
   <p class="counter__value" aria-live="polite">{{ count() }}</p>
 
   <div class="counter__actions">
+    <!-- (click) delega a un metodo: la logica resta nel TypeScript del componente. -->
     <button
       matButton="outlined"
       type="button"
       (click)="decrement()"
     >Diminuisci</button>
+
     <button
       matButton="filled"
       type="button"
       (click)="increment()"
     >Aumenta</button>
+
     <button
       matButton="text"
       type="button"
@@ -57,7 +62,8 @@ export default class SignalCounter {
     >Azzera</button>
   </div>
 </section>`,
-  css: `.counter {
+  css: `/* I token --mat-sys-* seguono il tema Material attivo: niente colori fissi. */
+.counter {
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -79,6 +85,7 @@ export default class SignalCounter {
 }
 
 .counter__actions {
+  /* flex-wrap manda i pulsanti a capo quando lo spazio non basta. */
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -102,6 +109,7 @@ export default class SignalComputed {
 
   // computed legge count(): quando cambia, il valore viene ricalcolato alla lettura.
   readonly double = computed(() => this.count() * 2);
+  // double non ha set: l'unico modo di cambiarlo è cambiare la sua dipendenza.
 
   add(step: number): void {
     this.count.update(value => value + step);
@@ -117,6 +125,7 @@ export default class SignalComputed {
   </p>
 
   <div class="computed__grid">
+    <!-- count() e double() sono letture: il doppio non è uno stato da sincronizzare. -->
     <div class="computed__card">
       <span class="computed__label">Conteggio</span>
       <span class="computed__value">{{ count() }}</span>
@@ -129,16 +138,19 @@ export default class SignalComputed {
   </div>
 
   <div class="computed__actions">
+    <!-- Ogni (click) delega a un metodo del componente, con il passo come argomento. -->
     <button
       matButton="outlined"
       type="button"
       (click)="add(1)"
     >+1 al conteggio</button>
+
     <button
       matButton="outlined"
       type="button"
       (click)="add(10)"
     >+10 al conteggio</button>
+
     <button
       matButton="text"
       type="button"
@@ -146,7 +158,8 @@ export default class SignalComputed {
     >Azzera</button>
   </div>
 </section>`,
-  css: `.computed {
+  css: `/* Superfici, bordi e testo arrivano dai token del tema Material. */
+.computed {
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -162,6 +175,7 @@ export default class SignalComputed {
 
 .computed__grid {
   display: grid;
+  /* auto-fit crea quante colonne entrano nello spazio; min(100%, 10rem) evita lo sbordamento. */
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
   gap: 0.75rem;
 }
@@ -221,8 +235,10 @@ export default class SignalEffect {
   readonly titleSync = signal(false);
 
   constructor() {
+    // effect richiede un contesto di iniezione: qui è il costruttore del componente.
     effect(onCleanup => {
-      // Opt-in esplicito: da spento l'effetto esce prima di leggere count.
+      // Opt-in esplicito: da spento l'effetto esce prima di leggere count,
+      // quindi count non entra nelle dipendenze finché la sincronizzazione resta disattivata.
       if (!this.titleSync()) return;
 
       this.document.title = 'Conteggio ' + this.count() + ' · Anteprima Angular';
@@ -260,11 +276,14 @@ export default class SignalEffect {
       type="button"
       (click)="increment()"
     >Aumenta</button>
+
     <button
       matButton="text"
       type="button"
       (click)="reset()"
     >Azzera</button>
+
+    <!-- aria-pressed riflette titleSync(): il template mostra uno stato reale. -->
     <button
       matButton="filled"
       type="button"
@@ -273,7 +292,7 @@ export default class SignalEffect {
     >{{ titleSync() ? 'Disattiva sincronizzazione' : 'Attiva sincronizzazione' }}</button>
   </div>
 
-  <!-- Leggiamo il titolo effettivo del documento, così la scrittura dell’effetto è visibile. -->
+  <!-- Lettura imperativa del titolo reale: non è un signal, ma mostra la scrittura dell'effetto. -->
   <p class="effect__title">Titolo dell’anteprima: <output>{{ document.title }}</output></p>
 
   <p class="effect__status" role="status">
@@ -284,7 +303,8 @@ export default class SignalEffect {
     Disattivando l'effetto o ricreando l'anteprima, la pulizia ripristina il titolo iniziale.
   </p>
 </section>`,
-  css: `.effect {
+  css: `/* I token del tema danno colori e raggi coerenti con Material. */
+.effect {
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -308,6 +328,7 @@ export default class SignalEffect {
 }
 
 .effect__actions {
+  /* I tre pulsanti vanno a capo invece di comprimersi su schermi stretti. */
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -330,6 +351,7 @@ const CART_SOURCES: PlaygroundSources = {
   typescript: `import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
+// L'id è l'identità stabile della riga: due prodotti possono avere lo stesso nome.
 interface CartItem {
   id: number;
   name: string;
@@ -338,6 +360,7 @@ interface CartItem {
 }
 
 // Lista di partenza condivisa dal costruttore e dal ripristino.
+// readonly impedisce di aggiungere o rimuovere elementi da questa lista.
 const INITIAL_ITEMS: readonly CartItem[] = [
   { id: 1, name: 'Taccuino', price: 6, quantity: 1 },
   { id: 2, name: 'Penna', price: 3, quantity: 2 },
@@ -355,8 +378,10 @@ export default class SignalCart {
   // nextId produce identificatori unici anche per righe con lo stesso nome.
   private nextId = 3;
 
+  // Lo spread copia ogni riga: la lista iniziale resta intatta e riutilizzabile.
   readonly items = signal<CartItem[]>(INITIAL_ITEMS.map(item => ({ ...item })));
 
+  // reduce somma prezzo per quantità: il totale deriva dalla lista, senza un secondo stato modificabile.
   readonly total = computed(() =>
     this.items().reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
@@ -376,10 +401,12 @@ export default class SignalCart {
   }
 
   removeItem(id: number): void {
+    // filter restituisce un nuovo array senza la riga scelta.
     this.items.update(items => items.filter(item => item.id !== id));
   }
 
   reset(): void {
+    // Ripristino completo: contatore degli ID e copie nuove della lista iniziale.
     this.nextId = 3;
     this.items.set(INITIAL_ITEMS.map(item => ({ ...item })));
   }
@@ -402,6 +429,7 @@ export default class SignalCart {
   </p>
 
   <ul class="cart__list">
+    <!-- track item.id mantiene l'identità della riga anche quando la lista è un nuovo array. -->
     @for (item of items(); track item.id) {
       <li class="cart__item" [attr.data-item-id]="item.id">
         <div class="cart__info">
@@ -410,6 +438,7 @@ export default class SignalCart {
         </div>
 
         <div class="cart__row-actions">
+          <!-- Il limite inferiore è 1: a quantità 1 "Meno" è disabilitato. -->
           <button
             matButton="outlined"
             type="button"
@@ -438,10 +467,12 @@ export default class SignalCart {
         </div>
       </li>
     } @empty {
+      <!-- Lista vuota: @empty mostra un messaggio al posto delle righe. -->
       <li class="cart__empty" role="status">Il carrello è vuoto: aggiungi un prodotto.</li>
     }
   </ul>
 
+  <!-- total() legge il computed: non serve aggiornare il totale nei metodi dei pulsanti. -->
   <p class="cart__total" aria-live="polite">Totale: <strong>{{ total() }} €</strong></p>
 
   <div class="cart__actions">
@@ -457,7 +488,8 @@ export default class SignalCart {
     >Ripristina</button>
   </div>
 </section>`,
-  css: `.cart {
+  css: `/* Colori e raggi vengono dai token del tema, così l'esempio segue il brand. */
+.cart {
   display: grid;
   gap: 1rem;
   padding: 1rem;
@@ -481,6 +513,7 @@ export default class SignalCart {
 }
 
 .cart__item {
+  /* Su schermi stretti i comandi vanno sotto il nome invece di comprimerlo. */
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -495,6 +528,7 @@ export default class SignalCart {
 .cart__info {
   display: grid;
   gap: 0.125rem;
+  /* Base di 10rem: cresce o si restringe, permettendo il ritorno a capo dei comandi. */
   flex: 1 1 10rem;
   min-width: 0;
 }
