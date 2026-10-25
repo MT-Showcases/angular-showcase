@@ -47,6 +47,7 @@ const supportedModules = [
   '@angular/material/button',
   '@angular/material/form-field',
   '@angular/material/input',
+  '@angular/material/tabs',
 ];
 const editorOptions = {
   strict: true,

@@ -8,31 +8,34 @@
 
   <app-lesson-examples [examples]="examples" />
 
-  <app-lesson-disclosure anchor="reducers" title="Reducer puri e traccia reale">
+  <app-lesson-disclosure anchor="reducers" title="Reducer puri e journal reale">
     <p class="lesson-text lesson-prose">
       Un <strong class="lesson-emphasis">reducer</strong> riceve lo stato precedente e un’azione, poi restituisce un
       nuovo stato senza modificare il precedente. Negli esempi gli array e gli oggetti cambiati vengono ricreati;
-      <code>nextId</code> e <code>sequence</code> vivono dentro lo stato, quindi gli identificativi restano
-      deterministici e il reducer non usa <code>Date.now</code> o valori casuali.
+      <code>nextId</code> vive dentro lo stato, quindi gli identificativi restano deterministici e il reducer non usa
+      <code>Date.now</code> o valori casuali.
     </p>
     <p class="lesson-text lesson-prose">
-      La traccia delle azioni è uno stato come gli altri: la scrive il reducer quando processa l’azione, non un
-      contatore nel componente. È limitata a otto voci con <code>slice(-8)</code>, quindi mostra solo le
-      <strong class="lesson-emphasis">ultime 8</strong>. La modifica di una regola del reducer cambia il risultato reale
-      che vedi nella preview.
+      Le due preview condividono un <strong class="lesson-emphasis">DevTools didattico</strong>: un
+      <code>MetaReducer</code> reale osserva il reducer radice e registra al massimo le ultime otto voci, con payload
+      e snapshot JSON prima/dopo. Il journal vive fuori dallo Store, quindi non entra nei suoi snapshot. Non c’è time
+      travel: selezionare un’azione non ripristina lo stato salvato, mentre la tab <strong>Stato</strong> mostra
+      sempre quello live.
     </p>
   </app-lesson-disclosure>
 
   <app-lesson-disclosure anchor="draft" title="Bozza locale, stato condiviso">
     <p class="lesson-text lesson-prose">
       Nel secondo esempio la bozza del campo è un <code>signal</code> locale: cambia a ogni tasto e non ha bisogno di
-      un’azione. Lista, filtro, contatori e traccia appartengono invece allo Store, perché più letture devono rimanere coerenti. Lo Store appartiene
-      alla preview: rieseguire il codice crea una nuova istanza e riparte dallo stato iniziale. Anche il filtro è un’azione: nessun componente conserva una copia separata.
+      un’azione. Lista, filtro e contatori appartengono invece allo Store, perché più letture devono rimanere coerenti.
+      Lo Store appartiene alla preview: rieseguire il codice crea una nuova istanza e riparte dallo stato iniziale.
+      Anche il filtro è un’azione: nessun componente conserva una copia separata.
     </p>
     <p class="lesson-text lesson-prose">
       Il testo inviato viene ripulito con <code>trim</code> nel reducer: un titolo vuoto non crea attività e non
-      consuma un identificativo. La lista usa <code>track todo.id</code>, così Angular segue l’identità della riga
-      anche dopo un filtro o una rimozione.
+      consuma un identificativo. L’azione viene comunque registrata nel DevTools con <strong>Nessuna variazione</strong>,
+      perché lo stato prima e dopo coincide. La lista usa <code>track todo.id</code>, così Angular segue l’identità
+      della riga anche dopo un filtro o una rimozione.
     </p>
   </app-lesson-disclosure>
 

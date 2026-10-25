@@ -43,7 +43,7 @@ describe('NgRx playground lesson', () => {
       const playground = activePlayground(fixture);
       expect(playground.initial()).toBe(NGRX_EXAMPLES[0].sources);
       expect(page.querySelectorAll('.cm-editor')).toHaveLength(editableFiles(playground.initial()).length);
-      expect(editableFiles(playground.initial())).toHaveLength(7);
+      expect(editableFiles(playground.initial())).toHaveLength(11);
       expect(page.querySelector('.lesson-shell__intro')).toBeNull();
       expect(page.querySelector('#demo')?.textContent).toContain('NgRx Store');
       expect(page.querySelector('#code')).not.toBeNull();
@@ -81,13 +81,26 @@ describe('NgRx playground lesson', () => {
       'counter.actions.ts',
       'counter.reducer.ts',
       'counter.selectors.ts',
+      'devtools.ts',
+      'devtools-inspector.ts',
+      'devtools-inspector.html',
+      'devtools-inspector.css',
     ]);
     expect(Object.keys(NGRX_EXAMPLES[1].sources.files ?? {})).toEqual([
       'app.config.ts',
       'todo.actions.ts',
       'todo.reducer.ts',
       'todo.selectors.ts',
+      'devtools.ts',
+      'devtools-inspector.ts',
+      'devtools-inspector.html',
+      'devtools-inspector.css',
     ]);
+
+    expect(NGRX_EXAMPLES[0].sources.files!['devtools.ts'])
+      .toBe(NGRX_EXAMPLES[1].sources.files!['devtools.ts']);
+    expect(NGRX_EXAMPLES[0].sources.files!['devtools-inspector.ts'])
+      .toBe(NGRX_EXAMPLES[1].sources.files!['devtools-inspector.ts']);
   });
 
   it('switches both seeds, keeps a reducer draft and resets it to the seed', async () => {

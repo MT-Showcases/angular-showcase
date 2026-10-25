@@ -37,6 +37,7 @@ export const SUPPORTED_IMPORTS = [
   '@angular/material/button',
   '@angular/material/form-field',
   '@angular/material/input',
+  '@angular/material/tabs',
 ] as const;
 
 const COMPILER_OPTIONS: ts.CompilerOptions = {

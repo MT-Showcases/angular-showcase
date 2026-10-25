@@ -10,6 +10,7 @@ import * as forms from '@angular/forms';
 import * as buttons from '@angular/material/button';
 import * as formFields from '@angular/material/form-field';
 import * as inputs from '@angular/material/input';
+import * as tabs from '@angular/material/tabs';
 import * as router from '@angular/router';
 import { createApplication } from '@angular/platform-browser';
 import * as ts from 'typescript';
@@ -275,7 +276,7 @@ function evaluate(sources: PlaygroundSources): EvaluatedProject {
     '@angular/common/http': http, '@angular/core/rxjs-interop': rxjsInterop, 'rxjs': rxjs,
     '@ngrx/store': ngrxStore,
     '@angular/material/button': buttons, '@angular/material/form-field': formFields,
-    '@angular/material/input': inputs,
+    '@angular/material/input': inputs, '@angular/material/tabs': tabs,
   };
 
   const load = (path: string): unknown => {
@@ -299,7 +300,7 @@ function evaluate(sources: PlaygroundSources): EvaluatedProject {
         if (!Object.hasOwn(bundled, specifier)) {
           throw new Error(
             `Import non disponibile: ${specifier} (in ${path}). Sono disponibili Angular core, ` +
-            'common, common/http, core/rxjs-interop, forms, router, rxjs, @ngrx/store e Material button, form-field e input.',
+            'common, common/http, core/rxjs-interop, forms, router, rxjs, @ngrx/store e Material button, form-field, input e tabs.',
           );
         }
         return bundled[specifier];

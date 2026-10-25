@@ -100,11 +100,6 @@ function counterValue(document, label) {
   return text(document, `.counter__value[aria-label="${label}"]`);
 }
 
-function traceTypes(document, scope) {
-  return [...document.querySelectorAll(`${scope} .counter__type, ${scope} .todo__type`)]
-    .map((element) => element.textContent.trim());
-}
-
 function todoCount(document, label) {
   return text(document, `[aria-label="${label}"]`);
 }
@@ -121,7 +116,44 @@ function pressed(document, label) {
   return document.querySelector(`[aria-label="${label}"]`)?.getAttribute('aria-pressed');
 }
 
-test('counter dispatches real actions, derives the double and keeps only the last eight entries', async () => {
+function openTab(document, label) {
+  const tab = [...document.querySelectorAll('[role="tab"]')]
+    .find((element) => element.textContent.trim() === label);
+  assert.ok(tab, `Missing DevTools tab "${label}"`);
+  tab.click();
+}
+
+function devtoolsTypes(document) {
+  return [...document.querySelectorAll('.devtools__entry-type')]
+    .map((element) => element.textContent.trim());
+}
+
+function inspect(document, index) {
+  const button = document.querySelectorAll('.devtools__select')[index];
+  assert.ok(button, `Missing DevTools action at index ${index}`);
+  button.click();
+}
+
+function selectedType(document) {
+  return text(document, '.devtools__type');
+}
+
+function snapshot(document, selector) {
+  const element = document.querySelector(selector);
+  assert.ok(element, `Missing JSON element "${selector}"`);
+  // JSON.parse accetta gli spazi dell'indentazione ma conserva quelli dentro le stringhe.
+  return JSON.parse(element.textContent);
+}
+
+function changes(document) {
+  return [...document.querySelectorAll('.devtools__change')].map((item) => ({
+    path: item.querySelector('.devtools__path').textContent.trim(),
+    before: item.querySelector('.devtools__old').textContent.trim(),
+    after: item.querySelector('.devtools__new').textContent.trim(),
+  }));
+}
+
+test('counter records real actions, keeps a pinned inspection and bounds the journal', async () => {
   const dom = await environment();
   try {
     await render(dom, COUNTER, 1);
@@ -130,44 +162,121 @@ test('counter dispatches real actions, derives the double and keeps only the las
 
     assert.equal(counterValue(document, 'Conteggio corrente'), '0');
     assert.equal(counterValue(document, 'Valore doppio'), '0');
-    assert.match(text(document, '[aria-label="Ultime azioni"]'), /Nessuna azione registrata/);
+    assert.deepEqual(
+      [...document.querySelectorAll('[role="tab"]')].map((element) => element.textContent.trim()),
+      ['Azione', 'Stato', 'Modifiche'],
+    );
+    assert.deepEqual(devtoolsTypes(document), ['@ngrx/store/init']);
+    assert.equal(selectedType(document), '@ngrx/store/init');
+    assert.equal(
+      document.querySelector('.devtools__select').getAttribute('aria-label'),
+      'Ispeziona azione 1 @ngrx/store/init',
+    );
+    assert.match(text(document, '.devtools__payload'), /Nessun payload/);
+    assert.match(text(document, '.devtools__before'), /Nessuno stato precedente/);
+    assert.deepEqual(snapshot(document, '.devtools__after'), { counter: { count: 0 } });
+    assert.equal(
+      document.querySelector('.devtools__select').getAttribute('aria-pressed'),
+      'true',
+    );
+
+    openTab(document, 'Stato');
+    await settle();
+    assert.equal(snapshot(document, '.devtools__live').counter.count, 0);
+
+    openTab(document, 'Modifiche');
+    await settle();
+    assert.deepEqual(changes(document).map((change) => change.path), ['counter']);
+    assert.equal(changes(document)[0].before, 'assente');
+    assert.equal(JSON.parse(changes(document)[0].after).count, 0);
 
     click(document, 'Incrementa di uno');
     click(document, 'Incrementa di uno');
     await settle();
     assert.equal(counterValue(document, 'Conteggio corrente'), '2');
     assert.equal(counterValue(document, 'Valore doppio'), '4');
-    assert.deepEqual(traceTypes(document, '.counter'), ['[Counter] increment', '[Counter] increment']);
+    assert.deepEqual(devtoolsTypes(document), [
+      '@ngrx/store/init',
+      '[Counter] increment',
+      '[Counter] increment',
+    ]);
+    assert.equal(selectedType(document), '[Counter] increment');
+    assert.equal(text(document, '.devtools__payload'), '{}');
+    assert.equal(snapshot(document, '.devtools__before').counter.count, 1);
+    assert.equal(snapshot(document, '.devtools__after').counter.count, 2);
 
     click(document, 'Decrementa di uno');
     await settle();
-    assert.equal(counterValue(document, 'Conteggio corrente'), '1');
-    assert.equal(counterValue(document, 'Valore doppio'), '2');
+    assert.deepEqual(changes(document).map((change) => change.path), ['counter.count']);
+    assert.equal(changes(document)[0].before, '2');
+    assert.equal(changes(document)[0].after, '1');
+
+    // Seleziona un'azione vecchia: gli snapshot restano quelli del momento.
+    inspect(document, 1);
+    await settle();
+    assert.equal(
+      document.querySelectorAll('.devtools__select')[1].getAttribute('aria-pressed'),
+      'true',
+    );
+    assert.equal(snapshot(document, '.devtools__after').counter.count, 1);
+    assert.equal(snapshot(document, '.devtools__before').counter.count, 0);
+
+    click(document, 'Incrementa di uno');
+    await settle();
+    assert.equal(counterValue(document, 'Conteggio corrente'), '2');
+    assert.equal(
+      document.querySelectorAll('.devtools__select')[1].getAttribute('aria-pressed'),
+      'true',
+    );
+    assert.equal(snapshot(document, '.devtools__after').counter.count, 1);
+    openTab(document, 'Stato');
+    await settle();
+    assert.equal(snapshot(document, '.devtools__live').counter.count, 2);
 
     for (let index = 0; index < 9; index += 1) click(document, 'Incrementa di uno');
     await settle();
-    assert.equal(counterValue(document, 'Conteggio corrente'), '10');
-    assert.equal(counterValue(document, 'Valore doppio'), '20');
-    assert.deepEqual(traceTypes(document, '.counter'), new Array(8).fill('[Counter] increment'));
-    assert.equal(text(document, '.counter__entry:last-child .counter__result'), 'count 10');
+    assert.equal(counterValue(document, 'Conteggio corrente'), '11');
+    assert.equal(counterValue(document, 'Valore doppio'), '22');
+    assert.deepEqual(devtoolsTypes(document), new Array(8).fill('[Counter] increment'));
+    assert.equal(snapshot(document, '.devtools__before').counter.count, 10);
+    assert.equal(snapshot(document, '.devtools__after').counter.count, 11);
+    assert.equal(snapshot(document, '.devtools__live').counter.count, 11);
 
-    click(document, 'Svuota la traccia');
+    click(document, 'Pulisci la cronologia DevTools');
     await settle();
-    assert.equal(counterValue(document, 'Conteggio corrente'), '10');
-    assert.equal(counterValue(document, 'Valore doppio'), '20');
-    assert.match(text(document, '[aria-label="Ultime azioni"]'), /Nessuna azione registrata/);
+    assert.equal(counterValue(document, 'Conteggio corrente'), '11');
+    assert.equal(counterValue(document, 'Valore doppio'), '22');
+    assert.deepEqual(devtoolsTypes(document), []);
+    assert.match(text(document, '.devtools__history'), /Nessuna azione registrata/);
+    assert.match(
+      text(document, '[aria-label="Dettaglio azione selezionata"]'),
+      /Seleziona un'azione/,
+    );
+    assert.equal(
+      document.querySelector('[aria-label="Pulisci la cronologia DevTools"]').disabled,
+      true,
+    );
+    assert.equal(snapshot(document, '.devtools__live').counter.count, 11);
 
-    click(document, 'Azzera conteggio e traccia');
+    click(document, 'Azzera il conteggio');
     await settle();
     assert.equal(counterValue(document, 'Conteggio corrente'), '0');
     assert.equal(counterValue(document, 'Valore doppio'), '0');
-    assert.match(text(document, '[aria-label="Ultime azioni"]'), /Nessuna azione registrata/);
+    assert.deepEqual(devtoolsTypes(document), ['[Counter] reset']);
+    assert.equal(selectedType(document), '[Counter] reset');
+    assert.equal(text(document, '.devtools__payload'), '{}');
+    assert.equal(snapshot(document, '.devtools__before').counter.count, 11);
+    assert.equal(snapshot(document, '.devtools__after').counter.count, 0);
+    assert.deepEqual(changes(document).map((change) => change.path), ['counter.count']);
+    assert.equal(changes(document)[0].before, '11');
+    assert.equal(changes(document)[0].after, '0');
+    assert.equal(snapshot(document, '.devtools__live').counter.count, 0);
   } finally {
     dom.window.close();
   }
 });
 
-test('editing the counter reducer changes the actual result of a dispatched action', async () => {
+test('editing the counter reducer changes the value and the recorded snapshot', async () => {
   const dom = await environment();
   try {
     const original = COUNTER.files['counter.reducer.ts'];
@@ -181,14 +290,21 @@ test('editing the counter reducer changes the actual result of a dispatched acti
 
     assert.equal(counterValue(dom.window.document, 'Conteggio corrente'), '3');
     assert.equal(counterValue(dom.window.document, 'Valore doppio'), '6');
-    assert.deepEqual(traceTypes(dom.window.document, '.counter'), ['[Counter] increment']);
-    assert.equal(text(dom.window.document, '.counter__entry .counter__result'), 'count 3');
+    assert.equal(selectedType(dom.window.document), '[Counter] increment');
+    assert.equal(snapshot(dom.window.document, '.devtools__before').counter.count, 0);
+    assert.equal(snapshot(dom.window.document, '.devtools__after').counter.count, 3);
+
+    openTab(dom.window.document, 'Modifiche');
+    await settle();
+    assert.deepEqual(changes(dom.window.document).map((change) => change.path), ['counter.count']);
+    assert.equal(changes(dom.window.document)[0].before, '0');
+    assert.equal(changes(dom.window.document)[0].after, '3');
   } finally {
     dom.window.close();
   }
 });
 
-test('todo trims, assigns deterministic ids, toggles, filters, removes and resets in the store', async () => {
+test('todo records real payloads and snapshots for add, toggle, filter, remove and blank titles', async () => {
   const dom = await environment();
   try {
     await render(dom, TODO, 1);
@@ -196,9 +312,17 @@ test('todo trims, assigns deterministic ids, toggles, filters, removes and reset
     const document = dom.window.document;
 
     assert.equal(todoCount(document, 'Totale attività'), '0');
-    assert.equal(todoCount(document, 'Attività completate'), '0');
-    assert.equal(todoCount(document, 'Attività visibili'), '0');
-    assert.equal(pressed(document, 'Mostra tutte le attività'), 'true');
+    assert.deepEqual(devtoolsTypes(document), ['@ngrx/store/init']);
+
+    openTab(document, 'Stato');
+    await settle();
+    assert.deepEqual(snapshot(document, '.devtools__live'), {
+      todos: { todos: [], filter: 'all', nextId: 1 },
+    });
+
+    openTab(document, 'Modifiche');
+    await settle();
+    assert.deepEqual(changes(document).map((change) => change.path), ['todos']);
 
     typeInto(dom.window, '.todo__field input', '  Comprare pane  ');
     await settle();
@@ -209,12 +333,34 @@ test('todo trims, assigns deterministic ids, toggles, filters, removes and reset
     assert.equal(todoCount(document, 'Totale attività'), '1');
     assert.equal(todoCount(document, 'Attività visibili'), '1');
 
+    assert.equal(selectedType(document), '[Todo] add');
+    assert.deepEqual(snapshot(document, '.devtools__payload'), { title: '  Comprare pane  ' });
+    assert.deepEqual(snapshot(document, '.devtools__before'), {
+      todos: { todos: [], filter: 'all', nextId: 1 },
+    });
+    assert.deepEqual(snapshot(document, '.devtools__after'), {
+      todos: {
+        todos: [{ id: 1, title: 'Comprare pane', completed: false }],
+        filter: 'all',
+        nextId: 2,
+      },
+    });
+    assert.deepEqual(changes(document).map((change) => change.path), ['todos.todos', 'todos.nextId']);
+    assert.equal(changes(document)[0].before, '[]');
+    assert.equal(JSON.parse(changes(document)[0].after)[0].title, 'Comprare pane');
+
+    // Un titolo vuoto è un'azione reale, ma prima e dopo sono identici.
     typeInto(dom.window, '.todo__field input', '   ');
     await settle();
     click(document, 'Aggiungi attività');
     await settle();
     assert.deepEqual(todoTitles(document), ['Comprare pane']);
     assert.equal(todoCount(document, 'Totale attività'), '1');
+    assert.equal(selectedType(document), '[Todo] add');
+    assert.deepEqual(snapshot(document, '.devtools__payload'), { title: '   ' });
+    assert.deepEqual(snapshot(document, '.devtools__before'), snapshot(document, '.devtools__after'));
+    assert.deepEqual(changes(document), []);
+    assert.match(text(document, '[aria-label="Modifiche dell\'azione selezionata"]'), /Nessuna variazione/);
 
     typeInto(dom.window, '.todo__field input', 'Studiare NgRx');
     await settle();
@@ -225,13 +371,20 @@ test('todo trims, assigns deterministic ids, toggles, filters, removes and reset
     click(document, 'Segna come completata: Comprare pane');
     await settle();
     assert.equal(todoCount(document, 'Attività completate'), '1');
-    assert.equal(pressed(document, 'Segna come attiva: Comprare pane'), 'true');
+    assert.equal(selectedType(document), '[Todo] toggle');
+    assert.deepEqual(snapshot(document, '.devtools__payload'), { id: 1 });
+    assert.equal(snapshot(document, '.devtools__after').todos.todos[0].completed, true);
 
     click(document, 'Mostra le attività attive');
     await settle();
     assert.deepEqual(todoTitles(document), ['Studiare NgRx']);
     assert.equal(todoCount(document, 'Attività visibili'), '1');
     assert.equal(pressed(document, 'Mostra le attività attive'), 'true');
+    assert.equal(selectedType(document), '[Todo] setFilter');
+    assert.deepEqual(snapshot(document, '.devtools__payload'), { filter: 'active' });
+    assert.deepEqual(changes(document).map((change) => change.path), ['todos.filter']);
+    assert.equal(changes(document)[0].before, '"all"');
+    assert.equal(changes(document)[0].after, '"active"');
 
     click(document, 'Mostra le attività completate');
     await settle();
@@ -246,6 +399,8 @@ test('todo trims, assigns deterministic ids, toggles, filters, removes and reset
     await settle();
     assert.deepEqual(todoTitles(document), ['Comprare pane']);
     assert.equal(todoCount(document, 'Totale attività'), '1');
+    assert.equal(selectedType(document), '[Todo] remove');
+    assert.deepEqual(snapshot(document, '.devtools__payload'), { id: 2 });
 
     typeInto(dom.window, '.todo__field input', 'Terza attività');
     await settle();
@@ -254,32 +409,58 @@ test('todo trims, assigns deterministic ids, toggles, filters, removes and reset
     assert.deepEqual(todoIds(document), ['#1', '#3']);
     assert.equal(todoCount(document, 'Totale attività'), '2');
 
-    const types = traceTypes(document, '.todo');
+    const types = devtoolsTypes(document);
     assert.equal(types.length, 8);
     assert.ok(types.includes('[Todo] add'));
     assert.ok(types.includes('[Todo] toggle'));
     assert.ok(types.includes('[Todo] remove'));
     assert.ok(types.includes('[Todo] setFilter'));
-    assert.ok(text(document, '[aria-label="Ultime azioni"]').includes('#1 «Comprare pane»'));
 
+    // Il reset azzera il dominio e la bozza, non il journal DevTools.
     typeInto(dom.window, '.todo__field input', 'Bozza non inviata');
     await settle();
     click(document, 'Azzera lista e filtro');
     await settle();
     assert.equal(document.querySelector('.todo__field input').value, '');
-    await settle();
     assert.deepEqual(todoTitles(document), []);
     assert.equal(todoCount(document, 'Totale attività'), '0');
     assert.equal(todoCount(document, 'Attività completate'), '0');
     assert.equal(todoCount(document, 'Attività visibili'), '0');
     assert.equal(pressed(document, 'Mostra tutte le attività'), 'true');
-    assert.match(text(document, '[aria-label="Ultime azioni"]'), /Nessuna azione registrata/);
+    assert.equal(selectedType(document), '[Todo] reset');
+    assert.equal(text(document, '.devtools__payload'), '{}');
+    assert.deepEqual(snapshot(document, '.devtools__after'), {
+      todos: { todos: [], filter: 'all', nextId: 1 },
+    });
+    assert.deepEqual(changes(document).map((change) => change.path), ['todos.todos', 'todos.nextId']);
+    assert.equal(changes(document)[1].before, '4');
+    assert.equal(changes(document)[1].after, '1');
+    assert.equal(devtoolsTypes(document).length, 8);
+
+    // nextId è tornato a 1: la nuova attività riparte da #1.
+    typeInto(dom.window, '.todo__field input', 'Dopo il reset');
+    await settle();
+    click(document, 'Aggiungi attività');
+    await settle();
+    assert.deepEqual(todoIds(document), ['#1']);
+    assert.equal(selectedType(document), '[Todo] add');
+
+    assert.equal(snapshot(document, '.devtools__after').todos.nextId, 2);
+
+    // Dopo una rimozione l'array vuoto è nuovo: il reset cambia solo nextId.
+    click(document, 'Rimuovi: Dopo il reset');
+    await settle();
+    click(document, 'Azzera lista e filtro');
+    await settle();
+    assert.deepEqual(changes(document).map(change => change.path), ['todos.nextId']);
+    assert.equal(changes(document)[0].before, '2');
+    assert.equal(changes(document)[0].after, '1');
   } finally {
     dom.window.close();
   }
 });
 
-test('a new render starts each preview from its own store instead of the previous one', async () => {
+test('a new render starts each preview with its own store and journal', async () => {
   const dom = await environment();
   try {
     await render(dom, COUNTER, 1);
@@ -288,6 +469,7 @@ test('a new render starts each preview from its own store instead of the previou
     click(dom.window.document, 'Incrementa di uno');
     await settle();
     assert.equal(counterValue(dom.window.document, 'Conteggio corrente'), '2');
+    assert.equal(devtoolsTypes(dom.window.document).length, 3);
 
     await render(dom, TODO, 2);
     await settle();
@@ -296,28 +478,41 @@ test('a new render starts each preview from its own store instead of the previou
     click(dom.window.document, 'Aggiungi attività');
     await settle();
     assert.deepEqual(todoTitles(dom.window.document), ['Solo in questa preview']);
+    assert.deepEqual(devtoolsTypes(dom.window.document), [
+      '@ngrx/store/init',
+      '[Todo] add',
+    ]);
+    openTab(dom.window.document, 'Stato');
+    await settle();
+    assert.equal(snapshot(dom.window.document, '.devtools__live').todos.todos.length, 1);
 
     await render(dom, COUNTER, 3);
     await settle();
     assert.equal(counterValue(dom.window.document, 'Conteggio corrente'), '0');
     assert.equal(counterValue(dom.window.document, 'Valore doppio'), '0');
-    assert.match(text(dom.window.document, '[aria-label="Ultime azioni"]'), /Nessuna azione registrata/);
+    assert.deepEqual(devtoolsTypes(dom.window.document), ['@ngrx/store/init']);
+    assert.equal(selectedType(dom.window.document), '@ngrx/store/init');
+    openTab(dom.window.document, 'Stato');
+    await settle();
+    assert.equal(snapshot(dom.window.document, '.devtools__live').counter.count, 0);
 
     await render(dom, TODO, 4);
     await settle();
     assert.deepEqual(todoTitles(dom.window.document), []);
     assert.equal(todoCount(dom.window.document, 'Totale attività'), '0');
+    assert.deepEqual(devtoolsTypes(dom.window.document), ['@ngrx/store/init']);
   } finally {
     dom.window.close();
   }
 });
 
-test('generated declarations resolve @ngrx/store across every virtual file', async () => {
+test('generated declarations resolve @ngrx/store and @angular/material/tabs in every virtual file', async () => {
   const { createTypeService } = await fixture('playground/type-service.ts');
   const generated = await readFile('public/playground/generated/typescript-libs.json', 'utf8');
   const { files: declarationFiles } = JSON.parse(generated);
 
   assert.ok(Object.hasOwn(declarationFiles, '/node_modules/@ngrx/store/types/ngrx-store.d.ts'));
+  assert.ok(Object.hasOwn(declarationFiles, '/node_modules/@angular/material/types/tabs.d.ts'));
 
   const service = createTypeService({ ...declarationFiles, '/component.ts': '' });
 
