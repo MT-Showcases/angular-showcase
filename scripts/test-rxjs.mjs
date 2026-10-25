@@ -177,7 +177,7 @@ test('of, filter and map emit real outputs and follow an edited predicate', asyn
     const document = dom.window.document;
 
     assert.equal(text(document, '.operators__card--inputs .operators__text'), '1, 2, 3, 4, 5, 6');
-    assert.equal(text(document, '.operators__card--steps .operators__text'), 'filter(pari) → map(×10)');
+    assert.equal(text(document, '.operators__card--steps .operators__text'), 'filter → map');
     assert.equal(text(document, '.operators__values'), 'Nessun valore: esegui la pipeline');
     assert.equal(text(document, '.operators__status'), 'Nessuna esecuzione');
 

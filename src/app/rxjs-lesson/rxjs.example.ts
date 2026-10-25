@@ -271,7 +271,7 @@ export default class OperatorPipeline {
 
     <p class="operators__card operators__card--steps">
       <span class="operators__label">Operatori</span>
-      <code class="operators__text">filter(pari) → map(×10)</code>
+      <code class="operators__text">filter → map</code>
     </p>
   </div>
 

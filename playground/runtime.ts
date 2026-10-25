@@ -5,6 +5,7 @@ import * as common from '@angular/common';
 import * as http from '@angular/common/http';
 import * as rxjsInterop from '@angular/core/rxjs-interop';
 import * as rxjs from 'rxjs';
+import * as ngrxStore from '@ngrx/store';
 import * as forms from '@angular/forms';
 import * as buttons from '@angular/material/button';
 import * as formFields from '@angular/material/form-field';
@@ -272,6 +273,7 @@ function evaluate(sources: PlaygroundSources): EvaluatedProject {
   const bundled: Record<string, unknown> = {
     '@angular/common': common, '@angular/forms': forms, '@angular/router': router,
     '@angular/common/http': http, '@angular/core/rxjs-interop': rxjsInterop, 'rxjs': rxjs,
+    '@ngrx/store': ngrxStore,
     '@angular/material/button': buttons, '@angular/material/form-field': formFields,
     '@angular/material/input': inputs,
   };
@@ -297,7 +299,7 @@ function evaluate(sources: PlaygroundSources): EvaluatedProject {
         if (!Object.hasOwn(bundled, specifier)) {
           throw new Error(
             `Import non disponibile: ${specifier} (in ${path}). Sono disponibili Angular core, ` +
-            'common, common/http, core/rxjs-interop, forms, router, rxjs e Material button, form-field e input.',
+            'common, common/http, core/rxjs-interop, forms, router, rxjs, @ngrx/store e Material button, form-field e input.',
           );
         }
         return bundled[specifier];

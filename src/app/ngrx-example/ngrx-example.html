@@ -1,52 +1,53 @@
-<div class="ngrx-container">
-  <app-page-header
-    title="NgRx - State Management"
-    subtitle="Redux pattern per Angular: gestione centralizzata dello stato applicativo"
-  />
+<app-lesson-shell topicId="ngrx" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">
+    <strong class="lesson-emphasis">NgRx Store</strong> raccoglie lo stato in un unico posto. Il componente invia
+    un’<strong>azione</strong>, un <strong>reducer</strong> puro calcola il nuovo stato e i
+    <strong>selettori</strong> espongono le letture alla vista. Nei due esempi puoi seguire davvero questo flusso,
+    modificare il codice e osservare i signal aggiornarsi.
+  </p>
 
-  <!-- Navigation Tabs -->
-  <div class="tabs">
-    <button
-      class="tab"
-      [class.active]="selectedTab() === 'concepts'"
-      (click)="selectedTab.set('concepts')"
-    >
-      📚 Concetti Base
-    </button>
-    <button
-      class="tab"
-      [class.active]="selectedTab() === 'counter'"
-      (click)="selectedTab.set('counter')"
-    >
-      🔢 Counter Demo
-    </button>
-    <button
-      class="tab"
-      [class.active]="selectedTab() === 'todos'"
-      (click)="selectedTab.set('todos')"
-    >
-      ✅ Todo Demo
-    </button>
-  </div>
+  <app-lesson-examples [examples]="examples" />
 
-  <!-- Concepts Tab -->
-  @if (selectedTab() === 'concepts') {
-  <div class="content-section">
-    <app-ngrx-concepts />
-  </div>
-  }
+  <app-lesson-disclosure anchor="reducers" title="Reducer puri e traccia reale">
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">reducer</strong> riceve lo stato precedente e un’azione, poi restituisce un
+      nuovo stato senza modificare il precedente. Negli esempi gli array e gli oggetti cambiati vengono ricreati;
+      <code>nextId</code> e <code>sequence</code> vivono dentro lo stato, quindi gli identificativi restano
+      deterministici e il reducer non usa <code>Date.now</code> o valori casuali.
+    </p>
+    <p class="lesson-text lesson-prose">
+      La traccia delle azioni è uno stato come gli altri: la scrive il reducer quando processa l’azione, non un
+      contatore nel componente. È limitata a otto voci con <code>slice(-8)</code>, quindi mostra solo le
+      <strong class="lesson-emphasis">ultime 8</strong>. La modifica di una regola del reducer cambia il risultato reale
+      che vedi nella preview.
+    </p>
+  </app-lesson-disclosure>
 
-  <!-- Counter Demo Tab -->
-  @if (selectedTab() === 'counter') {
-  <div class="content-section">
-    <app-ngrx-counter-demo />
-  </div>
-  }
+  <app-lesson-disclosure anchor="draft" title="Bozza locale, stato condiviso">
+    <p class="lesson-text lesson-prose">
+      Nel secondo esempio la bozza del campo è un <code>signal</code> locale: cambia a ogni tasto e non ha bisogno di
+      un’azione. Lista, filtro, contatori e traccia appartengono invece allo Store, perché più letture devono rimanere coerenti. Lo Store appartiene
+      alla preview: rieseguire il codice crea una nuova istanza e riparte dallo stato iniziale. Anche il filtro è un’azione: nessun componente conserva una copia separata.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Il testo inviato viene ripulito con <code>trim</code> nel reducer: un titolo vuoto non crea attività e non
+      consuma un identificativo. La lista usa <code>track todo.id</code>, così Angular segue l’identità della riga
+      anche dopo un filtro o una rimozione.
+    </p>
+  </app-lesson-disclosure>
 
-  <!-- Todos Demo Tab -->
-  @if (selectedTab() === 'todos') {
-  <div class="content-section">
-    <app-ngrx-todo-demo />
-  </div>
-  }
-</div>
+  <app-lesson-disclosure anchor="selections" title="selectSignal, AsyncPipe e il passo successivo">
+    <p class="lesson-text lesson-prose">
+      <code>inject(Store)</code> dà accesso allo Store della preview. <code>store.selectSignal(selettore)</code>
+      collega un selettore a un signal: il template legge <code>count()</code> senza una sottoscrizione manuale.
+      È un collegamento ai signal di Angular, non un SignalStore separato. In alternativa puoi usare
+      <code>store.select(selettore)</code> con l’<code>AsyncPipe</code>, come nella lezione
+      BehaviorSubject.
+    </p>
+    <p class="lesson-text lesson-prose">
+      Le azioni restano sincrone e senza rete. Gli <strong class="lesson-emphasis">Effects</strong> servono quando una
+      richiesta HTTP o un’altra operazione asincrona deve produrre nuove azioni: sono il prossimo passo, ma non sono
+      necessari per questo flusso.
+    </p>
+  </app-lesson-disclosure>
+</app-lesson-shell>

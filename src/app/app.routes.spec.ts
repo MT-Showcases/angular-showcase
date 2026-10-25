@@ -3,9 +3,7 @@ import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideStore } from '@ngrx/store';
 import { routes } from './app.routes';
-import { appReducers } from './store/app.reducers';
 import { TOPICS } from './learning/topics';
 
 // Verify lazy imports, templates and required providers together after dependency upgrades.
@@ -16,7 +14,6 @@ describe('Showcase routes', () => {
         provideRouter(routes),
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideStore(appReducers),
       ],
     }),
   );
@@ -38,7 +35,7 @@ describe('Showcase routes', () => {
     ['/advanced/signals', 'Signals'],
     ['/advanced/http', 'HTTP e servizi'],
     ['/state/rxjs', 'RxJS: flussi e sottoscrizioni'],
-    ['/state/ngrx', 'NgRx - State Management'],
+    ['/state/ngrx', 'NgRx Store'],
     ['/state/behavior-subject', 'BehaviorSubject'],
     ['/examples/users', 'Lista Utenti'],
     ['/code-block-demo', 'CodeBlock Component'],
@@ -117,20 +114,6 @@ describe('Showcase routes', () => {
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
-  it('updates the NgRx counter, history and action log from the demo UI', async () => {
-    const harness = await RouterTestingHarness.create('/state/ngrx');
-    const page = harness.routeNativeElement!;
-    Array.from(page.querySelectorAll<HTMLButtonElement>('.tab'))
-      .find((button) => button.textContent?.includes('Counter Demo'))!
-      .click();
-    await harness.fixture.whenStable();
-    page.querySelector<HTMLButtonElement>('.btn-increment')!.click();
-    await harness.fixture.whenStable();
-    expect(page.querySelector('.count-value')?.textContent?.trim()).toBe('1');
-    expect(page.querySelector('.history-list')?.textContent).toContain('1');
-    expect(page.querySelector('.log-list')?.textContent).toContain('INCREMENT');
-  });
-
   it('recreates the isolated HTTP preview after leaving and returning to the lesson', async () => {
     const harness = await RouterTestingHarness.create('/advanced/http');
     const frame = harness.routeNativeElement!.querySelector('iframe');
@@ -158,33 +141,21 @@ describe('Showcase routes', () => {
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
-  it('keeps the NgRx todo add, complete, filter and delete flow working', async () => {
+  it('keeps the NgRx playground mounted at code anchors and recreates it after navigation', async () => {
     const harness = await RouterTestingHarness.create('/state/ngrx');
     const page = harness.routeNativeElement!;
-    Array.from(page.querySelectorAll<HTMLButtonElement>('.tab'))
-      .find((button) => button.textContent?.includes('Todo Demo'))!.click();
-    await harness.fixture.whenStable();
-    const input = page.querySelector<HTMLInputElement>('.todo-input')!;
-    input.value = 'Verify Angular upgrade';
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    await harness.fixture.whenStable();
-    page.querySelector<HTMLButtonElement>('.btn-add')!.click();
-    await harness.fixture.whenStable();
-    expect(input.value).toBe('');
-    let added = Array.from(page.querySelectorAll<HTMLElement>('.todo-item'))
-      .find((item) => item.textContent?.includes('Verify Angular upgrade'))!;
-    expect(added).toBeTruthy();
-    added.querySelector<HTMLInputElement>('.todo-checkbox')!.click();
-    await harness.fixture.whenStable();
-    Array.from(page.querySelectorAll<HTMLButtonElement>('.filter-btn'))
-      .find((button) => button.textContent?.includes('Completati'))!.click();
-    await harness.fixture.whenStable();
-    added = Array.from(page.querySelectorAll<HTMLElement>('.todo-item'))
-      .find((item) => item.textContent?.includes('Verify Angular upgrade'))!;
-    expect(added.classList.contains('completed')).toBe(true);
-    added.querySelector<HTMLButtonElement>('.btn-delete')!.click();
-    await harness.fixture.whenStable();
-    expect(page.querySelector('.todo-list')?.textContent).not.toContain('Verify Angular upgrade');
+    const frame = page.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    await harness.navigateByUrl('/state/ngrx#code');
+    expect(TestBed.inject(Router).url).toBe('/state/ngrx#code');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
+    await harness.navigateByUrl('/state');
+    expect(harness.routeNativeElement?.querySelector('iframe')).toBeNull();
+    await harness.navigateByUrl('/state/ngrx');
+    const freshFrame = harness.routeNativeElement!.querySelector('iframe');
+    expect(freshFrame).not.toBeNull();
+    expect(freshFrame).not.toBe(frame);
   });
 
   it('keeps the BehaviorSubject playground mounted at its visible code anchor', async () => {

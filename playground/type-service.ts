@@ -31,6 +31,7 @@ export const SUPPORTED_IMPORTS = [
   '@angular/common/http',
   '@angular/core/rxjs-interop',
   'rxjs',
+  '@ngrx/store',
   '@angular/forms',
   '@angular/router',
   '@angular/material/button',
