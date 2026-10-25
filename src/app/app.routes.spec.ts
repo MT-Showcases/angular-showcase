@@ -86,19 +86,17 @@ describe('Showcase routes', () => {
     expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
-  it('updates computed values after a Signals counter click', async () => {
+  it('keeps the Signals playground mounted while opening its code anchor', async () => {
     const harness = await RouterTestingHarness.create('/advanced/signals');
     const page = harness.routeNativeElement!;
-    const increment = Array.from(page.querySelectorAll<HTMLButtonElement>('.counter button')).find(
-      (button) => button.textContent?.trim() === '+',
-    )!;
-    increment.click();
-    await harness.fixture.whenStable();
-    expect(
-      Array.from(page.querySelectorAll('.computed-card__value')).map((element) =>
-        element.textContent?.trim(),
-      ),
-    ).toEqual(['1', '2', '3']);
+    const frame = page.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    expect(page.querySelectorAll('iframe')).toHaveLength(1);
+
+    await harness.navigateByUrl('/advanced/signals#code');
+    expect(TestBed.inject(Router).url).toBe('/advanced/signals#code');
+    expect(page.querySelector('iframe')).toBe(frame);
+    expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
   });
 
   it('updates the NgRx counter, history and action log from the demo UI', async () => {

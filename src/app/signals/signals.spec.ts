@@ -1,114 +1,147 @@
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
+// COMPONENT TYPE: Test Suite
+// ROLE: Verify the four Signals seeds, their diagram targets and draft retention in the host lesson.
+// PATTERNS USED: Real lesson DOM, AngularPlayground selection and CodeMirror source inspection.
+// NOTES FOR CONTRIBUTORS: Signal runtime behavior belongs in scripts/test-signals.mjs.
+import { EditorView } from '@codemirror/view';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatButtonHarness } from '@angular/material/button/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { AngularPlayground } from '../components/angular-playground/angular-playground';
 import { Signals } from './signals';
+import { SIGNALS_EXAMPLES } from './signals.example';
 
-describe('Signals', () => {
-  let fixture: ComponentFixture<Signals>;
-  let loader: HarnessLoader;
+const ROOT_FILES = ['component.ts', 'component.html', 'component.css'];
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [Signals], providers: [provideRouter([])] }).compileComponents();
-    fixture = TestBed.createComponent(Signals);
-    loader = TestbedHarnessEnvironment.loader(fixture);
-    await fixture.whenStable();
-  });
+async function lessonFixture(): Promise<{ fixture: ComponentFixture<Signals>; page: HTMLElement }> {
+  TestBed.configureTestingModule({ imports: [Signals], providers: [provideRouter([])] });
+  const fixture = TestBed.createComponent(Signals);
+  await fixture.whenStable();
+  return { fixture, page: fixture.nativeElement };
+}
 
-  async function clickAction(label: string) {
-    const button = await loader.getHarness(
-      MatButtonHarness.with({ selector: `[aria-label="${label}"]` }),
-    );
-    await button.click();
-  }
+function activePlayground(fixture: ComponentFixture<Signals>): AngularPlayground {
+  return fixture.debugElement.query(By.directive(AngularPlayground)).componentInstance as AngularPlayground;
+}
 
-  function computedValues() {
-    return Array.from(fixture.nativeElement.querySelectorAll('.computed-card__value')).map(
-      (element) => (element as HTMLElement).textContent?.trim(),
-    );
-  }
+function diagramTargets(example: (typeof SIGNALS_EXAMPLES)[number]): string[] {
+  return example.diagram?.groups.flatMap(group =>
+    group.steps.flatMap(step => step.nodes.map(node => node.file)),
+  ) ?? [];
+}
 
-  it('updates all derived counter values and resets them through Material buttons', async () => {
-    await clickAction('Aumenta contatore');
-    expect(computedValues()).toEqual(['1', '2', '3']);
-    await clickAction('Diminuisci contatore');
-    await clickAction('Diminuisci contatore');
-    expect(computedValues()).toEqual(['-1', '-2', '-3']);
-    await (await loader.getHarness(MatButtonHarness.with({ text: 'Reset' }))).click();
-    expect(computedValues()).toEqual(['0', '0', '0']);
-  });
+describe('Signals playground lesson', () => {
+  it('exports four independent seeds and shows the first one in a visible editor before its schema', async () => {
+    const { fixture, page } = await lessonFixture();
+    try {
+      expect(SIGNALS_EXAMPLES.map(example => example.id)).toEqual([
+        'counter',
+        'computed',
+        'effect',
+        'cart',
+      ]);
+      expect(new Set(SIGNALS_EXAMPLES.map(example => example.sources)).size).toBe(4);
 
-  it('recalculates cart totals and prevents quantities below zero', async () => {
-    expect(fixture.componentInstance.total()).toBe(4746);
-    await clickAction('Diminuisci quantità di MacBook Pro');
-    expect(fixture.componentInstance.total()).toBe(2247);
-    const decrement = await loader.getHarness(
-      MatButtonHarness.with({ selector: '[aria-label="Diminuisci quantità di MacBook Pro"]' }),
-    );
-    expect(await decrement.isDisabled()).toBe(true);
-    await decrement.click();
-    expect(fixture.componentInstance.items()[0].quantity).toBe(0);
-    await clickAction('Aumenta quantità di MacBook Pro');
-    expect(await decrement.isDisabled()).toBe(false);
-    expect(fixture.nativeElement.querySelector('.cart-total__value').textContent).toContain('4746');
-  });
-
-  it('removes products, displays an empty cart and can add a new product', async () => {
-    for (const product of ['MacBook Pro', 'iPhone 15', 'AirPods Pro']) {
-      await clickAction(`Rimuovi ${product}`);
+      const playground = activePlayground(fixture);
+      expect(playground.initial()).toBe(SIGNALS_EXAMPLES[0].sources);
+      expect(page.querySelectorAll('.cm-editor')).toHaveLength(ROOT_FILES.length);
+      expect(page.querySelector('.lesson-shell__intro')).toBeNull();
+      expect(page.querySelector('#demo')?.textContent).toContain('signal');
+      expect(page.querySelector('#code')).not.toBeNull();
+      expect(page.querySelector('#code')?.closest('mat-expansion-panel')).toBeNull();
+      expect(
+        page.querySelector('app-angular-playground')!.compareDocumentPosition(
+          page.querySelector('app-lesson-diagram')!,
+        ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    } finally {
+      fixture.destroy();
     }
-    expect(fixture.componentInstance.total()).toBe(0);
-    expect(fixture.nativeElement.querySelector('.cart__empty').textContent).toContain('Il carrello è vuoto');
-    const add = await loader.getHarness(MatButtonHarness.with({ text: 'Aggiungi Magic Mouse' }));
-    await add.click();
-    expect(fixture.componentInstance.total()).toBe(99);
-    expect(fixture.nativeElement.querySelectorAll('.cart-item')).toHaveLength(1);
   });
 
-  it('keeps only the five latest effect entries after independent counter changes', async () => {
-    for (let index = 0; index < 6; index++) {
-      await clickAction('Aumenta contatore');
+  it('points every diagram node at an existing editable file', () => {
+    const editable = new Set(ROOT_FILES);
+
+    for (const example of SIGNALS_EXAMPLES) {
+      const targets = diagramTargets(example);
+      expect(targets.length).toBeGreaterThan(0);
+      expect(targets.every(target => editable.has(target))).toBe(true);
     }
-    const entries = Array.from(fixture.nativeElement.querySelectorAll('.effect-logs__item')).map(
-      (element) => (element as HTMLElement).textContent?.trim(),
-    );
-    expect(entries).toEqual([2, 3, 4, 5, 6].map((count) => `Conteggio aggiornato: ${count}`));
-  });
-  it('keeps duplicate products distinct and preserves the remaining DOM row when one is removed', async () => {
-    const add = await loader.getHarness(MatButtonHarness.with({ text: 'Aggiungi Magic Mouse' }));
-    await add.click(); await add.click();
-    const first = fixture.nativeElement.querySelector('[data-item-id="4"]');
-    const second = fixture.nativeElement.querySelector('[data-item-id="5"]');
-    first.querySelector('[aria-label="Rimuovi Magic Mouse"]').click();
-    await fixture.whenStable();
-    expect(fixture.nativeElement.querySelector('[data-item-id="4"]')).toBeNull();
-    expect(fixture.nativeElement.querySelector('[data-item-id="5"]')).toBe(second);
-    await (await loader.getHarness(MatButtonHarness.with({ text: 'Ripristina carrello' }))).click();
-    expect(fixture.componentInstance.total()).toBe(4746);
-    expect(fixture.nativeElement.querySelectorAll('.cart-item')).toHaveLength(3);
+
+    expect(diagramTargets(SIGNALS_EXAMPLES[0])).toEqual([
+      'component.html',
+      'component.ts',
+      'component.html',
+    ]);
+    expect(diagramTargets(SIGNALS_EXAMPLES[1])).toEqual([
+      'component.ts',
+      'component.ts',
+      'component.html',
+    ]);
+    expect(diagramTargets(SIGNALS_EXAMPLES[2])).toEqual([
+      'component.ts',
+      'component.ts',
+      'component.ts',
+      'component.ts',
+      'component.ts',
+    ]);
+    expect(diagramTargets(SIGNALS_EXAMPLES[3])).toEqual([
+      'component.html',
+      'component.ts',
+      'component.ts',
+      'component.html',
+    ]);
   });
 
-  it('opts into an imperative title effect and restores the title when disabled or destroyed', async () => {
-    const originalTitle = document.title;
-    const header: HTMLElement = fixture.nativeElement.querySelector('#deepen mat-expansion-panel-header');
-    header.click(); await fixture.whenStable();
-    const toggle = await loader.getHarness(MatButtonHarness.with({ text: 'Sincronizza titolo browser' }));
-    await toggle.click(); await clickAction('Aumenta contatore');
-    expect(document.title).toBe('Contatore 1 · Angular Showcase');
-    await toggle.click(); expect(document.title).toBe(originalTitle);
-    await clickAction('Aumenta contatore'); expect(document.title).toBe(originalTitle);
-    await toggle.click(); expect(document.title).toBe('Contatore 2 · Angular Showcase');
-    fixture.destroy(); expect(document.title).toBe(originalTitle);
-  });
+  it('switches all four seeds, keeps their source drafts and resets to the seed', async () => {
+    const { fixture, page } = await lessonFixture();
+    try {
+      const choices = page.querySelectorAll<HTMLButtonElement>(
+        'nav[aria-label="Scegli un esempio"] button',
+      );
+      expect(choices).toHaveLength(SIGNALS_EXAMPLES.length);
 
-  it('retains the counter and cart while opening and closing explanations', async () => {
-    await clickAction('Aumenta contatore');
-    await clickAction('Rimuovi iPhone 15');
-    const header: HTMLElement = fixture.nativeElement.querySelector('#code mat-expansion-panel-header');
-    header.click(); await fixture.whenStable(); header.click(); await fixture.whenStable();
-    expect(computedValues()).toEqual(['1', '2', '3']);
-    expect(fixture.componentInstance.total()).toBe(2748);
-  });
+      for (const [index, seed] of SIGNALS_EXAMPLES.entries()) {
+        choices[index].click();
+        await fixture.whenStable();
 
+        const playground = activePlayground(fixture);
+        const editor = EditorView.findFromDOM(page.querySelector<HTMLElement>('.cm-editor')!)!;
+
+        expect(playground.initial()).toBe(seed.sources);
+        expect(choices[index].getAttribute('aria-pressed')).toBe('true');
+        expect(page.querySelectorAll('.cm-editor')).toHaveLength(ROOT_FILES.length);
+        expect(editor.state.doc.toString()).toBe(seed.sources.typescript);
+        expect(page.querySelector('app-lesson-diagram')?.textContent).toContain(
+          seed.diagram!.title,
+        );
+      }
+
+      choices[0].click();
+      await fixture.whenStable();
+      const rootEditor = () => EditorView.findFromDOM(
+        page.querySelector<HTMLElement>('[id$="editor-typescript"] .cm-editor')!,
+      )!;
+      const original = SIGNALS_EXAMPLES[0].sources.typescript;
+      const modified = '// bozza locale\n' + original;
+
+      rootEditor().dispatch({
+        changes: { from: 0, to: rootEditor().state.doc.length, insert: modified },
+      });
+      choices[1].click();
+      await fixture.whenStable();
+      choices[0].click();
+      await fixture.whenStable();
+      expect(rootEditor().state.doc.toString()).toBe(modified);
+      expect(SIGNALS_EXAMPLES[0].sources.typescript).toBe(original);
+
+      [...page.querySelectorAll<HTMLButtonElement>('button')]
+        .find(button => button.textContent?.trim() === 'Ripristina codice')!
+        .click();
+      fixture.detectChanges();
+      expect(rootEditor().state.doc.toString()).toBe(original);
+      expect(page.querySelector('app-lesson-diagram')).not.toBeNull();
+    } finally {
+      fixture.destroy();
+    }
+  });
 });

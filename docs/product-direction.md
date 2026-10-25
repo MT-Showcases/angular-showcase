@@ -82,3 +82,7 @@ Verification: 111 host tests and 14 runtime tests passed, including three render
 ## Routing playground
 
 Routing uses three independent editable examples: navigation, reactive route parameters and a last-position wildcard with recovery. Component modules, route configuration and application configuration are separate virtual files. The preview runs the real Angular router against a per-application in-memory location strategy. This path is displayed inside the demo; it deliberately does not change the host page URL or browser history. A local application uses its browser location instead. Recompiling/resetting creates a fresh application and resets navigation. Conventional virtual `app.config.ts` supplies `appConfig.providers`; runtime-owned location and error handling remain authoritative inside the isolated preview.
+
+## Advanced lessons
+
+Signals follows the same editable lesson structure as Basics: independent writable-state, computed-value, imperative-effect and immutable-cart examples, with concise Italian comments and source-linked schemas after the editor. The title effect operates only inside the preview document and includes opt-in and cleanup; derived values use computed rather than effects that copy state. The existing /advanced/signals URL remains unchanged. HTTP/services is the next separate migration; its request lifecycle and network behavior must be verified explicitly.

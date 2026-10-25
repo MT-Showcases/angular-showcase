@@ -1,147 +1,36 @@
-<app-lesson-shell topicId="signals">
-<div class="signals-container" id="demo">
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 1. Writable Signal - Signal base modificabile                       -->
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="section">
-    <h2 class="section__title">Writable Signal - Contatore</h2>
-    <p class="section__text">
-      Un <strong>writable signal</strong> è un signal che può essere modificato usando
-      <code class="section__code">.set()</code> o <code class="section__code">.update()</code>.
+<app-lesson-shell topicId="signals" [compact]="true">
+  <p id="demo" class="playground-lesson__prompt lesson-prose lesson-prose--on-brand">
+    Un <strong class="lesson-emphasis">signal</strong> conserva un valore: quando cambia, Angular aggiorna il template che lo legge.
+    <code>computed</code> ricava uno stato dai signal esistenti, mentre <code>effect</code> collega i signal a
+    un’API imperativa. Scegli un esempio, cambia il codice e osserva la preview: ogni esempio ha stato indipendente.
+  </p>
+
+  <app-lesson-examples [examples]="examples" />
+
+  <app-lesson-disclosure anchor="deepen" title="Leggere, scrivere e derivare">
+    <p class="lesson-text lesson-prose">
+      Un signal è una funzione: <code>count()</code> legge il valore e registra la dipendenza. La scrittura avviene con
+      <code>set</code>, che sostituisce il valore, o con <code>update</code>, che parte dal valore corrente. Il template
+      non ha una copia dello stato: chi legge viene notificato quando la referenza cambia.
     </p>
-
-    <p class="section__text"><strong>Prova:</strong> premi +, poi Reset. <code>count()</code> legge il valore; non è una chiamata che lo incrementa.
-      <code>set(0)</code> lo sostituisce, <code>update(v =&gt; v + 1)</code> usa il valore precedente.
-      Un signal è un contenitore reattivo: il template che lo legge viene aggiornato quando cambia.</p>
-    <div class="counter">
-      <button matIconButton type="button" aria-label="Diminuisci contatore" (click)="decrement()">−</button>
-      <div class="counter__display" aria-live="polite">{{ count() }}</div>
-      <button matIconButton type="button" aria-label="Aumenta contatore" (click)="increment()">+</button>
-    </div>
-    <button matButton="tonal" type="button" (click)="reset()">Reset</button>
-
-
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 2. Computed Signal - Valori derivati reattivi                       -->
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="section">
-    <h2 class="section__title">Computed Signal - Valori derivati</h2>
-    <p class="section__text">
-      Un <strong>computed signal</strong> calcola automaticamente il suo valore basandosi su altri
-      signal. Quando cambia una dipendenza, il valore memorizzato viene invalidato: il calcolo avviene alla lettura successiva e poi viene memorizzato. Qui il template legge subito i risultati. Un computed è di sola lettura: non usare set sul doppio.
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">computed</strong> è di sola lettura e deriva il risultato da altri signal. Non
+      duplicare lo stato in un secondo signal: il doppio del conteggio deve restare una funzione del conteggio. Il
+      calcolo si ripete alla lettura successiva alla modifica, non a ogni evento.
     </p>
-
-    <div class="computed-grid">
-      <div class="computed-card">
-        <div class="computed-card__label">Conteggio</div>
-        <div class="computed-card__value">{{ count() }}</div>
-      </div>
-      <div class="computed-card computed-card--highlight">
-        <div class="computed-card__label">Doppio</div>
-        <div class="computed-card__value">{{ doubleCount() }}</div>
-      </div>
-      <div class="computed-card computed-card--highlight">
-        <div class="computed-card__label">Triplo</div>
-        <div class="computed-card__value">{{ tripleCount() }}</div>
-      </div>
-    </div>
-
-
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 3. Esempio Pratico - Carrello della spesa                           -->
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="section">
-    <h2 class="section__title">Esempio Pratico - Carrello</h2>
-    <p class="section__text">
-      Carrello con <strong>signal per gli items</strong> e <strong>computed per il totale</strong>.
-      Il totale si aggiorna automaticamente quando modifichi le quantità.
-    </p>
-
-    <div class="cart">
-      @for (item of items(); track item.id) {
-        <div class="cart-item" [attr.data-item-id]="item.id">
-          <div class="cart-item__info">
-            <div class="cart-item__name">{{ item.name }}</div>
-            <div class="cart-item__price">€{{ item.price }}</div>
-          </div>
-          <div class="cart-item__controls">
-            <button
-              matIconButton
-              type="button"
-              [attr.aria-label]="'Diminuisci quantità di ' + item.name"
-              (click)="updateQuantity(item.id, -1)"
-              [disabled]="item.quantity === 0"
-            >
-              −
-            </button>
-            <span class="cart-item__quantity">{{ item.quantity }}</span>
-            <button
-              matIconButton
-              type="button"
-              [attr.aria-label]="'Aumenta quantità di ' + item.name"
-              (click)="updateQuantity(item.id, 1)"
-            >+</button>
-            <button
-              matIconButton
-              type="button"
-              class="showcase-danger"
-              [attr.aria-label]="'Rimuovi ' + item.name"
-              (click)="removeItem(item.id)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      } @empty {
-        <p class="cart__empty" role="status">Il carrello è vuoto. Aggiungi un prodotto per iniziare.</p>
-      }
-
-      <div class="cart-total">
-        <span class="cart-total__label">Totale:</span>
-        <span class="cart-total__value" aria-live="polite">€{{ total() }}</span>
-      </div>
-
-      <div class="lesson-actions"><button matButton="filled" type="button" (click)="addItem()">Aggiungi Magic Mouse</button>
-        <button matButton="outlined" type="button" (click)="resetCart()">Ripristina carrello</button></div>
-      <p class="section__text">Aggiungi due prodotti uguali: hanno ID distinti. Il totale dipende solo dai dati; l'ID stabile conserva l'identità dei nodi quando rimuovi una riga. Quantità zero mantiene la riga, Rimuovi la elimina.</p>
-    </div>
-
-
-  </section>
-
-</div>
-  <app-lesson-disclosure anchor="code" title="Guarda lettura, scrittura e valori derivati">
-    <h2 class="lesson-title">Un’unica sorgente per lo stato</h2>
-    <p class="lesson-text">Frammenti di classe: importa signal e computed da &#64;angular/core. Il contatore usa update e Reset usa set(0).
-      Il template legge count(), doubleCount() e tripleCount(). Gli esempi usano lo stesso stato della demo.</p>
-    <app-code-block [code]="writableExample" /><app-code-block [code]="computedExample" />
-    <h3 class="lesson-subtitle">Array e oggetti: aggiorna la referenza</h3>
-    <p class="lesson-text">Mutare un oggetto già contenuto nel signal non equivale a notificare un nuovo valore.
-      Crea un array e l’oggetto modificato nuovi: la comparazione predefinita usa Object.is.
-      Questo non congela profondamente gli oggetti; l’immutabilità resta una responsabilità del codice.</p>
-    <app-code-block [code]="cartExample" />
   </app-lesson-disclosure>
-  <app-lesson-disclosure anchor="deepen" title="Approfondisci effect e dipendenze dinamiche">
-    <h2 class="lesson-title">Un effetto verso un’API imperativa</h2>
-    <p class="lesson-text">Per il doppio e il totale usa computed. Un effect serve quando devi aggiornare qualcosa fuori dal grafo dei valori derivati,
-      come il titolo della scheda del browser. Attiva la demo e cambia il contatore; disattivandola o lasciando la pagina il titolo iniziale viene ripristinato.</p>
-    <button matButton="tonal" type="button" [attr.aria-pressed]="titleSync()" (click)="titleSync.update(toggle)">Sincronizza titolo browser</button>
-    <p class="lesson-result" role="status">{{ titleStatus() }}</p>
-    <p class="lesson-text">Le dipendenze sono le letture eseguite nell’ultima esecuzione. Quando titleSync è falso, il ramo termina prima di leggere count:
-      il contatore non è una dipendenza di questo effetto. Quando è vero, viene letto e tracciato.
-      Non usare un effect per copiare continuamente uno stato in un altro signal: è facile creare cicli o valori incoerenti.</p>
-    <app-code-block [code]="effectExample" />
-    <h3 class="lesson-subtitle">Log didattico delle esecuzioni</h3>
-    <p class="lesson-text">Questo registro limitato a cinque righe è solo strumentazione: il contatore e i computed non dipendono dal log.
-      L’effetto può accorpare cambiamenti avvenuti prima della stessa sincronizzazione, quindi non è un registro garantito di ogni evento utente.</p>
-    <div class="effect-logs" tabindex="0" role="region" aria-label="Ultime cinque esecuzioni del log">
-      @for (log of effectLogs(); track $index) { <div class="effect-logs__item">{{ log }}</div> }
-    </div>
-    <p class="lesson-text">Gli effetti creati nel contesto del componente vengono distrutti con esso. Usa onCleanup per rimuovere timer,
-      listener o integrazioni prima dell’esecuzione successiva e alla distruzione. Signals gestisce lo stato sincrono; gli Observable restano utili per sequenze asincrone come HTTP.</p>
+
+  <app-lesson-disclosure anchor="signals-effects" title="Effetti, dipendenze e pulizia">
+    <p class="lesson-text lesson-prose">
+      Un <strong class="lesson-emphasis">effect</strong> non sostituisce <code>computed</code>: serve per un’API che
+      vive fuori dal grafo dei valori, come il titolo di un documento. Le dipendenze sono le letture dell’ultima
+      esecuzione: se l’effetto esce prima di leggere un signal, quel signal non lo riattiva.
+    </p>
+    <p class="lesson-text lesson-prose">
+      In questa pagina l’effetto modifica il titolo della <strong class="lesson-emphasis">sola anteprima</strong>, che
+      vive dentro l’iframe: la scheda del sito Showcase non cambia. <code>onCleanup</code> ripristina il titolo quando
+      l’effetto viene rieseguito, quando lo disattivi e alla distruzione. Per lo stato derivato usa sempre
+      <code>computed</code>.
+    </p>
   </app-lesson-disclosure>
 </app-lesson-shell>
